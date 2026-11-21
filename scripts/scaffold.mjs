@@ -12,7 +12,9 @@ export function scaffold({ docsDir, pages, templates }) {
 		const file = join(docsDir, `${page.path}.md`);
 		mkdirSync(dirname(file), { recursive: true });
 		// Function replacements, so "$&" or "$'" in a title stay literal.
-		const text = templates[page.type].replaceAll('{{title}}', () => JSON.stringify(page.title)).replaceAll('{{type}}', () => page.type);
+		const text = templates[page.type]
+			.replaceAll('{{title}}', () => JSON.stringify(page.title))
+			.replaceAll('{{type}}', () => page.type);
 		writeFileSync(file, text);
 		created.push(page.path);
 	}
@@ -21,7 +23,9 @@ export function scaffold({ docsDir, pages, templates }) {
 
 // Returns the process exit code: 1 when files exist outside the manifest.
 export function runScaffold({ docsDir = DOCS, pages = listPages(loadStructure()), log = console.log } = {}) {
-	const templates = Object.fromEntries(PAGE_TYPES.map((type) => [type, readFileSync(join(ROOT, `scripts/templates/${type}.md`), 'utf8')]));
+	const templates = Object.fromEntries(
+		PAGE_TYPES.map((type) => [type, readFileSync(join(ROOT, `scripts/templates/${type}.md`), 'utf8')]),
+	);
 	const { created } = scaffold({ docsDir, pages, templates });
 	const orphans = findOrphans(docsDir, pages, HANDWRITTEN);
 	log(`Utworzono ${created.length} stron.`);

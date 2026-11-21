@@ -3,7 +3,16 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { DOCS, HANDWRITTEN, findOrphans, findPage, listPages, loadStructure, parseStructure, toSidebar } from './structure.mjs';
+import {
+	DOCS,
+	HANDWRITTEN,
+	findOrphans,
+	findPage,
+	listPages,
+	loadStructure,
+	parseStructure,
+	toSidebar,
+} from './structure.mjs';
 
 const valid = `
 parts:
@@ -72,7 +81,11 @@ test('rejects bad shapes with a structure.yaml message', () => {
 	assert.throws(() => parseStructure(''), /structure\.yaml/);
 	assert.throws(() => parseStructure('partz: []'), /partz/);
 	assert.throws(() => parseStructure(valid.replace('label: Część I', 'lable: Część I')), /lable/);
-	assert.throws(() => parseStructure(valid.replace('label: Instalacja\n            items:', 'label: Instalacja\n            itemz:')), /itemz/);
+	assert.throws(
+		() =>
+			parseStructure(valid.replace('label: Instalacja\n            items:', 'label: Instalacja\n            itemz:')),
+		/itemz/,
+	);
 });
 
 test('rejects an unknown page type', () => {
@@ -89,13 +102,18 @@ test('findPage finds .md and .mdx pages', () => {
 test('findOrphans lists sorted files that are not in the manifest', () => {
 	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
 	mkdirSync(join(docs, '01-a'));
-	for (const file of ['01-a/09-z.md', '01-a/01-known.mdx', '05-b.md', 'index.mdx']) writeFileSync(join(docs, file), 'x');
+	for (const file of ['01-a/09-z.md', '01-a/01-known.mdx', '05-b.md', 'index.mdx'])
+		writeFileSync(join(docs, file), 'x');
 	const pages = [{ path: '01-a/01-known' }];
 	assert.deepEqual(findOrphans(docs, pages, ['index.mdx']), ['01-a/09-z.md', '05-b.md']);
 });
 
 test('the real docs tree matches the manifest in both directions', () => {
 	const pages = listPages(loadStructure());
-	assert.deepEqual(pages.filter((p) => !findPage(DOCS, p.path)).map((p) => p.path), [], 'pages missing on disk: run npm run scaffold');
+	assert.deepEqual(
+		pages.filter((p) => !findPage(DOCS, p.path)).map((p) => p.path),
+		[],
+		'pages missing on disk: run npm run scaffold',
+	);
 	assert.deepEqual(findOrphans(DOCS, pages, HANDWRITTEN), [], 'files outside the manifest: add them to structure.yaml');
 });

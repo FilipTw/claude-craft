@@ -9,14 +9,20 @@ const pages = [
 	{ path: '01-a/01-one', title: 'Jeden', type: 'explanation' },
 	{ path: '01-a/02-b/01-two', title: 'Dwa: "cytat"', type: 'how-to' },
 ];
-const templates = { explanation: '---\ntitle: {{title}}\ntype: {{type}}\n---\n', 'how-to': '---\ntitle: {{title}}\ntype: {{type}}\n---\n## Kroki\n' };
+const templates = {
+	explanation: '---\ntitle: {{title}}\ntype: {{type}}\n---\n',
+	'how-to': '---\ntitle: {{title}}\ntype: {{type}}\n---\n## Kroki\n',
+};
 const silent = () => {};
 
 test('creates missing pages from the template of their type', () => {
 	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
 	const { created } = scaffold({ docsDir: docs, pages, templates });
 	assert.deepEqual(created, ['01-a/01-one', '01-a/02-b/01-two']);
-	assert.equal(readFileSync(join(docs, '01-a/02-b/01-two.md'), 'utf8'), '---\ntitle: "Dwa: \\"cytat\\""\ntype: how-to\n---\n## Kroki\n');
+	assert.equal(
+		readFileSync(join(docs, '01-a/02-b/01-two.md'), 'utf8'),
+		'---\ntitle: "Dwa: \\"cytat\\""\ntype: how-to\n---\n## Kroki\n',
+	);
 });
 
 test('second run creates nothing and keeps edited pages', () => {

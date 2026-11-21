@@ -48,9 +48,14 @@ function checkPrefixes(items, parent) {
 export function parseStructure(text) {
 	const raw = parse(text);
 	checkShape(raw, '(root)', ['parts'], { parts: 'list' });
-	raw.parts.forEach((part, index) => checkShape(part, `parts[${index}]`, ['label', 'sections'], { label: 'text', sections: 'list' }));
+	raw.parts.forEach((part, index) =>
+		checkShape(part, `parts[${index}]`, ['label', 'sections'], { label: 'text', sections: 'list' }),
+	);
 	// Top-level sections share one docs root, so their prefixes ascend across all parts.
-	checkPrefixes(raw.parts.flatMap((part) => part.sections), '');
+	checkPrefixes(
+		raw.parts.flatMap((part) => part.sections),
+		'',
+	);
 	return { parts: raw.parts.map((part) => ({ label: part.label, sections: checkItems(part.sections, '') })) };
 }
 
@@ -75,7 +80,8 @@ export function listPages(structure) {
 	const walk = (items, base, section) => {
 		for (const item of items) {
 			if (item.dir) walk(item.items, `${base}${item.dir}/`, section ?? item.label);
-			else pages.push({ path: `${base}${item.file}`, title: item.title, type: item.type, section: section ?? item.title });
+			else
+				pages.push({ path: `${base}${item.file}`, title: item.title, type: item.type, section: section ?? item.title });
 		}
 	};
 	for (const part of structure.parts) walk(part.sections, '', undefined);

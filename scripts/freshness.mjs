@@ -24,11 +24,17 @@ export function classify(markdown, now) {
 export function renderProgress(rows) {
 	const sections = [...new Set(rows.map((r) => r.section))];
 	const count = (list, status) => list.filter((r) => r.status === status).length;
-	const line = (name, list) => `| ${name} | ${count(list, 'fresh')} | ${count(list, 'stale')} | ${count(list, 'todo')} |`;
+	const line = (name, list) =>
+		`| ${name} | ${count(list, 'fresh')} | ${count(list, 'stale')} | ${count(list, 'todo')} |`;
 	return [
 		'| Sekcja | Aktualne | Do sprawdzenia | Do napisania |',
 		'|---|---|---|---|',
-		...sections.map((s) => line(s, rows.filter((r) => r.section === s))),
+		...sections.map((s) =>
+			line(
+				s,
+				rows.filter((r) => r.section === s),
+			),
+		),
 		`| **Razem** | **${count(rows, 'fresh')}** | **${count(rows, 'stale')}** | **${count(rows, 'todo')}** |`,
 	].join('\n');
 }
@@ -40,7 +46,12 @@ export function writeProgress(text, table) {
 	return text.replace(new RegExp(`${START}[\\s\\S]*?${END}`), () => `${START}\n${table}\n${END}`);
 }
 
-export function runFreshness({ docsDir = DOCS, pages = listPages(loadStructure()), now = new Date(), log = console.log } = {}) {
+export function runFreshness({
+	docsDir = DOCS,
+	pages = listPages(loadStructure()),
+	now = new Date(),
+	log = console.log,
+} = {}) {
 	const rows = pages.map((page) => {
 		const file = findPage(docsDir, page.path);
 		if (!file) throw new Error(`${page.path} is in structure.yaml but missing on disk. Run npm run scaffold`);
@@ -51,7 +62,9 @@ export function runFreshness({ docsDir = DOCS, pages = listPages(loadStructure()
 	const text = readFileSync(roadmap, 'utf8');
 	const updated = writeProgress(text, renderProgress(rows));
 	if (updated !== text) writeFileSync(roadmap, updated);
-	log(`Aktualne: ${rows.filter((r) => r.status === 'fresh').length}/${rows.length}. Tabela postępu w src/content/docs/roadmap.md.`);
+	log(
+		`Aktualne: ${rows.filter((r) => r.status === 'fresh').length}/${rows.length}. Tabela postępu w src/content/docs/roadmap.md.`,
+	);
 	return rows;
 }
 

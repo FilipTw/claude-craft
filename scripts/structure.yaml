@@ -235,7 +235,10 @@ parts:
               - { file: 02-claude-desktop, title: Claude Code Desktop }
               - { file: 03-cursor-agents-window, title: Cursor Agents Window }
               - { file: 04-zed-acp, title: Zed i ACP }
-              - { file: 05-orchestrators-status, title: "Orkiestratory: Conductor, Superset, Emdash, Nimbalyst, Vibe Kanban" }
+              - {
+                  file: 05-orchestrators-status,
+                  title: "Orkiestratory: Conductor, Superset, Emdash, Nimbalyst, Vibe Kanban",
+                }
           - dir: 05-cli
             label: Agenci CLI
             items:

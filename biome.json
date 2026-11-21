@@ -4,7 +4,12 @@
 	"files": { "includes": ["**", "!!**/dist", "!!**/.astro", "!!**/reports", "!!**/.stryker-tmp"] },
 	"formatter": { "indentStyle": "tab", "lineWidth": 120, "lineEnding": "lf" },
 	"javascript": {
-		"formatter": { "quoteStyle": "single", "trailingCommas": "all", "semicolons": "always", "arrowParentheses": "always" }
+		"formatter": {
+			"quoteStyle": "single",
+			"trailingCommas": "all",
+			"semicolons": "always",
+			"arrowParentheses": "always"
+		}
 	},
 	"markdown": { "formatter": { "enabled": false } },
 	"assist": { "actions": { "source": { "organizeImports": "on", "useSortedKeys": "off" } } },

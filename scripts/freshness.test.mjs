@@ -74,5 +74,8 @@ test('runFreshness groups by top-level section and writes the table into roadmap
 
 test('runFreshness names a page that is in the manifest but missing on disk', () => {
 	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
-	assert.throws(() => runFreshness({ docsDir: docs, pages: [{ path: '01-gone', section: 'X' }], now, log: () => {} }), /01-gone.*npm run scaffold/);
+	assert.throws(
+		() => runFreshness({ docsDir: docs, pages: [{ path: '01-gone', section: 'X' }], now, log: () => {} }),
+		/01-gone.*npm run scaffold/,
+	);
 });
