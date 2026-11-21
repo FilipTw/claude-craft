@@ -47,7 +47,7 @@ test('renderProgress counts each status in its own column, per section and in to
 		renderProgress(rows),
 		[
 			'| Sekcja | Aktualne | Do sprawdzenia | Do napisania |',
-			'|---|---|---|---|',
+			'| --- | --- | --- | --- |',
 			'| Hooki | 2 | 0 | 1 |',
 			'| MCP | 0 | 1 | 3 |',
 			'| **Razem** | **2** | **1** | **4** |',

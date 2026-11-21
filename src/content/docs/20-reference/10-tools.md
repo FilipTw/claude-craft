@@ -5,6 +5,6 @@ sources: []
 ---
 
 | Element | Opis |
-|---|---|
+| --- | --- |
 
 ## Źródła

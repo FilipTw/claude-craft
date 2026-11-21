@@ -51,7 +51,7 @@ export function renderProgress(rows) {
 		`| ${name} | ${count(list, 'fresh')} | ${count(list, 'stale')} | ${count(list, 'todo')} |`;
 	return [
 		'| Sekcja | Aktualne | Do sprawdzenia | Do napisania |',
-		'|---|---|---|---|',
+		'| --- | --- | --- | --- |',
 		...sections.map((s) =>
 			line(
 				s,

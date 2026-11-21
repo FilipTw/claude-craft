@@ -20,7 +20,7 @@ Strona jest aktualna, gdy ma `lastVerified` nie starsze niż 90 dni. Tabelę gen
 
 <!-- progress:start -->
 | Sekcja | Aktualne | Do sprawdzenia | Do napisania |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Fundamenty | 0 | 0 | 12 |
 | Tryb interaktywny | 0 | 0 | 8 |
 | Inżynieria kontekstu | 0 | 0 | 6 |

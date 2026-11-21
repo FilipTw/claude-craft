@@ -1,0 +1,23 @@
+{
+	"$schema": "https://raw.githubusercontent.com/DavidAnson/markdownlint-cli2/v0.24.2/schema/markdownlint-cli2-config-schema.json",
+	"config": {
+		"default": true,
+		// Starlight renders the frontmatter title as the page h1, so a body h1 is a second one.
+		"MD025": { "level": 1, "front_matter_title": "^\\s*title\\s*:" },
+		"MD041": { "level": 1, "front_matter_title": "^\\s*title\\s*:" },
+		// Prose keeps one paragraph per line. Headings and code blocks keep a limit.
+		"MD013": { "line_length": 1000, "heading_line_length": 80, "code_block_line_length": 120 },
+		"MD003": { "style": "atx" },
+		"MD004": { "style": "dash" },
+		"MD029": { "style": "ordered" },
+		"MD035": { "style": "---" },
+		"MD046": { "style": "fenced" },
+		"MD048": { "style": "backtick" },
+		"MD049": { "style": "underscore" },
+		"MD050": { "style": "asterisk" },
+		"MD055": { "style": "leading_and_trailing" },
+		"MD060": { "style": "compact" }
+	},
+	"globs": ["*.md", "src/content/docs/**/*.{md,mdx}", "templates/**/*.md", "scripts/templates/*.md", "docs/**/*.md"],
+	"gitignore": true
+}
