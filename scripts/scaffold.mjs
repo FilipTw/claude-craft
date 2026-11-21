@@ -47,9 +47,9 @@ export function runScaffold({
 	);
 	const { created } = scaffold({ docsDir, pages, templates });
 	const orphans = findOrphans(docsDir, pages, HANDWRITTEN);
-	log(`Utworzono ${created.length} stron.`);
+	log(`Pages created: ${created.length}.`);
 	for (const orphan of orphans) {
-		log(`Poza manifestem: ${orphan}. Dodaj go do scripts/structure.yaml.`);
+		log(`Outside the manifest: ${orphan}. Add it to scripts/structure.yaml.`);
 	}
 	return orphans.length > 0 ? 1 : 0;
 }
