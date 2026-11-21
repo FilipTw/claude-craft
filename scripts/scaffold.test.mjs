@@ -5,13 +5,20 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import { runScaffold, scaffold } from './scaffold.mjs';
 
+/** @import { Page, PageType } from './structure.mjs' */
+
+/** @type {Page[]} */
 const pages = [
-	{ path: '01-a/01-one', title: 'Jeden', type: 'explanation' },
-	{ path: '01-a/02-b/01-two', title: 'Dwa: "cytat"', type: 'how-to' },
+	{ path: '01-a/01-one', title: 'Jeden', type: 'explanation', section: 'A' },
+	{ path: '01-a/02-b/01-two', title: 'Dwa: "cytat"', type: 'how-to', section: 'A' },
 ];
+const frontmatter = '---\ntitle: {{title}}\ntype: {{type}}\n---\n';
+/** @type {Record<PageType, string>} */
 const templates = {
-	explanation: '---\ntitle: {{title}}\ntype: {{type}}\n---\n',
-	'how-to': '---\ntitle: {{title}}\ntype: {{type}}\n---\n## Kroki\n',
+	tutorial: frontmatter,
+	'how-to': `${frontmatter}## Kroki\n`,
+	reference: frontmatter,
+	explanation: frontmatter,
 };
 const silent = () => undefined;
 
@@ -36,7 +43,11 @@ test('second run creates nothing and keeps edited pages', () => {
 
 test('writes titles with $ patterns verbatim', () => {
 	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
-	scaffold({ docsDir: docs, pages: [{ path: '01-x', title: "Koszt $' i $& $$", type: 'explanation' }], templates });
+	scaffold({
+		docsDir: docs,
+		pages: [{ path: '01-x', title: "Koszt $' i $& $$", type: 'explanation', section: 'X' }],
+		templates,
+	});
 	assert.match(readFileSync(join(docs, '01-x.md'), 'utf8'), /^title: "Koszt \$' i \$& \$\$"$/m);
 });
 

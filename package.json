@@ -12,6 +12,7 @@
 		"scaffold": "node scripts/scaffold.mjs",
 		"check:fresh": "node scripts/freshness.mjs",
 		"lint": "biome ci .",
+		"typecheck": "astro check --minimumSeverity warning",
 		"format": "biome check --write ."
 	},
 	"dependencies": {
@@ -23,6 +24,9 @@
 	},
 	"packageManager": "npm@11.20.0",
 	"devDependencies": {
-		"@biomejs/biome": "2.6.8"
+		"@astrojs/check": "0.9.12",
+		"@biomejs/biome": "2.6.8",
+		"@types/node": "26.6.6",
+		"typescript": "6.0.3"
 	}
 }

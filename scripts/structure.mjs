@@ -6,24 +6,52 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
 
-export const PAGE_TYPES = ['tutorial', 'how-to', 'reference', 'explanation'];
+export const PAGE_TYPES = /** @type {const} */ (['tutorial', 'how-to', 'reference', 'explanation']);
+
+/**
+ * @typedef {(typeof PAGE_TYPES)[number]} PageType
+ * @typedef {{ file: string, title: string, type: PageType }} PageEntry A page as the manifest lists it.
+ * @typedef {{ dir: string, label: string, items: Array<Section | PageEntry> }} Section
+ * @typedef {{ label: string, sections: Array<Section | PageEntry> }} Part
+ * @typedef {{ parts: Part[] }} Structure
+ * @typedef {{ path: string, title: string, type: PageType, section: string }} Page A manifest page located by docs path and top-level section.
+ * @typedef {string | { label: string, collapsed: boolean, items: SidebarItem[] }} SidebarItem
+ * @typedef {{ ok: (value: unknown) => boolean, noun: string }} Kind
+ */
 export const ROOT = fileURLToPath(new URL('..', import.meta.url));
 export const DOCS = join(ROOT, 'src/content/docs');
 // Pages written by hand, outside the manifest.
 export const HANDWRITTEN = ['index.mdx', 'roadmap.md'];
 const NAME = /^(\d{2})-[a-z0-9]+(-[a-z0-9]+)*$/;
 
+/**
+ * @param {string | URL} [path]
+ * @returns {Structure}
+ */
 export function loadStructure(path = new URL('./structure.yaml', import.meta.url)) {
 	return parseStructure(readFileSync(path, 'utf8'));
 }
 
+/**
+ * @param {string} where
+ * @param {string} problem
+ * @returns {never}
+ */
 function fail(where, problem) {
 	throw new Error(`structure.yaml: "${where}" ${problem}`);
 }
 
+/** @type {Kind} */
 const LIST = { ok: (value) => Array.isArray(value) && value.length > 0, noun: 'a non-empty list' };
+/** @type {Kind} */
 const TEXT = { ok: (value) => typeof value === 'string' && value !== '', noun: 'a text' };
 
+/**
+ * @param {unknown} node
+ * @param {string} where
+ * @param {Record<string, Kind>} required
+ * @param {string[]} [alsoAllowed]
+ */
 function checkShape(node, where, required, alsoAllowed = []) {
 	if (node === null || typeof node !== 'object' || Array.isArray(node)) {
 		fail(where, 'must be a mapping');
@@ -34,12 +62,16 @@ function checkShape(node, where, required, alsoAllowed = []) {
 		fail(where, `has unknown keys ${extra.join(', ')}. Quote titles that contain a comma`);
 	}
 	for (const [key, kind] of Object.entries(required)) {
-		if (!kind.ok(node[key])) {
+		if (!kind.ok(/** @type {Record<string, unknown>} */ (node)[key])) {
 			fail(where, `needs ${kind.noun} "${key}"`);
 		}
 	}
 }
 
+/**
+ * @param {any[]} items
+ * @param {string} parent
+ */
 function checkPrefixes(items, parent) {
 	let previous = 0;
 	items.forEach((item, index) => {
@@ -56,21 +88,32 @@ function checkPrefixes(items, parent) {
 	});
 }
 
-// Parse and validate once, at the boundary. Everything downstream trusts the result.
+/**
+ * Parse and validate once, at the boundary. Everything downstream trusts the result.
+ * @param {string} text
+ * @returns {Structure}
+ */
 export function parseStructure(text) {
 	const raw = parse(text);
 	checkShape(raw, '(root)', { parts: LIST });
-	for (const [index, part] of raw.parts.entries()) {
+	/** @type {any[]} */
+	const parts = raw.parts;
+	for (const [index, part] of parts.entries()) {
 		checkShape(part, `parts[${index}]`, { label: TEXT, sections: LIST });
 	}
 	// Top-level sections share one docs root, so their prefixes ascend across all parts.
 	checkPrefixes(
-		raw.parts.flatMap((part) => part.sections),
+		parts.flatMap((part) => part.sections),
 		'',
 	);
-	return { parts: raw.parts.map((part) => ({ label: part.label, sections: checkItems(part.sections, '') })) };
+	return { parts: parts.map((part) => ({ label: part.label, sections: checkItems(part.sections, '') })) };
 }
 
+/**
+ * @param {any[]} items
+ * @param {string} parent
+ * @returns {Array<Section | PageEntry>}
+ */
 function checkItems(items, parent) {
 	return items.map((item) => {
 		const where = `${parent}${item.dir ?? item.file}`;
@@ -88,12 +131,18 @@ function checkItems(items, parent) {
 	});
 }
 
-// Every page once, in manifest order. `section` is the top-level section label, used for progress.
+/**
+ * Every page once, in manifest order.
+ * @param {Structure} structure
+ * @returns {Page[]}
+ */
 export function listPages(structure) {
+	/** @type {Page[]} */
 	const pages = [];
+	/** @type {(items: Array<Section | PageEntry>, base: string, section: string | undefined) => void} */
 	const walk = (items, base, section) => {
 		for (const item of items) {
-			if (item.dir) {
+			if ('dir' in item) {
 				walk(item.items, `${base}${item.dir}/`, section ?? item.label);
 			} else {
 				pages.push({ path: `${base}${item.file}`, title: item.title, type: item.type, section: section ?? item.title });
@@ -106,20 +155,35 @@ export function listPages(structure) {
 	return pages;
 }
 
+/**
+ * @param {Structure} structure
+ * @returns {Array<{ label: string, items: SidebarItem[] }>}
+ */
 export function toSidebar(structure) {
+	/** @type {(item: Section | PageEntry, base: string) => SidebarItem} */
 	const toItem = (item, base) =>
-		item.dir
+		'dir' in item
 			? { label: item.label, collapsed: true, items: item.items.map((child) => toItem(child, `${base}${item.dir}/`)) }
 			: `${base}${item.file}`;
 	return structure.parts.map((part) => ({ label: part.label, items: part.sections.map((s) => toItem(s, '')) }));
 }
 
-// A page may live in .md or .mdx. Returns the existing file, or undefined.
+/**
+ * A page may live in .md or .mdx.
+ * @param {string} docsDir
+ * @param {string} path
+ * @returns {string | undefined} The existing file, or undefined.
+ */
 export function findPage(docsDir, path) {
 	return ['.md', '.mdx'].map((ext) => join(docsDir, `${path}${ext}`)).find((file) => existsSync(file));
 }
 
-// Markdown files on disk that the manifest does not list, sorted.
+/**
+ * @param {string} docsDir
+ * @param {Page[]} pages
+ * @param {string[]} [ignore]
+ * @returns {string[]} Markdown files on disk that the manifest does not list, sorted.
+ */
 export function findOrphans(docsDir, pages, ignore = []) {
 	const known = new Set([...pages.flatMap((p) => [`${p.path}.md`, `${p.path}.mdx`]), ...ignore]);
 	return readdirSync(docsDir, { recursive: true })

@@ -5,6 +5,12 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DOCS, findOrphans, findPage, HANDWRITTEN, listPages, loadStructure, PAGE_TYPES, ROOT } from './structure.mjs';
 
+/** @import { Page, PageType } from './structure.mjs' */
+
+/**
+ * @param {{ docsDir: string, pages: Page[], templates: Record<PageType, string> }} options
+ * @returns {{ created: string[] }}
+ */
 export function scaffold({ docsDir, pages, templates }) {
 	const created = [];
 	for (const page of pages) {
@@ -23,14 +29,19 @@ export function scaffold({ docsDir, pages, templates }) {
 	return { created };
 }
 
-// Returns the process exit code: 1 when files exist outside the manifest.
+/**
+ * @param {{ docsDir?: string, pages?: Page[], log?: (line: string) => void }} [options]
+ * @returns {0 | 1} The process exit code: 1 when files exist outside the manifest.
+ */
 export function runScaffold({
 	docsDir = DOCS,
 	pages = listPages(loadStructure()),
 	log = (line) => process.stdout.write(`${line}\n`),
 } = {}) {
-	const templates = Object.fromEntries(
-		PAGE_TYPES.map((type) => [type, readFileSync(join(ROOT, `scripts/templates/${type}.md`), 'utf8')]),
+	const templates = /** @type {Record<PageType, string>} */ (
+		Object.fromEntries(
+			PAGE_TYPES.map((type) => [type, readFileSync(join(ROOT, `scripts/templates/${type}.md`), 'utf8')]),
+		)
 	);
 	const { created } = scaffold({ docsDir, pages, templates });
 	const orphans = findOrphans(docsDir, pages, HANDWRITTEN);

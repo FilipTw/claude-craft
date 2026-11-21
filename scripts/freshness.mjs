@@ -6,18 +6,29 @@ import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
 import { DOCS, findPage, listPages, loadStructure } from './structure.mjs';
 
+/** @import { Page } from './structure.mjs' */
+/**
+ * @typedef {'todo' | 'stale' | 'fresh'} Status
+ * @typedef {Page & { status: Status }} ProgressRow
+ */
+
 const MAX_AGE_DAYS = 90;
 const DAY_MS = 24 * 60 * 60 * 1000;
 const START = '<!-- progress:start -->';
 const END = '<!-- progress:end -->';
 
+/**
+ * @param {string} markdown
+ * @param {Date} now
+ * @returns {Status}
+ */
 export function classify(markdown, now) {
 	const text = markdown.replace(/^﻿/, '').replace(/\r\n/g, '\n');
 	const frontmatter = parse(/^---\n([\s\S]*?)\n---/.exec(text)?.[1] ?? '') ?? {};
 	if (!frontmatter.lastVerified) {
 		return 'todo';
 	}
-	const age = (now - new Date(frontmatter.lastVerified)) / DAY_MS;
+	const age = (now.getTime() - new Date(frontmatter.lastVerified).getTime()) / DAY_MS;
 	// An unreadable or future date is not proof of a check, so it needs checking.
 	if (!(age >= 0 && age <= MAX_AGE_DAYS)) {
 		return 'stale';
@@ -25,9 +36,15 @@ export function classify(markdown, now) {
 	return 'fresh';
 }
 
+/**
+ * @param {ProgressRow[]} rows
+ * @returns {string}
+ */
 export function renderProgress(rows) {
 	const sections = [...new Set(rows.map((r) => r.section))];
+	/** @type {(list: ProgressRow[], status: Status) => number} */
 	const count = (list, status) => list.filter((r) => r.status === status).length;
+	/** @type {(name: string, list: ProgressRow[]) => string} */
 	const line = (name, list) =>
 		`| ${name} | ${count(list, 'fresh')} | ${count(list, 'stale')} | ${count(list, 'todo')} |`;
 	return [
@@ -43,6 +60,11 @@ export function renderProgress(rows) {
 	].join('\n');
 }
 
+/**
+ * @param {string} text
+ * @param {string} table
+ * @returns {string}
+ */
 export function writeProgress(text, table) {
 	const starts = text.split(START).length - 1;
 	const ends = text.split(END).length - 1;
@@ -52,6 +74,10 @@ export function writeProgress(text, table) {
 	return text.replace(new RegExp(`${START}[\\s\\S]*?${END}`), () => `${START}\n${table}\n${END}`);
 }
 
+/**
+ * @param {{ docsDir?: string, pages?: Page[], now?: Date, log?: (line: string) => void }} [options]
+ * @returns {ProgressRow[]}
+ */
 export function runFreshness({
 	docsDir = DOCS,
 	pages = listPages(loadStructure()),

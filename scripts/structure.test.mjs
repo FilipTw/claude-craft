@@ -14,6 +14,8 @@ import {
 	toSidebar,
 } from './structure.mjs';
 
+/** @import { Page } from './structure.mjs' */
+
 const valid = `
 parts:
   - label: Część I
@@ -105,7 +107,8 @@ test('findOrphans lists sorted files that are not in the manifest', () => {
 	for (const file of ['01-a/09-z.md', '01-a/01-known.mdx', '05-b.md', 'index.mdx']) {
 		writeFileSync(join(docs, file), 'x');
 	}
-	const pages = [{ path: '01-a/01-known' }];
+	/** @type {Page[]} */
+	const pages = [{ path: '01-a/01-known', title: 'Znany', type: 'explanation', section: 'A' }];
 	assert.deepEqual(findOrphans(docs, pages, ['index.mdx']), ['01-a/09-z.md', '05-b.md']);
 });
 

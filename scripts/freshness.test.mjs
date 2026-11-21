@@ -5,8 +5,14 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import { classify, renderProgress, runFreshness, writeProgress } from './freshness.mjs';
 
+/** @import { ProgressRow, Status } from './freshness.mjs' */
+/** @import { Page } from './structure.mjs' */
+
 const now = new Date('2026-11-21');
+/** @param {string} date */
 const verified = (date) => `---\ntitle: A\nlastVerified: ${date}\n---\n`;
+/** @type {(section: string, status: Status) => ProgressRow} */
+const row = (section, status) => ({ path: '01-x', title: 'X', type: 'explanation', section, status });
 
 test('a page without lastVerified is todo', () => {
 	assert.equal(classify('---\ntitle: A\ntype: explanation\n---\n', now), 'todo');
@@ -28,13 +34,13 @@ test('an invalid or future date needs checking, never counts as fresh', () => {
 
 test('renderProgress counts each status in its own column, per section and in total', () => {
 	const rows = [
-		{ section: 'Hooki', status: 'fresh' },
-		{ section: 'Hooki', status: 'fresh' },
-		{ section: 'Hooki', status: 'todo' },
-		{ section: 'MCP', status: 'stale' },
-		{ section: 'MCP', status: 'todo' },
-		{ section: 'MCP', status: 'todo' },
-		{ section: 'MCP', status: 'todo' },
+		row('Hooki', 'fresh'),
+		row('Hooki', 'fresh'),
+		row('Hooki', 'todo'),
+		row('MCP', 'stale'),
+		row('MCP', 'todo'),
+		row('MCP', 'todo'),
+		row('MCP', 'todo'),
 	];
 	assert.equal(
 		renderProgress(rows),
@@ -64,9 +70,10 @@ test('runFreshness groups by top-level section and writes the table into roadmap
 	writeFileSync(join(docs, 'roadmap.md'), 'x\n<!-- progress:start -->\n<!-- progress:end -->\n');
 	writeFileSync(join(docs, '01-a.md'), verified('2026-11-01'));
 	writeFileSync(join(docs, '02-b.md'), '---\ntitle: B\n---\n');
+	/** @type {Page[]} */
 	const pages = [
-		{ path: '01-a', section: 'Hooki' },
-		{ path: '02-b', section: 'Hooki' },
+		{ path: '01-a', title: 'A', type: 'explanation', section: 'Hooki' },
+		{ path: '02-b', title: 'B', type: 'explanation', section: 'Hooki' },
 	];
 	runFreshness({ docsDir: docs, pages, now, log: () => undefined });
 	assert.match(readFileSync(join(docs, 'roadmap.md'), 'utf8'), /\| Hooki \| 1 \| 0 \| 1 \|/);
@@ -75,7 +82,13 @@ test('runFreshness groups by top-level section and writes the table into roadmap
 test('runFreshness names a page that is in the manifest but missing on disk', () => {
 	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
 	assert.throws(
-		() => runFreshness({ docsDir: docs, pages: [{ path: '01-gone', section: 'X' }], now, log: () => undefined }),
+		() =>
+			runFreshness({
+				docsDir: docs,
+				pages: [{ path: '01-gone', title: 'G', type: 'explanation', section: 'X' }],
+				now,
+				log: () => undefined,
+			}),
 		/01-gone.*npm run scaffold/,
 	);
 });
