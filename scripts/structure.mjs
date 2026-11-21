@@ -16,7 +16,7 @@ export const PAGE_TYPES = /** @type {const} */ (['tutorial', 'how-to', 'referenc
  * @typedef {{ parts: Part[] }} Structure
  * @typedef {{ path: string, title: string, type: PageType, section: string }} LocatedPage
  * @typedef {string | { label: string, collapsed: boolean, items: SidebarItem[] }} SidebarItem
- * @typedef {{ ok: (value: unknown) => boolean, noun: string }} Kind
+ * @typedef {{ node: Record<string, unknown>, name: string, where: string }} Named
  */
 export const ROOT = fileURLToPath(new URL('..', import.meta.url));
 export const DOCS = join(ROOT, 'src/content/docs');
@@ -41,44 +41,70 @@ function fail(where, problem) {
 	throw new Error(`structure.yaml: "${where}" ${problem}`);
 }
 
-/** @type {Kind} */
-const LIST = { ok: (value) => Array.isArray(value) && value.length > 0, noun: 'a non-empty list' };
-/** @type {Kind} */
-const TEXT = { ok: (value) => typeof value === 'string' && value !== '', noun: 'a text' };
+/**
+ * @param {unknown} node
+ * @returns {node is Record<string, unknown>}
+ */
+function isMapping(node) {
+	return node !== null && typeof node === 'object' && !Array.isArray(node);
+}
 
 /**
  * @param {unknown} node
  * @param {string} where
- * @param {Record<string, Kind>} required
- * @param {string[]} [alsoAllowed]
+ * @param {string[]} keys
  */
-function checkShape(node, where, required, alsoAllowed = []) {
-	if (node === null || typeof node !== 'object' || Array.isArray(node)) {
+function mapping(node, where, keys) {
+	if (!isMapping(node)) {
 		fail(where, 'must be a mapping');
 	}
-	const allowed = [...Object.keys(required), ...alsoAllowed];
-	const extra = Object.keys(node).filter((key) => !allowed.includes(key));
+	const extra = Object.keys(node).filter((key) => !keys.includes(key));
 	if (extra.length > 0) {
 		fail(where, `has unknown keys ${extra.join(', ')}. Quote titles that contain a comma`);
 	}
-	for (const [key, kind] of Object.entries(required)) {
-		if (!kind.ok(/** @type {Record<string, unknown>} */ (node)[key])) {
-			fail(where, `needs ${kind.noun} "${key}"`);
-		}
-	}
+	return node;
 }
 
 /**
- * @param {any[]} items
- * @param {string} parent
+ * @param {Record<string, unknown>} node
+ * @param {string} where
+ * @param {string} key
  */
-function checkPrefixes(items, parent) {
+function textAt(node, where, key) {
+	const value = node[key];
+	if (typeof value !== 'string' || value === '') {
+		fail(where, `needs a text "${key}"`);
+	}
+	return value;
+}
+
+/**
+ * @param {Record<string, unknown>} node
+ * @param {string} where
+ * @param {string} key
+ * @returns {unknown[]}
+ */
+function listAt(node, where, key) {
+	const value = node[key];
+	if (!Array.isArray(value) || value.length === 0) {
+		fail(where, `needs a non-empty list "${key}"`);
+	}
+	return value;
+}
+
+/**
+ * @param {unknown[]} items
+ * @param {string} parent
+ * @returns {Named[]}
+ */
+function nameItems(items, parent) {
 	let previous = 0;
-	items.forEach((item, index) => {
-		const name = item?.dir ?? item?.file;
+	return items.map((item, index) => {
+		const node = isMapping(item) ? item : {};
+		const { dir, file } = node;
+		const name = dir ?? file;
 		const where = `${parent}${name ?? `[${index}]`}`;
-		// Stryker disable next-line StringLiteral: any fallback without a two-digit prefix fails the same way.
-		const match = NAME.exec(name ?? '');
+		const match = typeof name === 'string' ? NAME.exec(name) : null;
 		if (!match) {
 			fail(where, 'must look like 01-kebab-case');
 		}
@@ -86,6 +112,7 @@ function checkPrefixes(items, parent) {
 			fail(where, 'prefix must be greater than the one before it');
 		}
 		previous = Number(match[1]);
+		return { node, name: match[0], where };
 	});
 }
 
@@ -95,41 +122,46 @@ function checkPrefixes(items, parent) {
  * @internal
  */
 export function parseStructure(text) {
-	const raw = parse(text);
-	checkShape(raw, '(root)', { parts: LIST });
-	/** @type {any[]} */
-	const parts = raw.parts;
-	for (const [index, part] of parts.entries()) {
-		checkShape(part, `parts[${index}]`, { label: TEXT, sections: LIST });
-	}
+	const root = mapping(parse(text), '(root)', ['parts']);
+	const parts = listAt(root, '(root)', 'parts').map((node, index) => {
+		const where = `parts[${index}]`;
+		const part = mapping(node, where, ['label', 'sections']);
+		return { label: textAt(part, where, 'label'), sections: listAt(part, where, 'sections') };
+	});
 	// Top-level sections share one docs root, so their prefixes ascend across all parts.
-	checkPrefixes(
+	const sections = nameItems(
 		parts.flatMap((part) => part.sections),
 		'',
 	);
-	return { parts: parts.map((part) => ({ label: part.label, sections: checkItems(part.sections, '') })) };
+	return {
+		parts: parts.map((part) => ({
+			label: part.label,
+			sections: sections.splice(0, part.sections.length).map(parseItem),
+		})),
+	};
 }
 
 /**
- * @param {any[]} items
- * @param {string} parent
- * @returns {Array<Section | ManifestEntry>}
+ * @param {Named} item
+ * @returns {Section | ManifestEntry}
  */
-function checkItems(items, parent) {
-	return items.map((item) => {
-		const where = `${parent}${item.dir ?? item.file}`;
-		if (item.dir) {
-			checkShape(item, where, { label: TEXT, items: LIST }, ['dir']);
-			checkPrefixes(item.items, `${where}/`);
-			return { dir: item.dir, label: item.label, items: checkItems(item.items, `${where}/`) };
-		}
-		checkShape(item, where, { title: TEXT }, ['file', 'type']);
-		const type = item.type ?? 'explanation';
-		if (!PAGE_TYPES.includes(type)) {
-			fail(where, `has unknown type "${type}"`);
-		}
-		return { file: item.file, title: item.title, type };
-	});
+function parseItem({ node, name, where }) {
+	const { dir, type } = node;
+	if (dir) {
+		mapping(node, where, ['dir', 'label', 'items']);
+		return {
+			dir: name,
+			label: textAt(node, where, 'label'),
+			items: nameItems(listAt(node, where, 'items'), `${where}/`).map(parseItem),
+		};
+	}
+	mapping(node, where, ['file', 'title', 'type']);
+	const title = textAt(node, where, 'title');
+	const pageType = PAGE_TYPES.find((known) => known === (type ?? 'explanation'));
+	if (pageType === undefined) {
+		fail(where, `has unknown type "${type}"`);
+	}
+	return { file: name, title, type: pageType };
 }
 
 /**
