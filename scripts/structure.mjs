@@ -13,7 +13,7 @@ export const PAGE_TYPES = /** @type {const} */ (['tutorial', 'how-to', 'referenc
  * @typedef {{ parts: Part[] }} Structure
  * @typedef {{ path: string, title: string, type: PageType, section: string }} LocatedPage
  * @typedef {string | { label: string, collapsed: boolean, items: SidebarItem[] }} SidebarItem
- * @typedef {{ node: Record<string, unknown>, name: string, where: string }} Named
+ * @typedef {{ node: Record<string, unknown>, name: string, prefix: number, where: string }} Named
  */
 export const ROOT = fileURLToPath(new URL('..', import.meta.url));
 export const DOCS = join(ROOT, 'src/content/docs');
@@ -112,6 +112,28 @@ function listAt(node, where, key) {
 }
 
 /**
+ * @param {unknown} item
+ * @param {string} parent
+ * @param {number} index
+ * @returns {Named}
+ */
+function nameItem(item, parent, index) {
+	const node = isMapping(item) ? item : {};
+	const { dir } = node;
+	const key = dir == null ? 'file' : 'dir';
+	const name = node[key];
+	if (typeof name !== 'string') {
+		fail(`${parent}[${index}]`, name == null ? 'must look like 01-kebab-case' : `needs a text "${key}"`);
+	}
+	const where = `${parent}${name}`;
+	const match = NAME.exec(name);
+	if (!match) {
+		fail(where, 'must look like 01-kebab-case');
+	}
+	return { node, name, prefix: Number(match[1]), where };
+}
+
+/**
  * @param {unknown[]} items
  * @param {string} parent
  * @returns {Named[]}
@@ -119,19 +141,12 @@ function listAt(node, where, key) {
 function nameItems(items, parent) {
 	let previous = 0;
 	return items.map((item, index) => {
-		const node = isMapping(item) ? item : {};
-		const { dir, file } = node;
-		const name = dir ?? file;
-		const where = `${parent}${name ?? `[${index}]`}`;
-		const match = typeof name === 'string' ? NAME.exec(name) : null;
-		if (!match) {
-			fail(where, 'must look like 01-kebab-case');
+		const named = nameItem(item, parent, index);
+		if (named.prefix <= previous) {
+			fail(named.where, 'prefix must be greater than the one before it');
 		}
-		if (Number(match[1]) <= previous) {
-			fail(where, 'prefix must be greater than the one before it');
-		}
-		previous = Number(match[1]);
-		return { node, name: match[0], where };
+		previous = named.prefix;
+		return named;
 	});
 }
 
