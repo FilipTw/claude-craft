@@ -69,15 +69,16 @@ test('writeProgress replaces only the text between the markers, keeping $ patter
 	assert.equal(writeProgress(text, 'new $& $$'), 'a\n<!-- progress:start -->\nnew $& $$\n<!-- progress:end -->\nb\n');
 });
 
-test('writeProgress fails unless there is exactly one start and one end marker', () => {
+test('writeProgress fails unless there is exactly one start marker followed by one end marker', () => {
 	for (const text of [
 		'no markers',
 		'<!-- progress:start -->\n<!-- progress:end -->\n'.repeat(2),
 		'<!-- progress:start -->\nold\n',
 		'old\n<!-- progress:end -->\n',
+		'<!-- progress:end -->\nold\n<!-- progress:start -->\n',
 	]) {
 		assert.throws(() => writeProgress(text, 't'), {
-			message: 'roadmap.md: needs exactly one <!-- progress:start --> and one <!-- progress:end -->',
+			message: 'roadmap.md: needs exactly one <!-- progress:start --> followed by one <!-- progress:end -->',
 		});
 	}
 });
@@ -187,13 +188,15 @@ test('runFreshness names a page whose frontmatter alias has no anchor or expands
 });
 
 test('runFreshness names roadmap.md when its progress markers are wrong and exits 1 before any other line', () => {
-	const docs = tempDir();
-	writeFileSync(join(docs, 'roadmap.md'), 'no markers\n');
-	writeFileSync(join(docs, '01-a.md'), verified('2020-01-01'));
-	assert.deepEqual(runQuiet(docs, [{ path: '01-a', title: 'A', type: 'explanation', section: 'X' }]), {
-		code: 1,
-		lines: ['roadmap.md: needs exactly one <!-- progress:start --> and one <!-- progress:end -->'],
-	});
+	for (const roadmap of ['no markers\n', '<!-- progress:end -->\n<!-- progress:start -->\n']) {
+		const docs = tempDir();
+		writeFileSync(join(docs, 'roadmap.md'), roadmap);
+		writeFileSync(join(docs, '01-a.md'), verified('2020-01-01'));
+		assert.deepEqual(runQuiet(docs, [{ path: '01-a', title: 'A', type: 'explanation', section: 'X' }]), {
+			code: 1,
+			lines: ['roadmap.md: needs exactly one <!-- progress:start --> followed by one <!-- progress:end -->'],
+		});
+	}
 });
 
 test('runFreshness lets an error that is not a docs problem through with its stack', () => {
