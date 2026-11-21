@@ -5,6 +5,7 @@ const TOOLING = [
 	'structure',
 	'ci',
 	'deps',
+	'deps-dev',
 	'docs',
 	'lint',
 	'types',

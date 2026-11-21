@@ -109,6 +109,39 @@ for (const prose of PROSE) {
 	});
 }
 
+const DEPENDABOT_MESSAGE = [
+	'build(deps-dev): bump typescript from 6.0.3 to 7.0.2',
+	'',
+	'Bumps [typescript](https://github.com/microsoft/TypeScript) from 6.0.3 to 7.0.2.',
+	'- [Release notes](https://github.com/microsoft/TypeScript/releases)',
+	'',
+	'---',
+	'updated-dependencies:',
+	'- dependency-name: typescript',
+	'  dependency-version: 7.0.2',
+	'...',
+	'',
+	'Signed-off-by: dependabot[bot] <support@github.com>',
+	'',
+].join('\n');
+
+test('accepts the sign-off that Dependabot adds to every commit it makes', () => {
+	assert.deepEqual(findViolations(DEPENDABOT_MESSAGE), []);
+});
+
+for (const signOff of [
+	'Signed-off-by: dependabot[bot] <someone@example.com>',
+	'Signed-off-by: dependabot <support@github.com>',
+	'Signed-off-by: Claude <noreply@anthropic.com>',
+	'Signed-off-by: dependabot[bot] <support@github.com> and Claude',
+]) {
+	test(`rejects the sign-off ${JSON.stringify(signOff)}, which is not Dependabot's exact line`, () => {
+		assert.deepEqual(findViolations(`${clean}\n${signOff}\n`), [
+			{ line: 5, rule: 'attribution trailer', text: signOff },
+		]);
+	});
+}
+
 test('comment lines and the diff below the scissors line are ignored, as git drops them', () => {
 	const message = [
 		clean,

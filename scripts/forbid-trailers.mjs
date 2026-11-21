@@ -35,11 +35,17 @@ const SIGNATURE = new RegExp(
 	'iu',
 );
 
+// Dependabot signs off every commit it makes. A bot commit has no human co-author, so its exact line is allowed.
+const DEPENDABOT_SIGN_OFF = 'signed-off-by: dependabot[bot] <support@github.com>';
+
 /** @type {Rule[]} */
 const RULES = [
 	{
 		rule: 'attribution trailer',
 		matches: (line) => {
+			if (line.toLowerCase() === DEPENDABOT_SIGN_OFF) {
+				return false;
+			}
 			const token = TRAILER_TOKEN.exec(line.toLowerCase())?.[1];
 			return token !== undefined && (token.endsWith('-by') || token.split(/[-_]/).includes('ai'));
 		},
