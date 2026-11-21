@@ -13,7 +13,9 @@
 		"check:fresh": "node scripts/freshness.mjs",
 		"lint": "biome ci .",
 		"typecheck": "astro check --minimumSeverity warning",
-		"format": "biome check --write ."
+		"format": "biome check --write .",
+		"arch": "depcruise scripts src astro.config.mjs --output-type err-long",
+		"arch:graph": "depcruise scripts src astro.config.mjs --include-only '^(?:scripts|src|astro|node_modules)' --collapse 'node_modules/(@[^/]+/[^/]+|[^/]+)' --output-type mermaid --output-to docs/architecture.mmd"
 	},
 	"dependencies": {
 		"@astrojs/starlight": "0.43.1",
@@ -27,6 +29,7 @@
 		"@astrojs/check": "0.9.12",
 		"@biomejs/biome": "2.6.8",
 		"@types/node": "26.6.6",
+		"dependency-cruiser": "18.8.0",
 		"typescript": "6.0.3"
 	}
 }

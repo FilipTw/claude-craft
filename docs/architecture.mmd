@@ -1,0 +1,41 @@
+flowchart LR
+
+0["astro.config.mjs"]
+1["astro:content"]
+subgraph 2["node_modules"]
+subgraph 3["@astrojs"]
+4["starlight"]
+end
+5["astro"]
+6["starlight-links-validator"]
+7["yaml"]
+end
+subgraph 8["scripts"]
+9["freshness.mjs"]
+A["freshness.test.mjs"]
+B["scaffold.mjs"]
+C["scaffold.test.mjs"]
+D["structure.mjs"]
+E["structure.test.mjs"]
+end
+subgraph F["src"]
+G["content.config.ts"]
+end
+0-->D
+0-->4
+0-->5
+0-->6
+9-->D
+9-->7
+A-->9
+A-->D
+B-->D
+C-->B
+C-->D
+C-->7
+D-->7
+E-->D
+G-->D
+G-->4
+G-->1
+G-->5
