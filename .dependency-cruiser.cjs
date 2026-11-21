@@ -19,7 +19,7 @@ const config = {
 		{
 			comment: 'Each CLI builds on the core only. The two CLIs never import each other.',
 			from: { path: '^scripts/(?:scaffold|freshness)\\.mjs$' },
-			to: { path: [CORE, YAML] },
+			to: { path: CORE },
 		},
 		{
 			comment: 'Astro config reads the manifest from the core and nothing else from the repo.',

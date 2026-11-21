@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parse } from 'yaml';
+import { parse, parseDocument } from 'yaml';
 
 export const PAGE_TYPES = /** @type {const} */ (['tutorial', 'how-to', 'reference', 'explanation']);
 
@@ -27,6 +27,26 @@ const NAME = /^(\d{2})-[a-z0-9]+(-[a-z0-9]+)*$/;
  */
 export function loadStructure(path = new URL('./structure.yaml', import.meta.url)) {
 	return parseStructure(readFileSync(path, 'utf8'));
+}
+
+/**
+ * @param {string} text
+ * @param {(reason: string) => never} reject
+ */
+export function parseYaml(text, reject) {
+	const document = parseDocument(text);
+	const [error] = document.errors;
+	if (error) {
+		reject(error.message.replace(/:\n[\s\S]*/, ''));
+	}
+	try {
+		return document.toJS();
+	} catch (aliasError) {
+		if (aliasError instanceof ReferenceError) {
+			reject(aliasError.message);
+		}
+		throw aliasError;
+	}
 }
 
 /**

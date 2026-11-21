@@ -1,8 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parse, YAMLParseError } from 'yaml';
-import { DOCS, findPage, listPages, loadStructure, ROADMAP } from './structure.mjs';
+import { DOCS, findPage, listPages, loadStructure, parseYaml, ROADMAP } from './structure.mjs';
 
 /** @import { LocatedPage } from './structure.mjs' */
 /**
@@ -32,7 +31,10 @@ export function classify(markdown, now) {
 	if (frontmatterWithFileLineNumbers === undefined) {
 		return 'todo';
 	}
-	const frontmatter = parse(frontmatterWithFileLineNumbers) ?? {};
+	const frontmatter =
+		parseYaml(frontmatterWithFileLineNumbers, (reason) => {
+			throw new DocsProblem(`frontmatter is not valid YAML. ${reason}.`);
+		}) ?? {};
 	if (!frontmatter.lastVerified) {
 		return 'todo';
 	}
@@ -94,9 +96,8 @@ function readRow(docsDir, page, now) {
 	try {
 		return { ...page, status: classify(readFileSync(file, 'utf8'), now) };
 	} catch (error) {
-		if (error instanceof YAMLParseError) {
-			const reason = error.message.replace(/:?\n[\s\S]*/, '');
-			throw new DocsProblem(`${relative(docsDir, file)}: frontmatter is not valid YAML. ${reason}.`);
+		if (error instanceof DocsProblem) {
+			throw new DocsProblem(`${relative(docsDir, file)}: ${error.message}`);
 		}
 		throw error;
 	}
