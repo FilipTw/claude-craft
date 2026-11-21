@@ -2,6 +2,7 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightLinksValidator from 'starlight-links-validator';
+import { loadStructure, toSidebar } from './scripts/structure.mjs';
 
 export default defineConfig({
 	site: 'https://filiptw.github.io',
@@ -15,6 +16,7 @@ export default defineConfig({
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/FilipTw/claude-craft' }],
 			editLink: { baseUrl: 'https://github.com/FilipTw/claude-craft/edit/main/' },
 			lastUpdated: true,
+			sidebar: ['roadmap', ...toSidebar(loadStructure())],
 			plugins: [starlightLinksValidator()],
 		}),
 	],
