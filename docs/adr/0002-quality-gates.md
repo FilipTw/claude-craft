@@ -36,7 +36,9 @@ Zasady:
 Zmierzone 2026-11-21, po audycie:
 
 - `npm run check` trwa około 5 s na rozgrzanej maszynie. Mediana z 5 przebiegów to 5,0 s, rozrzut od 4,9 do 5,8 s. Ten sam pomiar przed audytem dał 4,4 s. Krok `arch` trwa 0,76 s zamiast 0,41 s, bo drugi przebieg depcruise buduje graf do porównania. Pozostałe kroki trwają tyle samo. Pomiar szedł przy obciążeniu około 30 na 8 rdzeniach, więc rozrzut jest duży. Hook `pre-commit` trwa poniżej 1 s.
-- Stryker bez `incremental` trwa około 17 s i daje 97,55% (478 zabitych z 490 ocenianych mutantów). 10 z 12 niewykrytych mutantów leży w blokach `if (process.argv[1] === ...)`, które uruchamiają CLI. Dwa pozostałe są równoważne z oryginałem: kotwica `^` przy BOM w `classify` i opcjonalny dwukropek w wyrażeniu, które skraca komunikat błędu YAML.
+- Po przeglądzie audytu `npm run check` na przemian na commicie sprzed przeglądu i po nim dał medianę 9,45 s i 9,15 s z 5 przebiegów. Rozrzut wynosił od 8,0 do 15,7 s i od 8,4 do 10,7 s przy obciążeniu od 22 do 36 na 8 rdzeniach. Przegląd nie zmienił czasu w granicach rozrzutu. Wzrost z 5 s do 9 s wynika z obciążenia maszyny, bo ten sam commit sprzed przeglądu też trwał 9 s.
+- Stryker bez `incremental` daje 97,71% (513 zabitych z 525 ocenianych mutantów). Przed przeglądem dawał 97,55% (478 z 490). 10 z 12 niewykrytych mutantów leży w blokach `if (process.argv[1] === ...)`, które uruchamiają CLI. Dwa pozostałe są równoważne z oryginałem: kotwica `^` przy BOM w `classify` i warunek `instanceof ReferenceError` w `parseYaml`. Gdy `parseDocument` nie zgłasza błędów, `toJS` rzuca tylko `ReferenceError` z aliasów, więc gałąź dla innego błędu nie ma testu.
+- Pełny przebieg Strykera trwał 17 s przy pierwszym pomiarze. Po przeglądzie dwa przebiegi na przemian dały 34 i 37 s przed przeglądem oraz 38 i 41 s po nim, przy obciążeniu od 26 do 60. Różnica około 4 s zgadza się z 35 nowymi mutantami i 4 nowymi testami. Resztę wzrostu od 17 s daje obciążenie, bo commit sprzed przeglądu też trwał ponad 30 s.
 - `npm test` nie zostawia folderów tymczasowych. Przed audytem jeden przebieg zostawiał 22 foldery `cc-`.
 - Nowy skrypt w `scripts/` musi mieć wpis na białej liście dependency-cruiser, testy i typy JSDoc.
 
@@ -72,6 +74,17 @@ Zmierzone 2026-11-21, po audycie:
 - `tsconfig.json` obejmuje `.dependency-cruiser.cjs`, bo wzorzec `**/*` pomija pliki z kropką. Konfiguracja ma typ przez stałą `config`, bo TypeScript nie sprawdza typu JSDoc przy `module.exports`.
 - `npm run arch` porównuje `docs/architecture.mmd` z grafem z kodu przez `cmp` i kończy się błędem przy różnicy. Plik odświeża `npm run arch:graph`. Porównanie niczego nie zapisuje i nie zależy od indeksu gita.
 - `npm audit fix` bez `--force` podniósł `qs` do 6.17.1. Stryker dostaje go przez `typed-rest-client` 2.3.0, bo wersja 2.3.1 przypina `qs` 6.15.1.
+
+## Przegląd audytu
+
+Po audycie przegląd komentarzy i trzech recenzentów sprawdziło jego commity. Każdą poprawkę błędu poprzedził test albo próba, która przed nią nie przechodziła.
+
+- Przegląd komentarzy usunął 29 linii komentarzy z `.gitignore`, `scripts/` i `src/content.config.ts`. Treść czterech z nich niosą teraz nazwy: `frontmatterWithFileLineNumbers`, `provesRecentCheck`, `checkPrefixesAscendAcrossParts` i `PAGES_OUTSIDE_MANIFEST`. Stała `HANDWRITTEN` nazywa się teraz `PAGES_OUTSIDE_MANIFEST`. `checkPrefixesAscendAcrossParts` zastąpił `splice` na liście wspólnej dla wszystkich części.
+- Uwagę, by schemat jawnie opisywał brak `lastVerified`, odrzucono. Brak pola oznacza stronę nienapisaną, tak jak mówi `CLAUDE.md`.
+- Alias bez kotwicy, np. `sources: *x`, i zbyt wiele aliasów we frontmatterze kończyły `npm run freshness` stosem wywołań. Biblioteka `yaml` rzuca wtedy zwykły `ReferenceError` z `toJS`, a `readRow` łapał tylko `YAMLParseError`. Teraz `parseYaml` w `structure.mjs` czyta `doc.errors` z `parseDocument` i łapie `ReferenceError` z `toJS`. Oba przypadki dają jedną linię `<plik>: frontmatter is not valid YAML. <powód>.` i kod 1.
+- Gdy `<!-- progress:end -->` stał przed `<!-- progress:start -->`, `npm run freshness` nie zapisywał tabeli, a mimo to kończył się kodem 0. Teraz wypisuje jedną linię o `roadmap.md` i kończy się kodem 1. Test obejmuje też dodatkowy znacznik obok poprawnej pary. Bez tego przypadku trzy mutanty warunku przeżywały.
+- Błąd w `scripts/structure.yaml`, np. `titel:` zamiast `title:`, kończył `npm run scaffold` i `npm run freshness` stosem wywołań. Oba wczytywały manifest w parametrach domyślnych, przed blokiem `try`. Teraz wypisują jedną linię `structure.yaml: ...` i kończą się kodem 1. Manifest, który nie jest poprawnym YAML, daje linię `structure.yaml: "(root)" is not valid YAML. <powód>`.
+- Komunikat dla nazwy, która nie jest tekstem, i powrót starego `prepare` opisuje wyżej sekcja Audyt 2026-11-21.
 
 ## Otwarte podatności
 
