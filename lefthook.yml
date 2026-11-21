@@ -16,6 +16,15 @@ commit-msg:
       run: node scripts/forbid-trailers.mjs {1}
 
 pre-push:
+  piped: true
   jobs:
+    - name: clean-tree
+      run: |
+        if [ -n "$(git status --porcelain --untracked-files=normal)" ]; then
+          echo "pre-push runs npm run check on the working tree, and the tree differs from the last commit."
+          echo "Commit, stash or gitignore these files, then push again:"
+          git status --short --untracked-files=normal
+          exit 1
+        fi
     - name: check
       run: npm run check

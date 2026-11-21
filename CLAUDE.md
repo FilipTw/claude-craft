@@ -27,6 +27,7 @@ Baza wiedzy o Claude Code jako strona Astro Starlight. Treść po polsku, nazwy 
 ## Jakość
 
 - `npm run check` uruchamia wszystkie bramki: Biome, markdownlint, dependency-cruiser, testy z progami pokrycia, knip i `astro check`. Hook `pre-push` i CI uruchamiają tę samą komendę.
+- Hook `pre-push` wymaga czystego drzewa roboczego. Zmiany i nowe pliki commitujesz, odkładasz przez `git stash` albo dopisujesz do `.gitignore`.
 - `npm run mutation` uruchamia Strykera. Próg wynosi 90%.
 - Nie obniżaj progów i nie wyłączaj reguł, żeby kod przeszedł. Napraw kod albo dopisz test zachowania.
 - Wyjątek wymaga reguły i powodu w komentarzu: `// biome-ignore <reguła>: <powód>` albo `// Stryker disable next-line <mutator>: <powód>`.
