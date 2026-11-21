@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
 import { loadStructure } from './structure.mjs';
+import { findPage } from './scaffold.mjs';
 
 const MAX_AGE_DAYS = 90;
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -14,10 +15,13 @@ const START = '<!-- progress:start -->';
 const END = '<!-- progress:end -->';
 
 export function classify(markdown, now) {
-	const frontmatter = parse(/^---\n([\s\S]*?)\n---/.exec(markdown)?.[1] ?? '') ?? {};
+	const text = markdown.replace(/^﻿/, '').replace(/\r\n/g, '\n');
+	const frontmatter = parse(/^---\n([\s\S]*?)\n---/.exec(text)?.[1] ?? '') ?? {};
 	if (!frontmatter.lastVerified) return 'todo';
 	const age = (now - new Date(frontmatter.lastVerified)) / DAY_MS;
-	return age > MAX_AGE_DAYS ? 'stale' : 'fresh';
+	// An unreadable or future date is not proof of a check, so it needs checking.
+	if (!(age >= 0 && age <= MAX_AGE_DAYS)) return 'stale';
+	return 'fresh';
 }
 
 export function renderProgress(rows) {
@@ -39,7 +43,7 @@ function collectRows(structure, now) {
 			if (item.dir) walk(item.items, `${base}${item.dir}/`, section ?? item.label);
 			else {
 				const path = `${base}${item.file}`;
-				rows.push({ path, section, status: classify(readFileSync(join(DOCS, `${path}.md`), 'utf8'), now) });
+				rows.push({ path, section, status: classify(readFileSync(findPage(DOCS, path), 'utf8'), now) });
 			}
 		}
 	};

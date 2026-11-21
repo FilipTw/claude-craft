@@ -9,16 +9,23 @@ const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const DOCS = join(ROOT, 'src/content/docs');
 const HANDWRITTEN = ['index.mdx', 'roadmap.md'];
 
+// A page may live in .md or .mdx. Returns the existing file, or undefined.
+export function findPage(docsDir, path) {
+	return ['.md', '.mdx'].map((ext) => join(docsDir, `${path}${ext}`)).find((file) => existsSync(file));
+}
+
 export function scaffold({ docsDir, pages, templates, ignore = [] }) {
 	const created = [];
 	for (const page of pages) {
+		if (findPage(docsDir, page.path)) continue;
 		const file = join(docsDir, `${page.path}.md`);
-		if (existsSync(file)) continue;
 		mkdirSync(dirname(file), { recursive: true });
-		writeFileSync(file, templates[page.type].replaceAll('{{title}}', JSON.stringify(page.title)).replaceAll('{{type}}', page.type));
+		// Function replacements, so "$&" or "$'" in a title stay literal.
+		const text = templates[page.type].replaceAll('{{title}}', () => JSON.stringify(page.title)).replaceAll('{{type}}', () => page.type);
+		writeFileSync(file, text);
 		created.push(page.path);
 	}
-	const known = new Set([...pages.map((p) => `${p.path}.md`), ...ignore]);
+	const known = new Set([...pages.flatMap((p) => [`${p.path}.md`, `${p.path}.mdx`]), ...ignore]);
 	const orphans = readdirSync(docsDir, { recursive: true })
 		.map(String)
 		.filter((f) => /\.mdx?$/.test(f) && !known.has(f))

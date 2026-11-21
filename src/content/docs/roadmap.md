@@ -1,6 +1,7 @@
 ---
 title: Ścieżka nauki i postęp
 description: Kolejność nauki i stan każdej sekcji.
+type: reference
 ---
 
 Ucz się częściami, w kolejności z menu bocznego. Każda część kończy się labem w sekcji **Laby**.

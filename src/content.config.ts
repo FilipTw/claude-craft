@@ -9,10 +9,10 @@ export const collections = {
 		loader: docsLoader(),
 		schema: docsSchema({
 			extend: z.object({
-				// One Diátaxis mode per page. Optional only for index and roadmap.
-				type: z.enum(PAGE_TYPES as [string, ...string[]]).optional(),
+				// One Diátaxis mode per page.
+				type: z.enum(PAGE_TYPES as [string, ...string[]]),
 				// Missing means the page is not written yet. scripts/freshness.mjs reports it.
-				lastVerified: z.coerce.date().optional(),
+				lastVerified: z.coerce.date().max(new Date(), 'lastVerified cannot be in the future').optional(),
 				sources: z.array(z.string().url()).default([]),
 			}),
 		}),

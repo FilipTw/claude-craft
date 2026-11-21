@@ -27,6 +27,20 @@ test('second run creates nothing and keeps edited pages', () => {
 	assert.equal(readFileSync(join(docs, '01-a/01-one.md'), 'utf8'), 'edited');
 });
 
+test('writes titles with $ patterns verbatim', () => {
+	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
+	scaffold({ docsDir: docs, pages: [{ path: '01-x', title: "Koszt $' i $& $$", type: 'explanation' }], templates });
+	assert.match(readFileSync(join(docs, '01-x.md'), 'utf8'), /^title: "Koszt \$' i \$& \$\$"$/m);
+});
+
+test('treats an existing .mdx page as present', () => {
+	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
+	mkdirSync(join(docs, '01-a'), { recursive: true });
+	writeFileSync(join(docs, '01-a/01-one.mdx'), 'x');
+	const { created, orphans } = scaffold({ docsDir: docs, pages: pages.slice(0, 1), templates });
+	assert.deepEqual([created, orphans], [[], []]);
+});
+
 test('reports pages that exist on disk but not in the manifest', () => {
 	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
 	mkdirSync(join(docs, '01-a'), { recursive: true });

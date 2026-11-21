@@ -60,6 +60,18 @@ test('rejects a page without a title', () => {
 	assert.throws(() => parseStructure(valid.replace(', title: Wstęp', '')), /01-intro/);
 });
 
+test('rejects the same section prefix reused in a later part', () => {
+	const twoParts = `${valid}\n  - label: Część II\n    sections:\n      - { file: 01-other, title: Inna }\n`;
+	assert.throws(() => parseStructure(twoParts), /01-other/);
+});
+
+test('rejects bad shapes with a structure.yaml message', () => {
+	assert.throws(() => parseStructure(''), /structure\.yaml/);
+	assert.throws(() => parseStructure('partz: []'), /partz/);
+	assert.throws(() => parseStructure(valid.replace('label: Część I', 'lable: Część I')), /lable/);
+	assert.throws(() => parseStructure(valid.replace('label: Instalacja\n            items:', 'label: Instalacja\n            itemz:')), /itemz/);
+});
+
 test('rejects an unknown page type', () => {
 	assert.throws(() => parseStructure(valid.replace('type: tutorial', 'type: guide')), /guide/);
 });
