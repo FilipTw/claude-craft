@@ -2,40 +2,45 @@ flowchart LR
 
 0["astro.config.mjs"]
 1["astro:content"]
-subgraph 2["node_modules"]
-subgraph 3["@astrojs"]
-4["starlight"]
+2["commitlint.config.mjs"]
+subgraph 3["node_modules"]
+subgraph 4["@astrojs"]
+5["starlight"]
 end
-5["astro"]
-6["starlight-links-validator"]
-7["yaml"]
+6["astro"]
+7["starlight-links-validator"]
+8["yaml"]
 end
-subgraph 8["scripts"]
-9["freshness.mjs"]
-A["freshness.test.mjs"]
-B["scaffold.mjs"]
-C["scaffold.test.mjs"]
-D["structure.mjs"]
-E["structure.test.mjs"]
+subgraph 9["scripts"]
+A["forbid-trailers.mjs"]
+B["forbid-trailers.test.mjs"]
+C["freshness.mjs"]
+D["freshness.test.mjs"]
+E["scaffold.mjs"]
+F["scaffold.test.mjs"]
+G["structure.mjs"]
+H["structure.test.mjs"]
 end
-subgraph F["src"]
-G["content.config.ts"]
+subgraph I["src"]
+J["content.config.ts"]
 end
-0-->D
-0-->4
+0-->G
 0-->5
 0-->6
-9-->D
-9-->7
-A-->9
-A-->D
-B-->D
-C-->B
-C-->D
-C-->7
-D-->7
-E-->D
-G-->D
-G-->4
-G-->1
-G-->5
+0-->7
+2-->G
+B-->A
+C-->G
+C-->8
+D-->C
+D-->G
+E-->G
+F-->E
+F-->G
+F-->8
+G-->8
+H-->G
+J-->G
+J-->5
+J-->1
+J-->6

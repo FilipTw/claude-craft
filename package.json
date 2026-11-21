@@ -14,10 +14,12 @@
 		"lint": "biome ci .",
 		"typecheck": "astro check --minimumSeverity warning",
 		"format": "biome check --write .",
-		"arch": "depcruise scripts src astro.config.mjs --output-type err-long",
-		"arch:graph": "depcruise scripts src astro.config.mjs --include-only '^(?:scripts|src|astro|node_modules)' --collapse 'node_modules/(@[^/]+/[^/]+|[^/]+)' --output-type mermaid --output-to docs/architecture.mmd",
+		"arch": "depcruise scripts src astro.config.mjs commitlint.config.mjs --output-type err-long",
+		"arch:graph": "depcruise scripts src astro.config.mjs commitlint.config.mjs --include-only '^(?:scripts|src|astro|commitlint|node_modules)' --collapse 'node_modules/(@[^/]+/[^/]+|[^/]+)' --output-type mermaid --output-to docs/architecture.mmd",
 		"deadcode": "knip && knip --production --strict",
-		"lint:md": "markdownlint-cli2"
+		"lint:md": "markdownlint-cli2",
+		"check": "npm run lint && npm run lint:md && npm run arch && npm run test && npm run deadcode && npm run typecheck",
+		"prepare": "node node_modules/lefthook/postinstall.js"
 	},
 	"dependencies": {
 		"@astrojs/starlight": "0.43.1",
@@ -29,10 +31,16 @@
 	"devDependencies": {
 		"@astrojs/check": "0.9.12",
 		"@biomejs/biome": "2.6.8",
+		"@commitlint/cli": "21.2.4",
+		"@commitlint/config-conventional": "21.2.4",
 		"@types/node": "26.6.6",
 		"dependency-cruiser": "18.8.0",
 		"knip": "6.47.0",
+		"lefthook": "2.2.2",
 		"markdownlint-cli2": "0.24.2",
 		"typescript": "6.0.3"
+	},
+	"allowScripts": {
+		"lefthook": false
 	}
 }

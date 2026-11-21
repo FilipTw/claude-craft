@@ -1,0 +1,22 @@
+# Git hooks. npm install sets them up through the prepare script in package.json.
+pre-commit:
+  parallel: true
+  jobs:
+    - name: biome
+      run: npx biome check --write --no-errors-on-unmatched --files-ignore-unknown=true --colors=off {staged_files}
+      stage_fixed: true
+    - name: markdownlint
+      glob: "*.{md,mdx}"
+      run: npx markdownlint-cli2 --no-globs {staged_files}
+
+commit-msg:
+  jobs:
+    - name: commitlint
+      run: npx commitlint --edit {1}
+    - name: forbid-trailers
+      run: node scripts/forbid-trailers.mjs {1}
+
+pre-push:
+  jobs:
+    - name: check
+      run: npm run check

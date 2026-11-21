@@ -28,6 +28,11 @@ module.exports = {
 			to: { path: [CORE, ...ASTRO] },
 		},
 		{
+			comment: 'The commitlint config reads the section folders from the core to build its scope list.',
+			from: { path: '^commitlint\\.config\\.mjs$' },
+			to: { path: CORE },
+		},
+		{
 			comment: 'A test imports its own subject, the core and yaml.',
 			from: { path: '^scripts/([^/]+)\\.test\\.mjs$' },
 			to: { path: ['^scripts/$1\\.mjs$', CORE, YAML] },

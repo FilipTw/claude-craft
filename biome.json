@@ -79,7 +79,7 @@
 			"linter": { "rules": { "complexity": { "noExcessiveLinesPerFunction": "off" } } }
 		},
 		{
-			"includes": ["astro.config.mjs", "src/content.config.ts"],
+			"includes": ["astro.config.mjs", "src/content.config.ts", "commitlint.config.mjs"],
 			"linter": { "rules": { "style": { "noDefaultExport": "off" } } }
 		}
 	]
