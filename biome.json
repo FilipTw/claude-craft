@@ -81,6 +81,15 @@
 		{
 			"includes": ["astro.config.mjs", "src/content.config.ts", "commitlint.config.mjs"],
 			"linter": { "rules": { "style": { "noDefaultExport": "off" } } }
+		},
+		{
+			"includes": ["**/*.astro"],
+			"linter": {
+				"rules": {
+					"style": { "useConst": "off", "useImportType": "off" },
+					"correctness": { "noUnusedVariables": "off", "noUnusedImports": "off" }
+				}
+			}
 		}
 	]
 }

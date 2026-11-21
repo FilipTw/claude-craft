@@ -43,6 +43,7 @@ Zmierzone 2026-11-21:
 
 - Formatowanie Markdown w Biome jest wyłączone. Biome 2.6 zmieniał `{{title}}` w szablonach stron na `{ { title } }` i dodawał pustą linię we frontmatterze. Markdown sprawdza markdownlint.
 - `noShadow` jest w grupie `suspicious`, a nie `nursery`. Biome 2.6 przeniósł tę regułę. Żadnej reguły z planu nie usunięto.
+- W plikach `.astro` Biome ma wyłączone `noUnusedVariables`, `noUnusedImports`, `useConst` i `useImportType`. Biome 2.6 czyta tam tylko frontmatter i nie widzi użycia w szablonie, więc odrzucał destrukturyzację `Astro.props` i import komponentu. Tę listę podaje dokumentacja Biome (Language support, „Linting HTML-ish languages”) dla wyłączonego `html.experimentalFullSupportEnabled`. Nieużyty import lub zmienną w `.astro` nadal zgłasza `astro check` (TS 6133).
 - `not-to-unresolvable` pomija moduły `astro:*`, bo to wirtualne moduły Vite.
 - dependency-cruiser nie parsuje plików `.astro` i `.mdx`. Test `no .astro or .mdx file in src imports from scripts/` w `scripts/structure.test.mjs` skanuje ich importy i odrzuca każdy, który prowadzi do `scripts/`.
 - `sharp` usunięto z zależności zamiast dodawać wyjątek w knip. Nic go nie importuje, a Astro instaluje go jako swoją zależność opcjonalną.
