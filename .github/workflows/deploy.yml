@@ -18,12 +18,35 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          # The commit message step reads every commit of the push or pull request.
+          fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      - name: Check commit messages
+        env:
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = pull_request ]; then
+            from=$PR_BASE to=$PR_HEAD
+          elif [ -n "$BEFORE" ] && [ "$BEFORE" != 0000000000000000000000000000000000000000 ]; then
+            from=$BEFORE to=$GITHUB_SHA
+          else
+            from=$GITHUB_SHA~1 to=$GITHUB_SHA
+          fi
+          commits=$(git rev-list "$from..$to")
+          status=0
+          npx commitlint --from "$from" --to "$to" || status=1
+          for sha in $commits; do
+            git log -1 --format=%B "$sha" > "$RUNNER_TEMP/commit-message"
+            node scripts/forbid-trailers.mjs "$RUNNER_TEMP/commit-message" || { echo "::error::commit $sha has a forbidden line"; status=1; }
+          done
+          exit "$status"
       - run: mkdir -p coverage && npm run check
         env:
           NODE_OPTIONS: >-

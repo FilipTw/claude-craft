@@ -35,4 +35,4 @@ Baza wiedzy o Claude Code jako strona Astro Starlight. Treść po polsku, nazwy 
 
 ## Commity
 
-Conventional Commits, na przykład `docs(hooks): write events lifecycle page`. Bez trailerów `*-by:` (`Co-Authored-By`, `Assisted-by`, `Signed-off-by`) i bez linii z podpisem narzędzia AI. Hook `commit-msg` sprawdza oba warunki.
+Conventional Commits, na przykład `docs(hooks): write events lifecycle page`. Bez trailerów `*-by:` (`Co-Authored-By`, `Assisted-by`, `Signed-off-by`) i bez linii z podpisem narzędzia AI. Hook `commit-msg` i job `check` w CI sprawdzają oba warunki dla każdego commita.
