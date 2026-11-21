@@ -1,0 +1,319 @@
+# Jedyne źródło drzewa stron.
+# Strona: { file, title, type }. Domyślny type to explanation. Typy: tutorial, how-to, reference, explanation.
+# Sekcja: { dir, label, items }. Prefiksy NN- rosną w obrębie listy (sprawdza scripts/structure.mjs).
+# title i type to wartości startowe. Po utworzeniu pliku właścicielem jest jego frontmatter.
+# Po zmianie: npm run scaffold
+
+parts:
+  - label: "Część I: Fundamenty"
+    sections:
+      - dir: 01-foundations
+        label: Fundamenty
+        items:
+          - { file: 01-prerequisites, title: Wymagania wstępne }
+          - { file: 02-how-llms-work-tokens-context, title: "Jak działają LLM-y, tokeny i kontekst" }
+          - { file: 03-what-is-claude-code, title: Czym jest Claude Code }
+          - { file: 04-how-claude-code-works, title: "Jak działa Claude Code, pętla agenta i narzędzia" }
+          - dir: 05-installation
+            label: Instalacja
+            items:
+              - { file: 01-macos, title: Instalacja na macOS, type: how-to }
+              - { file: 02-linux, title: Instalacja na Linuksie, type: how-to }
+              - { file: 03-windows-wsl, title: Instalacja na Windows i WSL, type: how-to }
+              - { file: 04-updating, title: Aktualizacje i kanały wydań, type: how-to }
+          - { file: 06-authentication-and-plans, title: Logowanie i plany }
+          - { file: 07-surfaces-and-platforms, title: "Gdzie działa Claude Code: CLI, desktop, web, IDE, mobile" }
+          - { file: 08-the-claude-directory, title: Katalog .claude }
+          - { file: 09-first-session, title: Pierwsza sesja, type: tutorial }
+
+  - label: "Część II: Codzienna praca"
+    sections:
+      - dir: 02-interactive-mode
+        label: Tryb interaktywny
+        items:
+          - { file: 01-interface-and-fullscreen, title: Interfejs i tryb pełnoekranowy }
+          - { file: 02-commands-and-skills-menu, title: Komendy i menu skilli }
+          - { file: 03-keybindings, title: Skróty klawiszowe, type: how-to }
+          - { file: 04-mentions-images-bash-mode, title: "Wzmianki @, obrazy i tryb bash" }
+          - { file: 05-checkpointing-and-rewind, title: Checkpointy i cofanie zmian }
+          - { file: 06-sessions-resume-fork, title: "Sesje, wznawianie i forki" }
+          - { file: 07-output-styles-and-statusline, title: Style odpowiedzi i status line }
+          - { file: 08-vs-code-and-jetbrains, title: VS Code i JetBrains, type: how-to }
+      - dir: 03-context-engineering
+        label: Inżynieria kontekstu
+        items:
+          - { file: 01-context-window, title: Okno kontekstu }
+          - { file: 02-inspecting-context, title: Podgląd kontekstu, type: how-to }
+          - { file: 03-compact-and-clear, title: Kompaktowanie i czyszczenie kontekstu }
+          - { file: 04-context-rot, title: Degradacja kontekstu }
+          - { file: 05-prompt-caching, title: Prompt caching }
+          - { file: 06-large-codebases, title: Duże repozytoria i monorepo }
+      - dir: 04-memory
+        label: Pamięć
+        items:
+          - { file: 01-overview, title: Jak działa pamięć }
+          - { file: 02-claude-md-hierarchy, title: Hierarchia plików CLAUDE.md }
+          - { file: 03-imports-and-rules-paths, title: Importy i reguły w .claude/rules }
+          - { file: 04-auto-memory, title: Auto memory }
+          - { file: 05-init-and-prompt-audit, title: "/init i prompt-audit", type: how-to }
+          - { file: 06-writing-effective-claude-md, title: Jak pisać dobry CLAUDE.md }
+          - { file: 07-agents-md-interop, title: AGENTS.md i współpraca z innymi narzędziami }
+      - dir: 05-workflows
+        label: Przepływy pracy
+        items:
+          - { file: 01-best-practices, title: Dobre praktyki }
+          - { file: 02-explore-plan-code-commit, title: "Explore, plan, code, commit" }
+          - { file: 03-plan-mode-in-practice, title: Plan mode w praktyce, type: how-to }
+          - { file: 04-effective-prompting, title: Skuteczne promptowanie }
+          - { file: 05-tdd, title: Test-driven development z agentem }
+          - { file: 06-spec-driven-development, title: Spec-driven development }
+          - { file: 07-interview-and-grilling, title: Wywiad i grilling przed kodem }
+          - { file: 08-verification-loops, title: Pętle weryfikacji }
+          - { file: 09-debugging, title: Debugowanie z Claude, type: how-to }
+          - { file: 10-refactoring-legacy, title: Refaktoryzacja starego kodu, type: how-to }
+
+  - label: "Część III: Konfiguracja i kontrola"
+    sections:
+      - dir: 06-settings-and-permissions
+        label: Ustawienia i uprawnienia
+        items:
+          - { file: 01-settings-hierarchy, title: Hierarchia ustawień }
+          - { file: 02-permissions-allow-ask-deny, title: "Uprawnienia: allow, ask, deny" }
+          - { file: 03-rule-syntax-patterns, title: Składnia i wzorce reguł, type: how-to }
+          - { file: 04-permission-modes-and-auto-mode, title: Tryby uprawnień i auto mode }
+          - { file: 05-sandboxing, title: Sandboxing }
+          - { file: 06-environment-variables, title: Zmienne środowiskowe, type: how-to }
+          - { file: 07-managed-settings, title: Ustawienia zarządzane }
+      - dir: 07-models-and-costs
+        label: Modele i koszty
+        items:
+          - { file: 01-models-and-aliases, title: Modele i aliasy }
+          - { file: 02-effort-and-thinking, title: Poziomy effort i myślenie }
+          - { file: 03-1m-context, title: Kontekst 1M }
+          - { file: 04-fast-mode-and-advisor, title: Fast mode i advisor }
+          - { file: 05-usage-limits-and-costs, title: Limity użycia i koszty }
+
+  - label: "Część IV: Rozszerzanie"
+    sections:
+      - dir: 08-skills
+        label: Skille
+        items:
+          - { file: 01-overview, title: Czym są skille }
+          - { file: 02-skill-md-anatomy, title: Budowa SKILL.md, type: reference }
+          - { file: 03-progressive-disclosure, title: Progressive disclosure }
+          - { file: 04-arguments-scripts-resources, title: "Argumenty, skrypty i zasoby", type: how-to }
+          - { file: 05-invocation-and-context-fork, title: Wywołanie skilla i context fork }
+          - { file: 06-migrating-from-commands, title: Migracja z custom commands, type: how-to }
+          - { file: 07-skill-creator-and-evals, title: skill-creator i ewaluacje, type: how-to }
+          - { file: 08-best-practices, title: Dobre praktyki pisania skilli }
+      - dir: 09-subagents-and-parallel-work
+        label: Subagenci i praca równoległa
+        items:
+          - { file: 01-subagents-overview, title: Czym są subagenci }
+          - { file: 02-built-in-agents, title: Wbudowani agenci }
+          - { file: 03-custom-agents, title: Własni agenci, type: how-to }
+          - { file: 04-agent-view-background-fork, title: "Agent view, /background i /fork" }
+          - { file: 05-worktrees, title: Worktrees }
+          - { file: 06-workflows-and-batch, title: "Workflows i /batch" }
+          - { file: 07-agent-teams, title: Agent teams }
+          - { file: 08-cross-session-messaging, title: Komunikacja między sesjami }
+          - { file: 09-when-to-delegate, title: Kiedy delegować }
+      - dir: 10-hooks
+        label: Hooki
+        items:
+          - { file: 01-overview, title: Czym są hooki }
+          - { file: 02-events-lifecycle, title: Zdarzenia i cykl życia }
+          - { file: 03-config-and-matchers, title: Konfiguracja i matchery, type: how-to }
+          - { file: 04-input-output-exit-codes, title: "Wejście, wyjście i kody wyjścia", type: reference }
+          - { file: 05-hook-types, title: Typy hooków }
+          - { file: 06-recipes-format-lint-test, title: "Przepisy: formatowanie, lint, testy", type: how-to }
+          - { file: 07-recipes-guardrails-notifications, title: "Przepisy: blokady i powiadomienia", type: how-to }
+      - dir: 11-mcp
+        label: MCP
+        items:
+          - { file: 01-what-is-mcp, title: Czym jest MCP }
+          - { file: 02-transports, title: Transporty }
+          - { file: 03-adding-and-scopes, title: Dodawanie serwerów i zakresy, type: how-to }
+          - { file: 04-oauth, title: Uwierzytelnianie OAuth, type: how-to }
+          - { file: 05-tool-search, title: Tool search }
+          - { file: 06-resources-and-prompts, title: Zasoby i prompty MCP }
+          - { file: 07-popular-servers, title: Popularne serwery, type: reference }
+          - { file: 08-build-your-own-server, title: Własny serwer MCP, type: how-to }
+      - dir: 12-plugins
+        label: Pluginy
+        items:
+          - { file: 01-overview, title: Czym są pluginy }
+          - { file: 02-install-and-marketplaces, title: Instalacja i marketplace'y, type: how-to }
+          - { file: 03-structure-and-components, title: Struktura i komponenty pluginu, type: reference }
+          - { file: 04-create-and-publish, title: Tworzenie i publikacja, type: how-to }
+          - { file: 05-mods, title: Mody }
+          - { file: 06-plugin-evals, title: Ewaluacje pluginów, type: how-to }
+
+  - label: "Część V: Automatyzacja"
+    sections:
+      - dir: 13-git-github-and-review
+        label: Git, GitHub i code review
+        items:
+          - { file: 01-git-workflows, title: Praca z gitem }
+          - { file: 02-commits-and-prs, title: Commity i pull requesty, type: how-to }
+          - { file: 03-code-review-levels-and-ultra, title: "/code-review: poziomy i ultra" }
+          - { file: 04-security-review-and-scans, title: Security review i skany }
+          - { file: 05-github-actions, title: GitHub Actions, type: how-to }
+          - { file: 06-gitlab-ci, title: GitLab CI/CD, type: how-to }
+      - dir: 14-headless-and-cloud
+        label: Headless i chmura
+        items:
+          - { file: 01-headless-print-mode, title: Tryb headless (-p) }
+          - { file: 02-output-formats, title: Formaty wyjścia, type: reference }
+          - { file: 03-agent-sdk-overview, title: Agent SDK }
+          - { file: 04-agent-sdk-typescript, title: Agent SDK w TypeScript, type: how-to }
+          - { file: 05-agent-sdk-python, title: Agent SDK w Pythonie, type: how-to }
+          - { file: 06-scheduled-tasks-loop-and-cloud, title: "Zadania cykliczne: /loop i /schedule" }
+          - { file: 07-cloud-sessions-and-teleport, title: Sesje w chmurze i teleport }
+          - { file: 08-remote-control, title: Remote Control }
+          - { file: 09-channels-goal-deep-links, title: "Channels, /goal i deep links" }
+
+  - label: "Część VI: Ekosystem"
+    sections:
+      - dir: 15-community-skills
+        label: Skille społeczności
+        items:
+          - { file: 01-choosing-and-installing-safely, title: Wybór i bezpieczna instalacja }
+          - { file: 02-comparison-matrix, title: Porównanie pakietów, type: reference }
+          - dir: 03-matt-pocock
+            label: Matt Pocock
+            items:
+              - { file: 01-overview-and-install, title: "Matt Pocock: przegląd i instalacja" }
+              - { file: 02-skills-map, title: "Matt Pocock: mapa skilli", type: reference }
+              - { file: 03-workflow-in-practice, title: "Matt Pocock: przepływ w praktyce", type: tutorial }
+          - dir: 04-addy-osmani
+            label: Addy Osmani
+            items:
+              - { file: 01-overview-and-install, title: "Addy Osmani: przegląd i instalacja" }
+              - { file: 02-skills-map, title: "Addy Osmani: mapa skilli", type: reference }
+              - { file: 03-workflow-in-practice, title: "Addy Osmani: przepływ w praktyce", type: tutorial }
+          - dir: 05-garry-tan-gstack
+            label: Garry Tan (gstack)
+            items:
+              - { file: 01-overview-and-install, title: "gstack: przegląd i instalacja" }
+              - { file: 02-skills-map, title: "gstack: mapa komend", type: reference }
+              - { file: 03-workflow-in-practice, title: "gstack: przepływ w praktyce", type: tutorial }
+          - dir: 06-lauren-tan-pstack
+            label: Lauren Tan (pstack)
+            items:
+              - { file: 01-overview-and-install, title: "pstack: przegląd i instalacja" }
+              - { file: 02-skills-map, title: "pstack: mapa skilli i zasad", type: reference }
+              - { file: 03-workflow-in-practice, title: "pstack: przepływ w praktyce", type: tutorial }
+          - dir: 07-obra-superpowers
+            label: superpowers (obra)
+            items:
+              - { file: 01-overview-and-install, title: "superpowers: przegląd i instalacja" }
+              - { file: 02-skills-map, title: "superpowers: mapa skilli", type: reference }
+              - { file: 03-workflow-in-practice, title: "superpowers: przepływ w praktyce", type: tutorial }
+          - dir: 08-anthropic-skills
+            label: Skille Anthropic
+            items:
+              - { file: 01-overview-and-install, title: "Skille Anthropic: przegląd i instalacja" }
+              - { file: 02-skills-map, title: "Skille Anthropic: mapa skilli", type: reference }
+              - { file: 03-workflow-in-practice, title: "Skille Anthropic: przepływ w praktyce", type: tutorial }
+          - { file: 09-karpathy-guidelines, title: Karpathy guidelines }
+      - dir: 16-agent-tools-ecosystem
+        label: Narzędzia agentowe
+        items:
+          - { file: 01-landscape-and-choosing, title: Przegląd rynku i wybór narzędzia }
+          - { file: 02-comparison-matrix, title: Porównanie narzędzi, type: reference }
+          - { file: 03-agents-md-and-acp, title: Standardy AGENTS.md i ACP }
+          - dir: 04-gui
+            label: Aplikacje GUI
+            items:
+              - dir: 01-t3-code
+                label: T3 Code
+                items:
+                  - { file: 01-overview, title: "T3 Code: przegląd" }
+                  - { file: 02-install, title: "T3 Code: instalacja", type: how-to }
+                  - { file: 03-workflow, title: "T3 Code: praca z Claude Code", type: tutorial }
+              - { file: 02-claude-desktop, title: Claude Code Desktop }
+              - { file: 03-cursor-agents-window, title: Cursor Agents Window }
+              - { file: 04-zed-acp, title: Zed i ACP }
+              - { file: 05-orchestrators-status, title: "Orkiestratory: Conductor, Superset, Emdash, Nimbalyst, Vibe Kanban" }
+          - dir: 05-cli
+            label: Agenci CLI
+            items:
+              - { file: 01-codex, title: OpenAI Codex }
+              - { file: 02-antigravity-cli, title: Antigravity CLI (dawniej Gemini CLI) }
+              - { file: 03-opencode, title: OpenCode }
+              - { file: 04-copilot-cli, title: GitHub Copilot CLI }
+              - { file: 05-amp, title: Amp }
+              - { file: 06-cursor-cli, title: Cursor CLI }
+              - { file: 07-aider, title: Aider }
+
+  - label: "Część VII: Praktyka seniora"
+    sections:
+      - dir: 17-security
+        label: Bezpieczeństwo
+        items:
+          - { file: 01-threat-model, title: Model zagrożeń }
+          - { file: 02-prompt-injection, title: Prompt injection }
+          - { file: 03-secrets, title: Sekrety, type: how-to }
+          - { file: 04-devcontainers-and-isolation, title: Devcontainery i izolacja, type: how-to }
+          - { file: 05-trust-skills-plugins-mcp, title: "Zaufanie do skilli, pluginów i MCP" }
+          - { file: 06-checklist, title: Checklista bezpieczeństwa, type: reference }
+      - dir: 18-senior-practices
+        label: Praktyki seniora
+        items:
+          - { file: 01-mindset, title: Sposób myślenia seniora przy pracy z AI }
+          - { file: 02-architecture-decisions, title: Decyzje architektoniczne }
+          - { file: 03-reviewing-ai-code, title: Review kodu z AI }
+          - { file: 04-testing-strategy, title: Strategia testów }
+          - { file: 05-team-adoption, title: Wdrożenie w zespole }
+          - { file: 06-anti-patterns, title: Antywzorce i pułapki vibe codingu }
+          - { file: 07-measuring-productivity, title: Mierzenie produktywności }
+      - dir: 19-troubleshooting
+        label: Rozwiązywanie problemów
+        items:
+          - { file: 01-doctor-and-checkup, title: "/doctor i /checkup", type: how-to }
+          - { file: 02-debug-your-config, title: Debugowanie konfiguracji, type: how-to }
+          - { file: 03-install-issues, title: Problemy z instalacją, type: how-to }
+          - { file: 04-common-errors, title: Częste błędy, type: reference }
+
+  - label: Referencja i praktyka
+    sections:
+      - dir: 20-reference
+        label: Referencja
+        items:
+          - { file: 01-cli-flags, title: Flagi CLI, type: reference }
+          - { file: 02-commands, title: Komendy, type: reference }
+          - { file: 03-keybindings, title: Skróty klawiszowe, type: reference }
+          - { file: 04-settings-keys, title: Klucze ustawień, type: reference }
+          - { file: 05-permission-rule-syntax, title: Składnia reguł uprawnień, type: reference }
+          - { file: 06-hook-events, title: Zdarzenia hooków, type: reference }
+          - { file: 07-frontmatter, title: Frontmatter skilli i agentów, type: reference }
+          - { file: 08-mcp-commands, title: Komendy MCP, type: reference }
+          - { file: 09-env-vars, title: Zmienne środowiskowe, type: reference }
+          - { file: 10-tools, title: Narzędzia Claude Code, type: reference }
+          - { file: 11-glossary, title: Słownik pojęć, type: reference }
+          - { file: 12-changelog-watch, title: Śledzenie zmian, type: how-to }
+      - dir: 21-labs
+        label: Laby
+        items:
+          - { file: 01-first-claude-md, title: "Lab: pierwszy CLAUDE.md", type: tutorial }
+          - { file: 02-permissions-preset, title: "Lab: preset uprawnień dla projektu", type: tutorial }
+          - { file: 03-custom-skill, title: "Lab: własny skill", type: tutorial }
+          - { file: 04-custom-subagent, title: "Lab: własny subagent", type: tutorial }
+          - { file: 05-hooks-pipeline, title: "Lab: pipeline jakości na hookach", type: tutorial }
+          - { file: 06-mcp-server, title: "Lab: serwer MCP", type: tutorial }
+          - { file: 07-plugin, title: "Lab: plugin", type: tutorial }
+          - { file: 08-spec-to-pr-full-feature, title: "Lab: od specyfikacji do PR", type: tutorial }
+          - { file: 09-headless-ci-review, title: "Lab: review w CI w trybie headless", type: tutorial }
+          - { file: 10-interview-questions, title: Pytania rekrutacyjne, type: reference }
+      - dir: 22-resources
+        label: Materiały
+        items:
+          - { file: 01-official-docs, title: Oficjalna dokumentacja, type: reference }
+          - { file: 02-engineering-blogs, title: Blogi inżynierskie, type: reference }
+          - { file: 03-experts, title: Eksperci, type: reference }
+          - { file: 04-youtube, title: YouTube, type: reference }
+          - { file: 05-courses, title: Kursy, type: reference }
+          - { file: 06-newsletters, title: Newslettery, type: reference }
+          - { file: 07-github-repos, title: Repozytoria GitHub, type: reference }
+          - { file: 08-community, title: Społeczność, type: reference }
