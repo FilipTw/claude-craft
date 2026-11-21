@@ -1,9 +1,16 @@
-// Creates every page listed in structure.yaml that does not exist yet. Never overwrites.
-// Safe to run any number of times: a second run changes nothing.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DOCS, findOrphans, findPage, HANDWRITTEN, listPages, loadStructure, PAGE_TYPES, ROOT } from './structure.mjs';
+import {
+	DOCS,
+	findOrphans,
+	findPage,
+	listPages,
+	loadStructure,
+	PAGE_TYPES,
+	PAGES_OUTSIDE_MANIFEST,
+	ROOT,
+} from './structure.mjs';
 
 /** @import { LocatedPage, PageType } from './structure.mjs' */
 
@@ -46,7 +53,7 @@ export function runScaffold({
 		)
 	);
 	const { created } = scaffold({ docsDir, pages, templates });
-	const orphans = findOrphans(docsDir, pages, HANDWRITTEN);
+	const orphans = findOrphans(docsDir, pages, PAGES_OUTSIDE_MANIFEST);
 	log(`Pages created: ${created.length}.`);
 	for (const orphan of orphans) {
 		log(`Outside the manifest: ${orphan}. Add it to scripts/structure.yaml.`);
