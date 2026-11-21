@@ -13,6 +13,7 @@ const MAX_AGE_DAYS = 90;
 const DAY_MS = 24 * 60 * 60 * 1000;
 const START = '<!-- progress:start -->';
 const END = '<!-- progress:end -->';
+const PROGRESS_BLOCK = new RegExp(`${START}[\\s\\S]*?${END}`);
 
 class DocsProblem extends Error {}
 
@@ -76,10 +77,10 @@ export function renderProgress(rows) {
 export function writeProgress(text, table) {
 	const starts = text.split(START).length - 1;
 	const ends = text.split(END).length - 1;
-	if (starts !== 1 || ends !== 1) {
-		throw new DocsProblem(`${ROADMAP}: needs exactly one ${START} and one ${END}`);
+	if (starts !== 1 || ends !== 1 || !PROGRESS_BLOCK.test(text)) {
+		throw new DocsProblem(`${ROADMAP}: needs exactly one ${START} followed by one ${END}`);
 	}
-	return text.replace(new RegExp(`${START}[\\s\\S]*?${END}`), () => `${START}\n${table}\n${END}`);
+	return text.replace(PROGRESS_BLOCK, () => `${START}\n${table}\n${END}`);
 }
 
 /**
