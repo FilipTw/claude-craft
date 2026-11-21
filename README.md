@@ -20,6 +20,8 @@ Do tego referencja, laby i materiały.
 
 ## Uruchomienie lokalne
 
+Wymaga Node 26 lub nowszego. Wersję podaje `.nvmrc`.
+
 ```sh
 npm install
 npm run dev

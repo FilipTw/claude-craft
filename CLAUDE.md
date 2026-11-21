@@ -5,7 +5,7 @@ Baza wiedzy o Claude Code jako strona Astro Starlight. Treść po polsku, nazwy 
 ## Komendy
 
 - `npm run dev`: serwer deweloperski. Uruchamiaj go w tle przez `astro dev --background` i zatrzymuj przez `astro dev stop`.
-- `npm run build`: build z walidacją schematu i linków. Musi przejść przed każdym commitem.
+- `npm run build`: build z walidacją schematu i linków. Hooki go nie uruchamiają. CI buduje stronę w każdym PR. Przed PR, który zmienia treść, uruchom go lokalnie.
 - `npm test`: testy skryptów w `scripts/`.
 - `npm run scaffold`: tworzy strony z `scripts/structure.yaml`, których jeszcze nie ma. Nigdy nie nadpisuje.
 - `npm run freshness`: raport aktualności i tabela postępu w `src/content/docs/roadmap.md`.
@@ -28,6 +28,7 @@ Baza wiedzy o Claude Code jako strona Astro Starlight. Treść po polsku, nazwy 
 ## Jakość
 
 - `npm run check` uruchamia wszystkie bramki: Biome, markdownlint, dependency-cruiser, testy z progami pokrycia, knip i `astro check`. Hook `pre-push` i CI uruchamiają tę samą komendę.
+- `npm run arch` sprawdza też, czy `docs/architecture.mmd` zgadza się z kodem. Po zmianie importów uruchom `npm run arch:graph` i dodaj plik do commita.
 - Hook `pre-push` wymaga czystego drzewa roboczego. Zmiany i nowe pliki commitujesz, odkładasz przez `git stash` albo dopisujesz do `.gitignore`.
 - `npm run mutation` uruchamia Strykera. Próg wynosi 90%.
 - Nie obniżaj progów i nie wyłączaj reguł, żeby kod przeszedł. Napraw kod albo dopisz test zachowania.
