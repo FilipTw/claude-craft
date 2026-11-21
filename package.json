@@ -2,9 +2,12 @@
 	"name": "claude-craft",
 	"type": "module",
 	"version": "0.0.1",
+	"private": true,
+	"engines": {
+		"node": ">=26"
+	},
 	"scripts": {
 		"dev": "astro dev",
-		"start": "astro dev",
 		"build": "astro build",
 		"preview": "astro preview",
 		"astro": "astro",
@@ -14,12 +17,13 @@
 		"lint": "biome ci .",
 		"typecheck": "astro check --minimumSeverity warning",
 		"format": "biome check --write .",
-		"arch": "depcruise scripts src astro.config.mjs commitlint.config.mjs --output-type err-long",
-		"arch:graph": "depcruise scripts src astro.config.mjs commitlint.config.mjs --include-only '^(?:scripts|src|astro|commitlint|node_modules)' --collapse 'node_modules/(@[^/]+/[^/]+|[^/]+)' --output-type mermaid --output-to docs/architecture.mmd",
+		"arch": "depcruise scripts src astro.config.mjs commitlint.config.mjs --output-type err-long && npm run -s arch:mermaid | cmp docs/architecture.mmd -",
+		"arch:mermaid": "depcruise scripts src astro.config.mjs commitlint.config.mjs --include-only '^(?:scripts|src|astro|commitlint|node_modules)' --collapse 'node_modules/(@[^/]+/[^/]+|[^/]+)' --output-type mermaid",
+		"arch:graph": "npm run -s arch:mermaid > docs/architecture.mmd",
 		"deadcode": "knip && knip --production --strict",
 		"lint:md": "markdownlint-cli2",
 		"check": "npm run lint && npm run lint:md && npm run arch && npm run test && npm run deadcode && npm run typecheck",
-		"prepare": "node node_modules/lefthook/postinstall.js",
+		"prepare": "lefthook install",
 		"mutation": "stryker run"
 	},
 	"dependencies": {
@@ -44,6 +48,7 @@
 		"typescript": "6.0.3"
 	},
 	"allowScripts": {
+		"fsevents": false,
 		"lefthook": false
 	}
 }

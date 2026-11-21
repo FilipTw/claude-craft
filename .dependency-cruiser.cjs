@@ -4,7 +4,7 @@ const ASTRO = ['^astro:', '^node_modules/(?:astro|@astrojs/[^/]+|starlight-[^/]+
 const TEST = '\\.test\\.mjs$';
 
 /** @type {import('dependency-cruiser').IConfiguration} */
-module.exports = {
+const config = {
 	allowed: [
 		{
 			comment: 'Every script may use node builtins. Astro config may not.',
@@ -64,3 +64,5 @@ module.exports = {
 		enhancedResolveOptions: { exportsFields: ['exports'], conditionNames: ['import', 'node', 'default'] },
 	},
 };
+
+module.exports = config;
