@@ -67,7 +67,8 @@ Zmierzone 2026-11-21, po audycie:
 - Każdy plik testów tworzy jeden folder tymczasowy i usuwa go w hooku `after`. Skan importów `.astro` i `.mdx` ma własny plik `scripts/architecture.test.mjs`.
 - `sources` przyjmuje tylko adresy `https` przez `z.url({ protocol: /^https$/ })`. `z.string().url()` jest w Zod 4.6 przestarzałe i przepuszczało `http://`.
 - `package.json` ma `engines.node` `>=26` i `private: true`. Bez `engines` ustawienie `engine-strict` w `.npmrc` niczego nie blokowało. `.nvmrc` dalej wybiera wersję, a `engines` ją wymusza. To odwraca wcześniejszą decyzję, która odrzucała `engines` jako drugie źródło wersji.
-- `prepare` uruchamia `lefthook install`. `allowScripts` blokuje skrypt instalacyjny pakietu `lefthook`, ale `prepare` to skrypt projektu, więc `npm ci` instaluje hooki. `fsevents` ma w `allowScripts` wartość `false`, bo ładuje się z gotowego pliku binarnego.
+- `prepare` uruchamia `node node_modules/lefthook/postinstall.js`. To skrypt instalacyjny z pakietu `lefthook`. `allowScripts` blokuje go jako `postinstall` zależności, więc projekt wywołuje go sam. Gdy zmienna `CI` jest ustawiona, a `LEFTHOOK` nie, skrypt nic nie robi. W przeciwnym razie uruchamia `lefthook install`, wypisuje jego błąd i nie przerywa `npm ci`. `fsevents` ma w `allowScripts` wartość `false`, bo ładuje się z gotowego pliku binarnego.
+- Audyt zamienił `prepare` na `lefthook install`. Opis commita 28b5d11 i ta sekcja twierdziły, że `npm ci` dalej działa. To była prawda tylko w klonie repo bez globalnego `core.hooksPath`. W drzewie bez `.git`, np. pobranym przez Download ZIP, i przy globalnym `core.hooksPath` polecenie `lefthook install` kończyło się błędem, więc `npm ci` też. Przegląd to wykrył i stary `prepare` wrócił.
 - `tsconfig.json` obejmuje `.dependency-cruiser.cjs`, bo wzorzec `**/*` pomija pliki z kropką. Konfiguracja ma typ przez stałą `config`, bo TypeScript nie sprawdza typu JSDoc przy `module.exports`.
 - `npm run arch` porównuje `docs/architecture.mmd` z grafem z kodu przez `cmp` i kończy się błędem przy różnicy. Plik odświeża `npm run arch:graph`. Porównanie niczego nie zapisuje i nie zależy od indeksu gita.
 - `npm audit fix` bez `--force` podniósł `qs` do 6.17.1. Stryker dostaje go przez `typed-rest-client` 2.3.0, bo wersja 2.3.1 przypina `qs` 6.15.1.
@@ -85,6 +86,7 @@ Zmierzone 2026-11-21, po audycie:
 - ESLint i Prettier: dwa narzędzia i dwie konfiguracje zamiast jednego dla 4 skryptów.
 - oxlint: szybki, ale nic nie dodaje obok Biome.
 - TypeScript 7: `@astrojs/check` 0.9.12 obsługuje tylko wersje 5 i 6.
+- `lefthook install` w `prepare`: kończy `npm ci` błędem w drzewie bez `.git` i przy globalnym `core.hooksPath`.
 - SonarQube: koszt konfiguracji większy niż zysk przy jednym autorze.
 - `withastro/action`: nie czyta `.nvmrc`.
 - Tabela `Kind` z generycznym typem wyniku w parserze manifestu: wymaga rzutowania w miejscu, gdzie TypeScript nie łączy pętli po tabeli z typem wyniku, oraz ręcznych predykatów typów w JSDoc.

@@ -23,7 +23,7 @@
 		"deadcode": "knip && knip --production --strict",
 		"lint:md": "markdownlint-cli2",
 		"check": "npm run lint && npm run lint:md && npm run arch && npm run test && npm run deadcode && npm run typecheck",
-		"prepare": "lefthook install",
+		"prepare": "node node_modules/lefthook/postinstall.js",
 		"mutation": "stryker run"
 	},
 	"dependencies": {
