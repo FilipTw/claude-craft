@@ -77,6 +77,7 @@ function checkPrefixes(items, parent) {
 	items.forEach((item, index) => {
 		const name = item?.dir ?? item?.file;
 		const where = `${parent}${name ?? `[${index}]`}`;
+		// Stryker disable next-line StringLiteral: any fallback without a two-digit prefix fails the same way.
 		const match = NAME.exec(name ?? '');
 		if (!match) {
 			fail(where, 'must look like 01-kebab-case');
@@ -182,10 +183,10 @@ export function findPage(docsDir, path) {
 /**
  * @param {string} docsDir
  * @param {Page[]} pages
- * @param {string[]} [ignore]
+ * @param {string[]} ignore
  * @returns {string[]} Markdown files on disk that the manifest does not list, sorted.
  */
-export function findOrphans(docsDir, pages, ignore = []) {
+export function findOrphans(docsDir, pages, ignore) {
 	const known = new Set([...pages.flatMap((p) => [`${p.path}.md`, `${p.path}.mdx`]), ...ignore]);
 	return readdirSync(docsDir, { recursive: true })
 		.map(String)

@@ -25,6 +25,7 @@ const END = '<!-- progress:end -->';
  */
 export function classify(markdown, now) {
 	const text = markdown.replace(/^﻿/, '').replace(/\r\n/g, '\n');
+	// Stryker disable next-line StringLiteral: any fallback text parses to a value with no lastVerified, so the page is todo.
 	const frontmatter = parse(/^---\n([\s\S]*?)\n---/.exec(text)?.[1] ?? '') ?? {};
 	if (!frontmatter.lastVerified) {
 		return 'todo';

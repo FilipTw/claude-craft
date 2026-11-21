@@ -65,16 +65,24 @@ test('toSidebar keeps manifest order and Polish labels', () => {
 	]);
 });
 
-test('rejects a name without a two-digit prefix', () => {
-	assert.throws(() => parseStructure(valid.replace('01-intro', 'intro')), /intro/);
+test('rejects a file or folder name that is not NN-kebab-case', () => {
+	for (const name of ['intro', '1-intro', 'x01-intro', '01-Intro', '01-intro_x']) {
+		assert.throws(() => parseStructure(valid.replace('01-intro', name)), {
+			message: `structure.yaml: "01-basics/${name}" must look like 01-kebab-case`,
+		});
+	}
 });
 
 test('rejects prefixes out of order', () => {
-	assert.throws(() => parseStructure(valid.replace('03-first', '02-first')), /02-first/);
+	assert.throws(() => parseStructure(valid.replace('03-first', '02-first')), {
+		message: 'structure.yaml: "01-basics/02-first" prefix must be greater than the one before it',
+	});
 });
 
-test('rejects an unquoted title with a comma, which YAML splits into an extra key', () => {
-	assert.throws(() => parseStructure(valid.replace('title: Wstęp', 'title: Wstęp, cel')), /cel/);
+test('rejects an unquoted title with commas, which YAML splits into extra keys', () => {
+	assert.throws(() => parseStructure(valid.replace('title: Wstęp', 'title: Wstęp, cel, zakres')), {
+		message: 'structure.yaml: "01-basics/01-intro" has unknown keys cel, zakres. Quote titles that contain a comma',
+	});
 });
 
 test('rejects a page without a title', () => {
@@ -83,7 +91,9 @@ test('rejects a page without a title', () => {
 
 test('rejects the same section prefix reused in a later part', () => {
 	const twoParts = `${valid}\n  - label: Część II\n    sections:\n      - { file: 01-other, title: Inna }\n`;
-	assert.throws(() => parseStructure(twoParts), /01-other/);
+	assert.throws(() => parseStructure(twoParts), {
+		message: 'structure.yaml: "01-other" prefix must be greater than the one before it',
+	});
 });
 
 test('rejects bad shapes with a structure.yaml message', () => {
@@ -103,6 +113,8 @@ test('an error tells the editor where structure.yaml is wrong and what that plac
 	const cases = [
 		['- parts', '"(root)" must be a mapping'],
 		['parts: []', '"(root)" needs a non-empty list "parts"'],
+		['parts:\n  - Część I', '"parts[0]" must be a mapping'],
+		['parts:\n  - { label: Część I, sections: [~] }', '"[0]" must look like 01-kebab-case'],
 		['parts:\n  - { label: Część I, sections: [] }', '"parts[0]" needs a non-empty list "sections"'],
 		[valid.replace('label: Część I', "label: ''"), '"parts[0]" needs a text "label"'],
 		[valid.replace(install, 'items: []'), '"01-basics/02-install" needs a non-empty list "items"'],
@@ -128,10 +140,10 @@ test('findPage finds .md and .mdx pages', () => {
 	assert.equal(findPage(docs, '02-b'), undefined);
 });
 
-test('findOrphans lists sorted files that are not in the manifest', () => {
+test('findOrphans lists sorted Markdown files that are not in the manifest', () => {
 	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
 	mkdirSync(join(docs, '01-a'));
-	for (const file of ['01-a/09-z.md', '01-a/01-known.mdx', '05-b.md', 'index.mdx']) {
+	for (const file of ['01-a/09-z.md', '01-a/01-known.mdx', '05-b.md', '05-b.md.orig', 'index.mdx']) {
 		writeFileSync(join(docs, file), 'x');
 	}
 	/** @type {Page[]} */

@@ -28,3 +28,6 @@ pnpm-debug.log*
 
 # decision log and gate reports
 reports/
+
+# stryker sandbox
+.stryker-tmp/

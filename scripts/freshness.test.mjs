@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, statSync, utimesSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
@@ -19,7 +19,12 @@ test('a page without lastVerified or without frontmatter is todo', () => {
 	assert.equal(classify('# Strona\n', now), 'todo');
 });
 
-test('a page is fresh up to exactly 90 days and stale from day 91', () => {
+test('only a block at the top of the page is frontmatter, not text between two rules', () => {
+	assert.equal(classify('# Strona\n\n---\n\nlastVerified: 2026-11-01\n\n---\n', now), 'todo');
+});
+
+test('a page is fresh from the day it is verified up to exactly 90 days, and stale from day 91', () => {
+	assert.equal(classify(verified('2026-11-21'), now), 'fresh');
 	assert.equal(classify(verified('2026-08-23'), now), 'fresh');
 	assert.equal(classify(verified('2026-08-22'), now), 'stale');
 });
@@ -60,10 +65,17 @@ test('writeProgress replaces only the text between the markers, keeping $ patter
 	assert.equal(writeProgress(text, 'new $& $$'), 'a\n<!-- progress:start -->\nnew $& $$\n<!-- progress:end -->\nb\n');
 });
 
-test('writeProgress fails when the markers are missing or repeated', () => {
-	assert.throws(() => writeProgress('no markers', 't'), /progress/);
-	const twice = '<!-- progress:start -->\n<!-- progress:end -->\n'.repeat(2);
-	assert.throws(() => writeProgress(twice, 't'), /progress/);
+test('writeProgress fails unless there is exactly one start and one end marker', () => {
+	for (const text of [
+		'no markers',
+		'<!-- progress:start -->\n<!-- progress:end -->\n'.repeat(2),
+		'<!-- progress:start -->\nold\n',
+		'old\n<!-- progress:end -->\n',
+	]) {
+		assert.throws(() => writeProgress(text, 't'), {
+			message: 'roadmap.md needs exactly one <!-- progress:start --> and one <!-- progress:end -->',
+		});
+	}
 });
 
 test('runFreshness groups by top-level section and writes the table into roadmap.md', () => {
@@ -85,18 +97,34 @@ test('runFreshness prints each stale page and the fresh count on stdout by defau
 	writeFileSync(join(docs, 'roadmap.md'), '<!-- progress:start -->\n<!-- progress:end -->\n');
 	writeFileSync(join(docs, '01-a.md'), verified('2026-01-01'));
 	writeFileSync(join(docs, '02-b.md'), verified('2026-11-01'));
+	writeFileSync(join(docs, '03-c.md'), '---\ntitle: C\n---\n');
 	/** @type {Page[]} */
 	const pages = [
 		{ path: '01-a', title: 'A', type: 'explanation', section: 'Hooki' },
 		{ path: '02-b', title: 'B', type: 'explanation', section: 'Hooki' },
+		{ path: '03-c', title: 'C', type: 'explanation', section: 'Hooki' },
 	];
 	const write = t.mock.method(process.stdout, 'write', () => true);
 	runFreshness({ docsDir: docs, pages, now });
 	write.mock.restore();
 	assert.deepEqual(
 		write.mock.calls.map((call) => call.arguments[0]),
-		['Do sprawdzenia: 01-a\n', 'Aktualne: 1/2. Tabela postępu w src/content/docs/roadmap.md.\n'],
+		['Do sprawdzenia: 01-a\n', 'Aktualne: 1/3. Tabela postępu w src/content/docs/roadmap.md.\n'],
 	);
+});
+
+test('runFreshness leaves an up-to-date roadmap.md untouched', () => {
+	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
+	const roadmap = join(docs, 'roadmap.md');
+	writeFileSync(roadmap, '<!-- progress:start -->\n<!-- progress:end -->\n');
+	writeFileSync(join(docs, '01-a.md'), verified('2026-11-01'));
+	/** @type {Page[]} */
+	const pages = [{ path: '01-a', title: 'A', type: 'explanation', section: 'Hooki' }];
+	runFreshness({ docsDir: docs, pages, now, log: () => undefined });
+	const past = new Date('2020-01-01');
+	utimesSync(roadmap, past, past);
+	runFreshness({ docsDir: docs, pages, now, log: () => undefined });
+	assert.equal(statSync(roadmap).mtimeMs, past.getTime());
 });
 
 test('runFreshness names a page that is in the manifest but missing on disk', () => {

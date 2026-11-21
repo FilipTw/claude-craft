@@ -19,7 +19,8 @@
 		"deadcode": "knip && knip --production --strict",
 		"lint:md": "markdownlint-cli2",
 		"check": "npm run lint && npm run lint:md && npm run arch && npm run test && npm run deadcode && npm run typecheck",
-		"prepare": "node node_modules/lefthook/postinstall.js"
+		"prepare": "node node_modules/lefthook/postinstall.js",
+		"mutation": "stryker run"
 	},
 	"dependencies": {
 		"@astrojs/starlight": "0.43.1",
@@ -33,6 +34,8 @@
 		"@biomejs/biome": "2.6.8",
 		"@commitlint/cli": "21.2.4",
 		"@commitlint/config-conventional": "21.2.4",
+		"@stryker-mutator/core": "10.1.1",
+		"@stryker-mutator/tap-runner": "10.1.1",
 		"@types/node": "26.6.6",
 		"dependency-cruiser": "18.8.0",
 		"knip": "6.47.0",
