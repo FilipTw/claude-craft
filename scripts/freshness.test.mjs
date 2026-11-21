@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync, statSync, utimesSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, statSync, utimesSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
@@ -30,7 +30,7 @@ test('a page is fresh from the day it is verified up to exactly 90 days, and sta
 });
 
 test('reads frontmatter with CRLF line endings and a BOM', () => {
-	assert.equal(classify('﻿---\r\ntitle: A\r\nlastVerified: 2020-01-01\r\n---\r\n', now), 'stale');
+	assert.equal(classify('\uFEFF---\r\ntitle: A\r\nlastVerified: 2020-01-01\r\n---\r\n', now), 'stale');
 });
 
 test('an invalid or future date needs checking, never counts as fresh', () => {
@@ -73,7 +73,7 @@ test('writeProgress fails unless there is exactly one start and one end marker',
 		'old\n<!-- progress:end -->\n',
 	]) {
 		assert.throws(() => writeProgress(text, 't'), {
-			message: 'roadmap.md needs exactly one <!-- progress:start --> and one <!-- progress:end -->',
+			message: 'roadmap.md: needs exactly one <!-- progress:start --> and one <!-- progress:end -->',
 		});
 	}
 });
@@ -105,11 +105,12 @@ test('runFreshness prints each stale page and the fresh count on stdout by defau
 		{ path: '03-c', title: 'C', type: 'explanation', section: 'Hooki' },
 	];
 	const write = t.mock.method(process.stdout, 'write', () => true);
-	runFreshness({ docsDir: docs, pages, now });
+	const code = runFreshness({ docsDir: docs, pages, now });
 	write.mock.restore();
+	assert.equal(code, 0);
 	assert.deepEqual(
 		write.mock.calls.map((call) => call.arguments[0]),
-		['Do sprawdzenia: 01-a\n', 'Aktualne: 1/3. Tabela postępu w src/content/docs/roadmap.md.\n'],
+		['Stale: 01-a\n', 'Fresh: 1/3. Progress table in src/content/docs/roadmap.md.\n'],
 	);
 });
 
@@ -127,16 +128,56 @@ test('runFreshness leaves an up-to-date roadmap.md untouched', () => {
 	assert.equal(statSync(roadmap).mtimeMs, past.getTime());
 });
 
-test('runFreshness names a page that is in the manifest but missing on disk', () => {
+/**
+ * @param {string} docs
+ * @param {LocatedPage[]} pages
+ * @returns {{ code: 0 | 1, lines: string[] }}
+ */
+const runQuiet = (docs, pages) => {
+	/** @type {string[]} */
+	const lines = [];
+	const code = runFreshness({ docsDir: docs, pages, now, log: (line) => lines.push(line) });
+	return { code, lines };
+};
+
+test('runFreshness names a page that is in the manifest but missing on disk and exits 1', () => {
 	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
-	assert.throws(
-		() =>
-			runFreshness({
-				docsDir: docs,
-				pages: [{ path: '01-gone', title: 'G', type: 'explanation', section: 'X' }],
-				now,
-				log: () => undefined,
-			}),
-		/01-gone.*npm run scaffold/,
-	);
+	writeFileSync(join(docs, 'roadmap.md'), '<!-- progress:start -->\n<!-- progress:end -->\n');
+	assert.deepEqual(runQuiet(docs, [{ path: '01-gone', title: 'G', type: 'explanation', section: 'X' }]), {
+		code: 1,
+		lines: ['01-gone: listed in structure.yaml but missing on disk. Run npm run scaffold.'],
+	});
+});
+
+test('runFreshness names a page whose frontmatter is not valid YAML and exits 1 without touching roadmap.md', () => {
+	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
+	const roadmap = '<!-- progress:start -->\nold\n<!-- progress:end -->\n';
+	writeFileSync(join(docs, 'roadmap.md'), roadmap);
+	writeFileSync(join(docs, '01-a.mdx'), '---\ntitle: Hooki: zdarzenia\n---\n');
+	assert.deepEqual(runQuiet(docs, [{ path: '01-a', title: 'A', type: 'explanation', section: 'X' }]), {
+		code: 1,
+		lines: [
+			'01-a.mdx: frontmatter is not valid YAML. Nested mappings are not allowed in compact mappings at line 2, column 8.',
+		],
+	});
+	assert.equal(readFileSync(join(docs, 'roadmap.md'), 'utf8'), roadmap);
+});
+
+test('runFreshness names roadmap.md when its progress markers are wrong and exits 1 before any other line', () => {
+	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
+	writeFileSync(join(docs, 'roadmap.md'), 'no markers\n');
+	writeFileSync(join(docs, '01-a.md'), verified('2020-01-01'));
+	assert.deepEqual(runQuiet(docs, [{ path: '01-a', title: 'A', type: 'explanation', section: 'X' }]), {
+		code: 1,
+		lines: ['roadmap.md: needs exactly one <!-- progress:start --> and one <!-- progress:end -->'],
+	});
+});
+
+test('runFreshness lets an error that is not a docs problem through with its stack', () => {
+	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
+	writeFileSync(join(docs, 'roadmap.md'), '<!-- progress:start -->\n<!-- progress:end -->\n');
+	mkdirSync(join(docs, '01-a.md'));
+	assert.throws(() => runQuiet(docs, [{ path: '01-a', title: 'A', type: 'explanation', section: 'X' }]), {
+		code: 'EISDIR',
+	});
 });

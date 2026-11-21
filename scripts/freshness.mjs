@@ -1,9 +1,9 @@
 // Reports which pages are fresh, stale (lastVerified older than 90 days), or not written yet (no lastVerified).
 // Writes the progress table into roadmap.md between the progress markers.
 import { readFileSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parse } from 'yaml';
+import { parse, YAMLParseError } from 'yaml';
 import { DOCS, findPage, listPages, loadStructure } from './structure.mjs';
 
 /** @import { LocatedPage } from './structure.mjs' */
@@ -17,6 +17,8 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const START = '<!-- progress:start -->';
 const END = '<!-- progress:end -->';
 
+class DocsProblem extends Error {}
+
 /**
  * @param {string} markdown
  * @param {Date} now
@@ -24,8 +26,9 @@ const END = '<!-- progress:end -->';
  * @internal
  */
 export function classify(markdown, now) {
-	const text = markdown.replace(/^﻿/, '').replace(/\r\n/g, '\n');
-	const block = /^---\n([\s\S]*?)\n---/.exec(text)?.[1];
+	const text = markdown.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n');
+	// The block keeps its opening ---, so a YAML error counts lines the way the file does.
+	const block = /^(---\n[\s\S]*?)\n---/.exec(text)?.[1];
 	if (block === undefined) {
 		return 'todo';
 	}
@@ -76,14 +79,36 @@ export function writeProgress(text, table) {
 	const starts = text.split(START).length - 1;
 	const ends = text.split(END).length - 1;
 	if (starts !== 1 || ends !== 1) {
-		throw new Error(`roadmap.md needs exactly one ${START} and one ${END}`);
+		throw new DocsProblem(`roadmap.md: needs exactly one ${START} and one ${END}`);
 	}
 	return text.replace(new RegExp(`${START}[\\s\\S]*?${END}`), () => `${START}\n${table}\n${END}`);
 }
 
 /**
+ * @param {string} docsDir
+ * @param {LocatedPage} page
+ * @param {Date} now
+ * @returns {ProgressRow}
+ */
+function readRow(docsDir, page, now) {
+	const file = findPage(docsDir, page.path);
+	if (!file) {
+		throw new DocsProblem(`${page.path}: listed in structure.yaml but missing on disk. Run npm run scaffold.`);
+	}
+	try {
+		return { ...page, status: classify(readFileSync(file, 'utf8'), now) };
+	} catch (error) {
+		if (error instanceof YAMLParseError) {
+			const reason = error.message.replace(/:?\n[\s\S]*/, '');
+			throw new DocsProblem(`${relative(docsDir, file)}: frontmatter is not valid YAML. ${reason}.`);
+		}
+		throw error;
+	}
+}
+
+/**
  * @param {{ docsDir?: string, pages?: LocatedPage[], now?: Date, log?: (line: string) => void }} [options]
- * @returns {ProgressRow[]}
+ * @returns {0 | 1}
  * @internal
  */
 export function runFreshness({
@@ -92,28 +117,30 @@ export function runFreshness({
 	now = new Date(),
 	log = (line) => process.stdout.write(`${line}\n`),
 } = {}) {
-	const rows = pages.map((page) => {
-		const file = findPage(docsDir, page.path);
-		if (!file) {
-			throw new Error(`${page.path} is in structure.yaml but missing on disk. Run npm run scaffold`);
+	try {
+		const rows = pages.map((page) => readRow(docsDir, page, now));
+		const roadmap = join(docsDir, 'roadmap.md');
+		const text = readFileSync(roadmap, 'utf8');
+		const updated = writeProgress(text, renderProgress(rows));
+		for (const row of rows.filter((r) => r.status === 'stale')) {
+			log(`Stale: ${row.path}`);
 		}
-		return { ...page, status: classify(readFileSync(file, 'utf8'), now) };
-	});
-	for (const row of rows.filter((r) => r.status === 'stale')) {
-		log(`Do sprawdzenia: ${row.path}`);
+		if (updated !== text) {
+			writeFileSync(roadmap, updated);
+		}
+		log(
+			`Fresh: ${rows.filter((r) => r.status === 'fresh').length}/${rows.length}. Progress table in src/content/docs/roadmap.md.`,
+		);
+		return 0;
+	} catch (error) {
+		if (error instanceof DocsProblem) {
+			log(error.message);
+			return 1;
+		}
+		throw error;
 	}
-	const roadmap = join(docsDir, 'roadmap.md');
-	const text = readFileSync(roadmap, 'utf8');
-	const updated = writeProgress(text, renderProgress(rows));
-	if (updated !== text) {
-		writeFileSync(roadmap, updated);
-	}
-	log(
-		`Aktualne: ${rows.filter((r) => r.status === 'fresh').length}/${rows.length}. Tabela postępu w src/content/docs/roadmap.md.`,
-	);
-	return rows;
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-	runFreshness();
+	process.exitCode = runFreshness();
 }

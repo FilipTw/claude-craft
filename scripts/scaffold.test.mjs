@@ -84,7 +84,7 @@ test('runScaffold prints the created count and each orphan on stdout by default'
 	assert.equal(code, 1);
 	assert.deepEqual(
 		write.mock.calls.map((call) => call.arguments[0]),
-		['Utworzono 2 stron.\n', 'Poza manifestem: 09-stray.md. Dodaj go do scripts/structure.yaml.\n'],
+		['Pages created: 2.\n', 'Outside the manifest: 09-stray.md. Add it to scripts/structure.yaml.\n'],
 	);
 });
 
