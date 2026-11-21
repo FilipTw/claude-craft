@@ -16,7 +16,7 @@ Ucz się częściami, w kolejności z menu bocznego. Każda część kończy si�
 
 ## Postęp
 
-Strona jest aktualna, gdy ma `lastVerified` nie starsze niż 90 dni. Tabelę generuje `npm run check:fresh`.
+Strona jest aktualna, gdy ma `lastVerified` nie starsze niż 90 dni. Tabelę generuje `npm run freshness`.
 
 <!-- progress:start -->
 | Sekcja | Aktualne | Do sprawdzenia | Do napisania |

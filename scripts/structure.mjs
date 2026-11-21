@@ -20,8 +20,9 @@ export const PAGE_TYPES = /** @type {const} */ (['tutorial', 'how-to', 'referenc
  */
 export const ROOT = fileURLToPath(new URL('..', import.meta.url));
 export const DOCS = join(ROOT, 'src/content/docs');
+export const ROADMAP = 'roadmap.md';
 // Pages written by hand, outside the manifest.
-export const HANDWRITTEN = ['index.mdx', 'roadmap.md'];
+export const HANDWRITTEN = ['index.mdx', ROADMAP];
 const NAME = /^(\d{2})-[a-z0-9]+(-[a-z0-9]+)*$/;
 
 /**

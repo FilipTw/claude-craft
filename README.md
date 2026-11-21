@@ -2,7 +2,7 @@
 
 Baza wiedzy do nauki Claude Code i pracy z agentami AI na poziomie Senior Dev. Strona: <https://filiptw.github.io/claude-craft/>
 
-Każda strona ma źródła i datę ostatniej weryfikacji. Skrypt `npm run check:fresh` pokazuje strony starsze niż 90 dni.
+Każda strona ma źródła i datę ostatniej weryfikacji. Skrypt `npm run freshness` pokazuje strony starsze niż 90 dni.
 
 ## Ścieżka nauki
 
@@ -31,7 +31,7 @@ npm run dev
 | --- | --- |
 | `src/content/docs/` | Strony w Markdown |
 | `scripts/structure.yaml` | Drzewo stron i sidebar |
-| `scripts/templates/` | Szablony stron dla czterech typów Diátaxis |
+| `scripts/page-templates/` | Szablony stron dla czterech typów Diátaxis |
 | `templates/` | Szablony konfiguracji Claude Code z labów |
 
 Zasady pisania i komendy są w `CLAUDE.md`.

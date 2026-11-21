@@ -42,7 +42,7 @@ export function runScaffold({
 } = {}) {
 	const templates = /** @type {Record<PageType, string>} */ (
 		Object.fromEntries(
-			PAGE_TYPES.map((type) => [type, readFileSync(join(ROOT, `scripts/templates/${type}.md`), 'utf8')]),
+			PAGE_TYPES.map((type) => [type, readFileSync(join(ROOT, `scripts/page-templates/${type}.md`), 'utf8')]),
 		)
 	);
 	const { created } = scaffold({ docsDir, pages, templates });

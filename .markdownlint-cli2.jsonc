@@ -34,6 +34,12 @@
 		"MD055": { "style": "leading_and_trailing" },
 		"MD060": { "style": "compact" }
 	},
-	"globs": ["*.md", "src/content/docs/**/*.{md,mdx}", "templates/**/*.md", "scripts/templates/*.md", "docs/**/*.md"],
+	"globs": [
+		"*.md",
+		"src/content/docs/**/*.{md,mdx}",
+		"templates/**/*.md",
+		"scripts/page-templates/*.md",
+		"docs/**/*.md"
+	],
 	"gitignore": true
 }
