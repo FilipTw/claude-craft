@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parse, parseDocument } from 'yaml';
+import { parseDocument } from 'yaml';
 
 export const PAGE_TYPES = /** @type {const} */ (['tutorial', 'how-to', 'reference', 'explanation']);
 
@@ -20,6 +20,8 @@ export const DOCS = join(ROOT, 'src/content/docs');
 export const ROADMAP = 'roadmap.md';
 export const PAGES_OUTSIDE_MANIFEST = ['index.mdx', ROADMAP];
 const NAME = /^(\d{2})-[a-z0-9]+(-[a-z0-9]+)*$/;
+
+export class DocsProblem extends Error {}
 
 /**
  * @param {string | URL} [path]
@@ -55,7 +57,7 @@ export function parseYaml(text, reject) {
  * @returns {never}
  */
 function fail(where, problem) {
-	throw new Error(`structure.yaml: "${where}" ${problem}`);
+	throw new DocsProblem(`structure.yaml: "${where}" ${problem}`);
 }
 
 /**
@@ -139,7 +141,8 @@ function nameItems(items, parent) {
  * @internal
  */
 export function parseStructure(text) {
-	const root = mapping(parse(text), '(root)', ['parts']);
+	const yaml = parseYaml(text, (reason) => fail('(root)', `is not valid YAML. ${reason}`));
+	const root = mapping(yaml, '(root)', ['parts']);
 	const parts = listAt(root, '(root)', 'parts').map((node, index) => {
 		const where = `parts[${index}]`;
 		const part = mapping(node, where, ['label', 'sections']);

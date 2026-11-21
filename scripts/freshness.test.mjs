@@ -199,6 +199,16 @@ test('runFreshness names roadmap.md when its progress markers are wrong and exit
 	}
 });
 
+test('runFreshness prints the structure.yaml problem as one line and exits 1', () => {
+	const docs = tempDir();
+	const manifest = join(docs, 'structure.yaml');
+	writeFileSync(manifest, 'parts:\n  - label: A\n    sections:\n      - { file: 01-a, titel: A }\n');
+	/** @type {string[]} */
+	const lines = [];
+	assert.equal(runFreshness({ docsDir: docs, manifest, now, log: (line) => lines.push(line) }), 1);
+	assert.deepEqual(lines, ['structure.yaml: "01-a" has unknown keys titel. Quote titles that contain a comma']);
+});
+
 test('runFreshness lets an error that is not a docs problem through with its stack', () => {
 	const docs = tempDir();
 	writeFileSync(join(docs, 'roadmap.md'), '<!-- progress:start -->\n<!-- progress:end -->\n');

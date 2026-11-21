@@ -98,3 +98,19 @@ test('runScaffold exits 0 on a clean tree and 1 when a file is outside the manif
 	writeFileSync(join(docs, '01-a/09-stray.md'), 'x');
 	assert.equal(runScaffold({ docsDir: docs, pages, log: silent }), 1);
 });
+
+test('runScaffold prints the structure.yaml problem as one line and exits 1', () => {
+	const docs = tempDir();
+	const manifest = join(docs, 'structure.yaml');
+	writeFileSync(manifest, 'parts:\n  - label: A\n    sections:\n      - { file: 01-a, titel: A }\n');
+	/** @type {string[]} */
+	const lines = [];
+	assert.equal(runScaffold({ docsDir: docs, manifest, log: (line) => lines.push(line) }), 1);
+	assert.deepEqual(lines, ['structure.yaml: "01-a" has unknown keys titel. Quote titles that contain a comma']);
+});
+
+test('runScaffold lets an error that is not a docs problem through with its stack', () => {
+	const docs = tempDir();
+	writeFileSync(join(docs, '01-a'), 'a file where the folder should be');
+	assert.throws(() => runScaffold({ docsDir: docs, pages, log: silent }), { code: 'EEXIST' });
+});
