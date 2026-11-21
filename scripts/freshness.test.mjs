@@ -1,8 +1,8 @@
-import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { test } from 'node:test';
 import { classify, renderProgress, runFreshness, writeProgress } from './freshness.mjs';
 
 const now = new Date('2026-11-21');
@@ -68,14 +68,14 @@ test('runFreshness groups by top-level section and writes the table into roadmap
 		{ path: '01-a', section: 'Hooki' },
 		{ path: '02-b', section: 'Hooki' },
 	];
-	runFreshness({ docsDir: docs, pages, now, log: () => {} });
+	runFreshness({ docsDir: docs, pages, now, log: () => undefined });
 	assert.match(readFileSync(join(docs, 'roadmap.md'), 'utf8'), /\| Hooki \| 1 \| 0 \| 1 \|/);
 });
 
 test('runFreshness names a page that is in the manifest but missing on disk', () => {
 	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
 	assert.throws(
-		() => runFreshness({ docsDir: docs, pages: [{ path: '01-gone', section: 'X' }], now, log: () => {} }),
+		() => runFreshness({ docsDir: docs, pages: [{ path: '01-gone', section: 'X' }], now, log: () => undefined }),
 		/01-gone.*npm run scaffold/,
 	);
 });

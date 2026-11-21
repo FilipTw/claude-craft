@@ -1,13 +1,13 @@
-import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { test } from 'node:test';
 import {
 	DOCS,
-	HANDWRITTEN,
 	findOrphans,
 	findPage,
+	HANDWRITTEN,
 	listPages,
 	loadStructure,
 	parseStructure,
@@ -102,8 +102,9 @@ test('findPage finds .md and .mdx pages', () => {
 test('findOrphans lists sorted files that are not in the manifest', () => {
 	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
 	mkdirSync(join(docs, '01-a'));
-	for (const file of ['01-a/09-z.md', '01-a/01-known.mdx', '05-b.md', 'index.mdx'])
+	for (const file of ['01-a/09-z.md', '01-a/01-known.mdx', '05-b.md', 'index.mdx']) {
 		writeFileSync(join(docs, file), 'x');
+	}
 	const pages = [{ path: '01-a/01-known' }];
 	assert.deepEqual(findOrphans(docs, pages, ['index.mdx']), ['01-a/09-z.md', '05-b.md']);
 });

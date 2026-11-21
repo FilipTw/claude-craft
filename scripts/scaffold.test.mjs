@@ -1,8 +1,8 @@
-import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { test } from 'node:test';
 import { runScaffold, scaffold } from './scaffold.mjs';
 
 const pages = [
@@ -13,7 +13,7 @@ const templates = {
 	explanation: '---\ntitle: {{title}}\ntype: {{type}}\n---\n',
 	'how-to': '---\ntitle: {{title}}\ntype: {{type}}\n---\n## Kroki\n',
 };
-const silent = () => {};
+const silent = () => undefined;
 
 test('creates missing pages from the template of their type', () => {
 	const docs = mkdtempSync(join(tmpdir(), 'cc-'));

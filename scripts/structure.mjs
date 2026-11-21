@@ -1,7 +1,7 @@
 // The manifest (structure.yaml) is the only source of the page tree, and this module
 // is the only owner of where pages live on disk.
 // The manifest seeds new pages and builds the sidebar. After a page exists, its frontmatter owns title and type.
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
@@ -21,14 +21,22 @@ function fail(where, problem) {
 	throw new Error(`structure.yaml: "${where}" ${problem}`);
 }
 
-function checkShape(node, where, allowed, required) {
-	if (node === null || typeof node !== 'object' || Array.isArray(node)) fail(where, 'must be a mapping');
+const LIST = { ok: (value) => Array.isArray(value) && value.length > 0, noun: 'a non-empty list' };
+const TEXT = { ok: (value) => typeof value === 'string' && value !== '', noun: 'a text' };
+
+function checkShape(node, where, required, alsoAllowed = []) {
+	if (node === null || typeof node !== 'object' || Array.isArray(node)) {
+		fail(where, 'must be a mapping');
+	}
+	const allowed = [...Object.keys(required), ...alsoAllowed];
 	const extra = Object.keys(node).filter((key) => !allowed.includes(key));
-	if (extra.length) fail(where, `has unknown keys ${extra.join(', ')}. Quote titles that contain a comma`);
+	if (extra.length > 0) {
+		fail(where, `has unknown keys ${extra.join(', ')}. Quote titles that contain a comma`);
+	}
 	for (const [key, kind] of Object.entries(required)) {
-		const value = node[key];
-		const ok = kind === 'list' ? Array.isArray(value) && value.length > 0 : typeof value === 'string' && value !== '';
-		if (!ok) fail(where, `needs ${kind === 'list' ? 'a non-empty list' : 'a text'} "${key}"`);
+		if (!kind.ok(node[key])) {
+			fail(where, `needs ${kind.noun} "${key}"`);
+		}
 	}
 }
 
@@ -38,8 +46,12 @@ function checkPrefixes(items, parent) {
 		const name = item?.dir ?? item?.file;
 		const where = `${parent}${name ?? `[${index}]`}`;
 		const match = NAME.exec(name ?? '');
-		if (!match) fail(where, 'must look like 01-kebab-case');
-		if (Number(match[1]) <= previous) fail(where, 'prefix must be greater than the one before it');
+		if (!match) {
+			fail(where, 'must look like 01-kebab-case');
+		}
+		if (Number(match[1]) <= previous) {
+			fail(where, 'prefix must be greater than the one before it');
+		}
 		previous = Number(match[1]);
 	});
 }
@@ -47,10 +59,10 @@ function checkPrefixes(items, parent) {
 // Parse and validate once, at the boundary. Everything downstream trusts the result.
 export function parseStructure(text) {
 	const raw = parse(text);
-	checkShape(raw, '(root)', ['parts'], { parts: 'list' });
-	raw.parts.forEach((part, index) =>
-		checkShape(part, `parts[${index}]`, ['label', 'sections'], { label: 'text', sections: 'list' }),
-	);
+	checkShape(raw, '(root)', { parts: LIST });
+	for (const [index, part] of raw.parts.entries()) {
+		checkShape(part, `parts[${index}]`, { label: TEXT, sections: LIST });
+	}
 	// Top-level sections share one docs root, so their prefixes ascend across all parts.
 	checkPrefixes(
 		raw.parts.flatMap((part) => part.sections),
@@ -63,13 +75,15 @@ function checkItems(items, parent) {
 	return items.map((item) => {
 		const where = `${parent}${item.dir ?? item.file}`;
 		if (item.dir) {
-			checkShape(item, where, ['dir', 'label', 'items'], { label: 'text', items: 'list' });
+			checkShape(item, where, { label: TEXT, items: LIST }, ['dir']);
 			checkPrefixes(item.items, `${where}/`);
 			return { dir: item.dir, label: item.label, items: checkItems(item.items, `${where}/`) };
 		}
-		checkShape(item, where, ['file', 'title', 'type'], { title: 'text' });
+		checkShape(item, where, { title: TEXT }, ['file', 'type']);
 		const type = item.type ?? 'explanation';
-		if (!PAGE_TYPES.includes(type)) fail(where, `has unknown type "${type}"`);
+		if (!PAGE_TYPES.includes(type)) {
+			fail(where, `has unknown type "${type}"`);
+		}
 		return { file: item.file, title: item.title, type };
 	});
 }
@@ -79,12 +93,16 @@ export function listPages(structure) {
 	const pages = [];
 	const walk = (items, base, section) => {
 		for (const item of items) {
-			if (item.dir) walk(item.items, `${base}${item.dir}/`, section ?? item.label);
-			else
+			if (item.dir) {
+				walk(item.items, `${base}${item.dir}/`, section ?? item.label);
+			} else {
 				pages.push({ path: `${base}${item.file}`, title: item.title, type: item.type, section: section ?? item.title });
+			}
 		}
 	};
-	for (const part of structure.parts) walk(part.sections, '', undefined);
+	for (const part of structure.parts) {
+		walk(part.sections, '', undefined);
+	}
 	return pages;
 }
 
