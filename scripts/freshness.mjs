@@ -4,7 +4,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse, YAMLParseError } from 'yaml';
-import { DOCS, findPage, listPages, loadStructure } from './structure.mjs';
+import { DOCS, findPage, listPages, loadStructure, ROADMAP } from './structure.mjs';
 
 /** @import { LocatedPage } from './structure.mjs' */
 /**
@@ -79,7 +79,7 @@ export function writeProgress(text, table) {
 	const starts = text.split(START).length - 1;
 	const ends = text.split(END).length - 1;
 	if (starts !== 1 || ends !== 1) {
-		throw new DocsProblem(`roadmap.md: needs exactly one ${START} and one ${END}`);
+		throw new DocsProblem(`${ROADMAP}: needs exactly one ${START} and one ${END}`);
 	}
 	return text.replace(new RegExp(`${START}[\\s\\S]*?${END}`), () => `${START}\n${table}\n${END}`);
 }
@@ -119,7 +119,7 @@ export function runFreshness({
 } = {}) {
 	try {
 		const rows = pages.map((page) => readRow(docsDir, page, now));
-		const roadmap = join(docsDir, 'roadmap.md');
+		const roadmap = join(docsDir, ROADMAP);
 		const text = readFileSync(roadmap, 'utf8');
 		const updated = writeProgress(text, renderProgress(rows));
 		for (const row of rows.filter((r) => r.status === 'stale')) {
@@ -129,7 +129,7 @@ export function runFreshness({
 			writeFileSync(roadmap, updated);
 		}
 		log(
-			`Fresh: ${rows.filter((r) => r.status === 'fresh').length}/${rows.length}. Progress table in src/content/docs/roadmap.md.`,
+			`Fresh: ${rows.filter((r) => r.status === 'fresh').length}/${rows.length}. Progress table in src/content/docs/${ROADMAP}.`,
 		);
 		return 0;
 	} catch (error) {

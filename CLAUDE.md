@@ -8,7 +8,7 @@ Baza wiedzy o Claude Code jako strona Astro Starlight. Treść po polsku, nazwy 
 - `npm run build`: build z walidacją schematu i linków. Musi przejść przed każdym commitem.
 - `npm test`: testy skryptów w `scripts/`.
 - `npm run scaffold`: tworzy strony z `scripts/structure.yaml`, których jeszcze nie ma. Nigdy nie nadpisuje.
-- `npm run check:fresh`: raport aktualności i tabela postępu w `src/content/docs/roadmap.md`.
+- `npm run freshness`: raport aktualności i tabela postępu w `src/content/docs/roadmap.md`.
 
 ## Dodawanie i zmiana stron
 
