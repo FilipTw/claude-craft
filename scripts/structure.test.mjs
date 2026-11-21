@@ -39,6 +39,13 @@ test('listPages flattens the tree with paths, default type and top-level section
 	]);
 });
 
+test('a page listed directly in a part is its own section', () => {
+	const flat = 'parts:\n  - label: Część I\n    sections:\n      - { file: 01-faq, title: FAQ }\n';
+	assert.deepEqual(listPages(parseStructure(flat)), [
+		{ path: '01-faq', title: 'FAQ', type: 'explanation', section: 'FAQ' },
+	]);
+});
+
 test('toSidebar keeps manifest order and Polish labels', () => {
 	assert.deepEqual(toSidebar(parseStructure(valid)), [
 		{
@@ -88,6 +95,26 @@ test('rejects bad shapes with a structure.yaml message', () => {
 			parseStructure(valid.replace('label: Instalacja\n            items:', 'label: Instalacja\n            itemz:')),
 		/itemz/,
 	);
+});
+
+test('an error tells the editor where structure.yaml is wrong and what that place needs', () => {
+	const install = 'items:\n              - { file: 01-macos, title: macOS, type: how-to }';
+	/** @type {Array<[string, string]>} */
+	const cases = [
+		['- parts', '"(root)" must be a mapping'],
+		['parts: []', '"(root)" needs a non-empty list "parts"'],
+		['parts:\n  - { label: Część I, sections: [] }', '"parts[0]" needs a non-empty list "sections"'],
+		[valid.replace('label: Część I', "label: ''"), '"parts[0]" needs a text "label"'],
+		[valid.replace(install, 'items: []'), '"01-basics/02-install" needs a non-empty list "items"'],
+		[valid.replace('title: Wstęp', "title: ''"), '"01-basics/01-intro" needs a text "title"'],
+		[
+			valid.replace('{ file: 01-intro, title: Wstęp }', '{ title: Wstęp }'),
+			'"01-basics/[0]" must look like 01-kebab-case',
+		],
+	];
+	for (const [text, problem] of cases) {
+		assert.throws(() => parseStructure(text), { message: `structure.yaml: ${problem}` });
+	}
 });
 
 test('rejects an unknown page type', () => {

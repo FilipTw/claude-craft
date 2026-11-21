@@ -8,7 +8,7 @@
 		"build": "astro build",
 		"preview": "astro preview",
 		"astro": "astro",
-		"test": "node --test 'scripts/*.test.mjs'",
+		"test": "node --test --experimental-test-coverage --test-coverage-include='scripts/**/*.mjs' --test-coverage-exclude='**/*.test.mjs' --test-coverage-include-all --test-coverage-lines=95 --test-coverage-branches=90 --test-coverage-functions=100 'scripts/*.test.mjs'",
 		"scaffold": "node scripts/scaffold.mjs",
 		"check:fresh": "node scripts/freshness.mjs",
 		"lint": "biome ci .",

@@ -14,8 +14,9 @@ const verified = (date) => `---\ntitle: A\nlastVerified: ${date}\n---\n`;
 /** @type {(section: string, status: Status) => ProgressRow} */
 const row = (section, status) => ({ path: '01-x', title: 'X', type: 'explanation', section, status });
 
-test('a page without lastVerified is todo', () => {
+test('a page without lastVerified or without frontmatter is todo', () => {
 	assert.equal(classify('---\ntitle: A\ntype: explanation\n---\n', now), 'todo');
+	assert.equal(classify('# Strona\n', now), 'todo');
 });
 
 test('a page is fresh up to exactly 90 days and stale from day 91', () => {
@@ -77,6 +78,25 @@ test('runFreshness groups by top-level section and writes the table into roadmap
 	];
 	runFreshness({ docsDir: docs, pages, now, log: () => undefined });
 	assert.match(readFileSync(join(docs, 'roadmap.md'), 'utf8'), /\| Hooki \| 1 \| 0 \| 1 \|/);
+});
+
+test('runFreshness prints each stale page and the fresh count on stdout by default', (t) => {
+	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
+	writeFileSync(join(docs, 'roadmap.md'), '<!-- progress:start -->\n<!-- progress:end -->\n');
+	writeFileSync(join(docs, '01-a.md'), verified('2026-01-01'));
+	writeFileSync(join(docs, '02-b.md'), verified('2026-11-01'));
+	/** @type {Page[]} */
+	const pages = [
+		{ path: '01-a', title: 'A', type: 'explanation', section: 'Hooki' },
+		{ path: '02-b', title: 'B', type: 'explanation', section: 'Hooki' },
+	];
+	const write = t.mock.method(process.stdout, 'write', () => true);
+	runFreshness({ docsDir: docs, pages, now });
+	write.mock.restore();
+	assert.deepEqual(
+		write.mock.calls.map((call) => call.arguments[0]),
+		['Do sprawdzenia: 01-a\n', 'Aktualne: 1/2. Tabela postępu w src/content/docs/roadmap.md.\n'],
+	);
 });
 
 test('runFreshness names a page that is in the manifest but missing on disk', () => {
