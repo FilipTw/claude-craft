@@ -1,6 +1,3 @@
-// The manifest (structure.yaml) is the only source of the page tree, and this module
-// is the only owner of where pages live on disk.
-// The manifest seeds new pages and builds the sidebar. After a page exists, its frontmatter owns title and type.
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -21,8 +18,7 @@ export const PAGE_TYPES = /** @type {const} */ (['tutorial', 'how-to', 'referenc
 export const ROOT = fileURLToPath(new URL('..', import.meta.url));
 export const DOCS = join(ROOT, 'src/content/docs');
 export const ROADMAP = 'roadmap.md';
-// Pages written by hand, outside the manifest.
-export const HANDWRITTEN = ['index.mdx', ROADMAP];
+export const PAGES_OUTSIDE_MANIFEST = ['index.mdx', ROADMAP];
 const NAME = /^(\d{2})-[a-z0-9]+(-[a-z0-9]+)*$/;
 
 /**
@@ -129,17 +125,20 @@ export function parseStructure(text) {
 		const part = mapping(node, where, ['label', 'sections']);
 		return { label: textAt(part, where, 'label'), sections: listAt(part, where, 'sections') };
 	});
-	// Top-level sections share one docs root, so their prefixes ascend across all parts.
-	const sections = nameItems(
+	checkPrefixesAscendAcrossParts(parts);
+	return {
+		parts: parts.map((part) => ({ label: part.label, sections: nameItems(part.sections, '').map(parseItem) })),
+	};
+}
+
+/**
+ * @param {Array<{ sections: unknown[] }>} parts
+ */
+function checkPrefixesAscendAcrossParts(parts) {
+	nameItems(
 		parts.flatMap((part) => part.sections),
 		'',
 	);
-	return {
-		parts: parts.map((part) => ({
-			label: part.label,
-			sections: sections.splice(0, part.sections.length).map(parseItem),
-		})),
-	};
 }
 
 /**

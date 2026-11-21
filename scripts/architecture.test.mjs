@@ -14,7 +14,7 @@ const IMPORT = /\b(?:from|import)\s*\(?\s*(['"])(.+?)\1/g;
 /**
  * dependency-cruiser does not parse .astro and .mdx files, so this scan stands in for its layer rules there.
  * @param {string} root
- * @returns {string[]} each import in an .astro or .mdx file under src/ that resolves into scripts/, as `file -> specifier`
+ * @returns {string[]}
  */
 const importsIntoScripts = (root) =>
 	globSync('src/**/*.{astro,mdx}', { cwd: root })

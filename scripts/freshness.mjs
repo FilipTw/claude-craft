@@ -1,5 +1,3 @@
-// Reports which pages are fresh, stale (lastVerified older than 90 days), or not written yet (no lastVerified).
-// Writes the progress table into roadmap.md between the progress markers.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -19,6 +17,9 @@ const END = '<!-- progress:end -->';
 
 class DocsProblem extends Error {}
 
+/** @param {number} ageDays */
+const provesRecentCheck = (ageDays) => ageDays >= 0 && ageDays <= MAX_AGE_DAYS;
+
 /**
  * @param {string} markdown
  * @param {Date} now
@@ -27,21 +28,16 @@ class DocsProblem extends Error {}
  */
 export function classify(markdown, now) {
 	const text = markdown.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n');
-	// The block keeps its opening ---, so a YAML error counts lines the way the file does.
-	const block = /^(---\n[\s\S]*?)\n---/.exec(text)?.[1];
-	if (block === undefined) {
+	const frontmatterWithFileLineNumbers = /^(---\n[\s\S]*?)\n---/.exec(text)?.[1];
+	if (frontmatterWithFileLineNumbers === undefined) {
 		return 'todo';
 	}
-	const frontmatter = parse(block) ?? {};
+	const frontmatter = parse(frontmatterWithFileLineNumbers) ?? {};
 	if (!frontmatter.lastVerified) {
 		return 'todo';
 	}
 	const age = (now.getTime() - new Date(frontmatter.lastVerified).getTime()) / DAY_MS;
-	// An unreadable or future date is not proof of a check, so it needs checking.
-	if (!(age >= 0 && age <= MAX_AGE_DAYS)) {
-		return 'stale';
-	}
-	return 'fresh';
+	return provesRecentCheck(age) ? 'fresh' : 'stale';
 }
 
 /**

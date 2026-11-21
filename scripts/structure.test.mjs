@@ -7,9 +7,9 @@ import {
 	DOCS,
 	findOrphans,
 	findPage,
-	HANDWRITTEN,
 	listPages,
 	loadStructure,
+	PAGES_OUTSIDE_MANIFEST,
 	parseStructure,
 	toSidebar,
 } from './structure.mjs';
@@ -168,5 +168,9 @@ test('the real docs tree matches the manifest in both directions', () => {
 		[],
 		'pages missing on disk: run npm run scaffold',
 	);
-	assert.deepEqual(findOrphans(DOCS, pages, HANDWRITTEN), [], 'files outside the manifest: add them to structure.yaml');
+	assert.deepEqual(
+		findOrphans(DOCS, pages, PAGES_OUTSIDE_MANIFEST),
+		[],
+		'files outside the manifest: add them to structure.yaml',
+	);
 });
