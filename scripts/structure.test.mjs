@@ -130,6 +130,12 @@ test('an error tells the editor where structure.yaml is wrong and what that plac
 	}
 });
 
+test('rejects a file name written as a YAML list, so only text reaches the sidebar', () => {
+	assert.throws(() => parseStructure(valid.replace('file: 01-intro', 'file: [01-intro]')), {
+		message: 'structure.yaml: "01-basics/01-intro" must look like 01-kebab-case',
+	});
+});
+
 test('rejects an unknown page type', () => {
 	assert.throws(() => parseStructure(valid.replace('type: tutorial', 'type: guide')), /guide/);
 });
