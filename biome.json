@@ -1,0 +1,81 @@
+{
+	"$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+	"vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true, "defaultBranch": "main" },
+	"files": { "includes": ["**", "!!**/dist", "!!**/.astro", "!!**/reports", "!!**/.stryker-tmp"] },
+	"formatter": { "indentStyle": "tab", "lineWidth": 120, "lineEnding": "lf" },
+	"javascript": {
+		"formatter": { "quoteStyle": "single", "trailingCommas": "all", "semicolons": "always", "arrowParentheses": "always" }
+	},
+	"markdown": { "formatter": { "enabled": false } },
+	"assist": { "actions": { "source": { "organizeImports": "on", "useSortedKeys": "off" } } },
+	"linter": {
+		"rules": {
+			"preset": "recommended",
+			"complexity": {
+				"noExcessiveCognitiveComplexity": { "level": "error", "options": { "maxAllowedComplexity": 10 } },
+				"noExcessiveLinesPerFunction": { "level": "error", "options": { "maxLines": 40 } },
+				"noForEach": "error",
+				"noUselessStringConcat": "error",
+				"useSimplifiedLogicExpression": "error"
+			},
+			"correctness": {
+				"noUnusedVariables": "error",
+				"noUnusedImports": "error",
+				"noUnusedFunctionParameters": "error",
+				"useImportExtensions": "error",
+				"noNodejsModules": "off",
+				"noUndeclaredDependencies": "error"
+			},
+			"style": {
+				"useBlockStatements": "error",
+				"noParameterAssign": "error",
+				"noNestedTernary": "error",
+				"useConst": "error",
+				"useTemplate": "error",
+				"noUselessElse": "error",
+				"useNodejsImportProtocol": "error",
+				"useNamingConvention": "error",
+				"useConsistentArrayType": "error",
+				"noDefaultExport": "error",
+				"useExplicitLengthCheck": "error",
+				"useCollapsedIf": "error",
+				"noNegationElse": "error",
+				"useShorthandAssign": "error",
+				"noYodaExpression": "error",
+				"useThrowNewError": "error",
+				"useThrowOnlyError": "error",
+				"useNumberNamespace": "error",
+				"noInferrableTypes": "error"
+			},
+			"suspicious": {
+				"noConsole": { "level": "error", "options": { "allow": ["error"] } },
+				"noEmptyBlockStatements": "error",
+				"noVar": "error",
+				"noDoubleEquals": "error",
+				"noEvolvingTypes": "error",
+				"useAwait": "error",
+				"noSkippedTests": "error",
+				"noFocusedTests": "error",
+				"noExportsInTest": "error",
+				"noShadow": "error"
+			},
+			"performance": {
+				"noAccumulatingSpread": "error",
+				"noBarrelFile": "error",
+				"noReExportAll": "error",
+				"noDelete": "error"
+			},
+			"nursery": { "noFloatingPromises": "error", "useExplicitType": "off" }
+		}
+	},
+	"overrides": [
+		{
+			"includes": ["**/*.test.mjs"],
+			"linter": { "rules": { "complexity": { "noExcessiveLinesPerFunction": "off" } } }
+		},
+		{
+			"includes": ["astro.config.mjs", "src/content.config.ts"],
+			"linter": { "rules": { "style": { "noDefaultExport": "off" } } }
+		}
+	]
+}

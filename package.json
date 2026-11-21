@@ -10,7 +10,9 @@
     "astro": "astro",
     "test": "node --test 'scripts/*.test.mjs'",
     "scaffold": "node scripts/scaffold.mjs",
-    "check:fresh": "node scripts/freshness.mjs"
+    "check:fresh": "node scripts/freshness.mjs",
+    "lint": "biome ci .",
+    "format": "biome check --write ."
   },
   "dependencies": {
     "@astrojs/starlight": "0.43.1",
@@ -19,5 +21,8 @@
     "starlight-links-validator": "0.27.0",
     "yaml": "2.9.1"
   },
-  "packageManager": "npm@11.20.0"
+  "packageManager": "npm@11.20.0",
+  "devDependencies": {
+    "@biomejs/biome": "2.6.8"
+  }
 }
