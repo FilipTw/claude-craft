@@ -6,6 +6,23 @@
 		"MD025": { "level": 1, "front_matter_title": "^\\s*title\\s*:" },
 		"MD041": { "level": 1, "front_matter_title": "^\\s*title\\s*:" },
 		"MD013": { "line_length": 1000, "heading_line_length": 80, "code_block_line_length": 120 },
+		// Starlight components in MDX. markdownlint compares names case-insensitively, so <aside> and <code> pass too.
+		"MD033": {
+			"allowed_elements": [
+				"Aside",
+				"Badge",
+				"Card",
+				"CardGrid",
+				"Code",
+				"FileTree",
+				"Icon",
+				"LinkButton",
+				"LinkCard",
+				"Steps",
+				"TabItem",
+				"Tabs"
+			]
+		},
 		"MD003": { "style": "atx" },
 		"MD004": { "style": "dash" },
 		"MD029": { "style": "ordered" },

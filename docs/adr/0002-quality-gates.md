@@ -48,6 +48,7 @@ Zmierzone 2026-11-21:
 - dependency-cruiser nie parsuje plików `.astro` i `.mdx`. Test `no .astro or .mdx file in src imports from scripts/` w `scripts/structure.test.mjs` skanuje ich importy i odrzuca każdy, który prowadzi do `scripts/`.
 - `sharp` usunięto z zależności zamiast dodawać wyjątek w knip. Nic go nie importuje, a Astro instaluje go jako swoją zależność opcjonalną.
 - `MD013` dopuszcza 1000 znaków w prozie, bo akapit to jedna linia. Nagłówki mają limit 80 znaków, a bloki kodu 120.
+- `MD033` dopuszcza w MDX komponenty Starlight: `Aside`, `Badge`, `Card`, `CardGrid`, `Code`, `FileTree`, `Icon`, `LinkButton`, `LinkCard`, `Steps`, `TabItem` i `Tabs`. Zwykły HTML, np. `<div>`, dalej odpada. markdownlint porównuje nazwy bez względu na wielkość liter, więc `<aside>` i `<code>` jako HTML też przechodzą.
 - Raport lcov w CI powstaje przez `NODE_OPTIONS` w kroku workflow. Skrypt `test:ci` z tymi flagami powodował błędy knip.
 - Dwa mutanty `StringLiteral` są wyłączone komentarzem, bo są równoważne z oryginałem.
 - `forbid-trailers` odrzuca każdy trailer, którego nazwa kończy się na `-by` albo ma część `ai`, także `Signed-off-by`. Commity mają jednego autora. Przed sprawdzeniem linia przechodzi normalizację NFKC, a każdy myślnik Unicode zmienia się w `-`.

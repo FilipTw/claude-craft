@@ -22,6 +22,7 @@ Baza wiedzy o Claude Code jako strona Astro Starlight. Treść po polsku, nazwy 
 - Temat ma jedno miejsce. Inne strony linkują do niego i nie powtarzają treści.
 - Każdy fakt ma źródło w `sources`. Najpierw oficjalna dokumentacja (`code.claude.com/docs`), potem repo autora, potem blog eksperta.
 - Po sprawdzeniu strony ze źródłami ustaw `lastVerified: RRRR-MM-DD`. Bez tego pola strona liczy się jako nienapisana.
+- W MDX wolno używać komponentów Starlight z listy `MD033` w `.markdownlint-cli2.jsonc`, np. `Aside`, `Card` i `Tabs`. Zwykły HTML blokuje markdownlint.
 - Pisz przez skille `pstack:technical-writing` i `pstack:unslop`.
 
 ## Jakość
