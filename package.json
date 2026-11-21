@@ -15,12 +15,12 @@
 		"typecheck": "astro check --minimumSeverity warning",
 		"format": "biome check --write .",
 		"arch": "depcruise scripts src astro.config.mjs --output-type err-long",
-		"arch:graph": "depcruise scripts src astro.config.mjs --include-only '^(?:scripts|src|astro|node_modules)' --collapse 'node_modules/(@[^/]+/[^/]+|[^/]+)' --output-type mermaid --output-to docs/architecture.mmd"
+		"arch:graph": "depcruise scripts src astro.config.mjs --include-only '^(?:scripts|src|astro|node_modules)' --collapse 'node_modules/(@[^/]+/[^/]+|[^/]+)' --output-type mermaid --output-to docs/architecture.mmd",
+		"deadcode": "knip && knip --production --strict"
 	},
 	"dependencies": {
 		"@astrojs/starlight": "0.43.1",
 		"astro": "7.4.13",
-		"sharp": "0.35.5",
 		"starlight-links-validator": "0.27.0",
 		"yaml": "2.9.1"
 	},
@@ -30,6 +30,7 @@
 		"@biomejs/biome": "2.6.8",
 		"@types/node": "26.6.6",
 		"dependency-cruiser": "18.8.0",
+		"knip": "6.47.0",
 		"typescript": "6.0.3"
 	}
 }

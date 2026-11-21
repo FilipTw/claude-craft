@@ -10,6 +10,7 @@ import { DOCS, findOrphans, findPage, HANDWRITTEN, listPages, loadStructure, PAG
 /**
  * @param {{ docsDir: string, pages: Page[], templates: Record<PageType, string> }} options
  * @returns {{ created: string[] }}
+ * @internal
  */
 export function scaffold({ docsDir, pages, templates }) {
 	const created = [];
@@ -32,6 +33,7 @@ export function scaffold({ docsDir, pages, templates }) {
 /**
  * @param {{ docsDir?: string, pages?: Page[], log?: (line: string) => void }} [options]
  * @returns {0 | 1} The process exit code: 1 when files exist outside the manifest.
+ * @internal
  */
 export function runScaffold({
 	docsDir = DOCS,

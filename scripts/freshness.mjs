@@ -21,6 +21,7 @@ const END = '<!-- progress:end -->';
  * @param {string} markdown
  * @param {Date} now
  * @returns {Status}
+ * @internal
  */
 export function classify(markdown, now) {
 	const text = markdown.replace(/^﻿/, '').replace(/\r\n/g, '\n');
@@ -39,6 +40,7 @@ export function classify(markdown, now) {
 /**
  * @param {ProgressRow[]} rows
  * @returns {string}
+ * @internal
  */
 export function renderProgress(rows) {
 	const sections = [...new Set(rows.map((r) => r.section))];
@@ -64,6 +66,7 @@ export function renderProgress(rows) {
  * @param {string} text
  * @param {string} table
  * @returns {string}
+ * @internal
  */
 export function writeProgress(text, table) {
 	const starts = text.split(START).length - 1;
@@ -77,6 +80,7 @@ export function writeProgress(text, table) {
 /**
  * @param {{ docsDir?: string, pages?: Page[], now?: Date, log?: (line: string) => void }} [options]
  * @returns {ProgressRow[]}
+ * @internal
  */
 export function runFreshness({
 	docsDir = DOCS,

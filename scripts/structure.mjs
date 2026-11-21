@@ -92,6 +92,7 @@ function checkPrefixes(items, parent) {
  * Parse and validate once, at the boundary. Everything downstream trusts the result.
  * @param {string} text
  * @returns {Structure}
+ * @internal
  */
 export function parseStructure(text) {
 	const raw = parse(text);
