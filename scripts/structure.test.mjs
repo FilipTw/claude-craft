@@ -1,6 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseStructure, listPages, toSidebar } from './structure.mjs';
+import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { DOCS, HANDWRITTEN, findOrphans, findPage, listPages, loadStructure, parseStructure, toSidebar } from './structure.mjs';
 
 const valid = `
 parts:
@@ -17,11 +20,11 @@ parts:
           - { file: 03-first, title: Pierwsza sesja, type: tutorial }
 `;
 
-test('listPages flattens the tree with paths and default type', () => {
+test('listPages flattens the tree with paths, default type and top-level section', () => {
 	assert.deepEqual(listPages(parseStructure(valid)), [
-		{ path: '01-basics/01-intro', title: 'Wstęp', type: 'explanation' },
-		{ path: '01-basics/02-install/01-macos', title: 'macOS', type: 'how-to' },
-		{ path: '01-basics/03-first', title: 'Pierwsza sesja', type: 'tutorial' },
+		{ path: '01-basics/01-intro', title: 'Wstęp', type: 'explanation', section: 'Podstawy' },
+		{ path: '01-basics/02-install/01-macos', title: 'macOS', type: 'how-to', section: 'Podstawy' },
+		{ path: '01-basics/03-first', title: 'Pierwsza sesja', type: 'tutorial', section: 'Podstawy' },
 	]);
 });
 
@@ -74,4 +77,25 @@ test('rejects bad shapes with a structure.yaml message', () => {
 
 test('rejects an unknown page type', () => {
 	assert.throws(() => parseStructure(valid.replace('type: tutorial', 'type: guide')), /guide/);
+});
+
+test('findPage finds .md and .mdx pages', () => {
+	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
+	writeFileSync(join(docs, '01-a.mdx'), 'x');
+	assert.equal(findPage(docs, '01-a'), join(docs, '01-a.mdx'));
+	assert.equal(findPage(docs, '02-b'), undefined);
+});
+
+test('findOrphans lists sorted files that are not in the manifest', () => {
+	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
+	mkdirSync(join(docs, '01-a'));
+	for (const file of ['01-a/09-z.md', '01-a/01-known.mdx', '05-b.md', 'index.mdx']) writeFileSync(join(docs, file), 'x');
+	const pages = [{ path: '01-a/01-known' }];
+	assert.deepEqual(findOrphans(docs, pages, ['index.mdx']), ['01-a/09-z.md', '05-b.md']);
+});
+
+test('the real docs tree matches the manifest in both directions', () => {
+	const pages = listPages(loadStructure());
+	assert.deepEqual(pages.filter((p) => !findPage(DOCS, p.path)).map((p) => p.path), [], 'pages missing on disk: run npm run scaffold');
+	assert.deepEqual(findOrphans(DOCS, pages, HANDWRITTEN), [], 'files outside the manifest: add them to structure.yaml');
 });

@@ -4,13 +4,10 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
-import { loadStructure } from './structure.mjs';
-import { findPage } from './scaffold.mjs';
+import { DOCS, findPage, listPages, loadStructure } from './structure.mjs';
 
 const MAX_AGE_DAYS = 90;
 const DAY_MS = 24 * 60 * 60 * 1000;
-const ROOT = fileURLToPath(new URL('..', import.meta.url));
-const DOCS = join(ROOT, 'src/content/docs');
 const START = '<!-- progress:start -->';
 const END = '<!-- progress:end -->';
 
@@ -36,28 +33,26 @@ export function renderProgress(rows) {
 	].join('\n');
 }
 
-function collectRows(structure, now) {
-	const rows = [];
-	const walk = (items, base, section) => {
-		for (const item of items) {
-			if (item.dir) walk(item.items, `${base}${item.dir}/`, section ?? item.label);
-			else {
-				const path = `${base}${item.file}`;
-				rows.push({ path, section, status: classify(readFileSync(findPage(DOCS, path), 'utf8'), now) });
-			}
-		}
-	};
-	for (const part of structure.parts) walk(part.sections, '', undefined);
+export function writeProgress(text, table) {
+	const starts = text.split(START).length - 1;
+	const ends = text.split(END).length - 1;
+	if (starts !== 1 || ends !== 1) throw new Error(`roadmap.md needs exactly one ${START} and one ${END}`);
+	return text.replace(new RegExp(`${START}[\\s\\S]*?${END}`), () => `${START}\n${table}\n${END}`);
+}
+
+export function runFreshness({ docsDir = DOCS, pages = listPages(loadStructure()), now = new Date(), log = console.log } = {}) {
+	const rows = pages.map((page) => {
+		const file = findPage(docsDir, page.path);
+		if (!file) throw new Error(`${page.path} is in structure.yaml but missing on disk. Run npm run scaffold`);
+		return { ...page, status: classify(readFileSync(file, 'utf8'), now) };
+	});
+	for (const row of rows.filter((r) => r.status === 'stale')) log(`Do sprawdzenia: ${row.path}`);
+	const roadmap = join(docsDir, 'roadmap.md');
+	const text = readFileSync(roadmap, 'utf8');
+	const updated = writeProgress(text, renderProgress(rows));
+	if (updated !== text) writeFileSync(roadmap, updated);
+	log(`Aktualne: ${rows.filter((r) => r.status === 'fresh').length}/${rows.length}. Tabela postępu w src/content/docs/roadmap.md.`);
 	return rows;
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-	const rows = collectRows(loadStructure(), new Date());
-	for (const row of rows.filter((r) => r.status === 'stale')) console.log(`Do sprawdzenia: ${row.path}`);
-	const roadmap = join(DOCS, 'roadmap.md');
-	const text = readFileSync(roadmap, 'utf8');
-	const updated = text.replace(new RegExp(`${START}[\\s\\S]*${END}`), `${START}\n${renderProgress(rows)}\n${END}`);
-	if (updated !== text) writeFileSync(roadmap, updated);
-	const done = rows.filter((r) => r.status === 'fresh').length;
-	console.log(`Aktualne: ${done}/${rows.length}. Tabela postępu w src/content/docs/roadmap.md.`);
-}
+if (process.argv[1] === fileURLToPath(import.meta.url)) runFreshness();
