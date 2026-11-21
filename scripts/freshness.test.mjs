@@ -167,6 +167,25 @@ test('runFreshness names a page whose frontmatter is not valid YAML and exits 1 
 	assert.equal(readFileSync(join(docs, 'roadmap.md'), 'utf8'), roadmap);
 });
 
+test('runFreshness names a page whose frontmatter alias has no anchor or expands too far, and exits 1', () => {
+	const tenTimes = (/** @type {string} */ value) => `[${Array(10).fill(value).join(', ')}]`;
+	const bomb = `a: &a ${tenTimes('x')}\nb: &b ${tenTimes('*a')}\nc: &c ${tenTimes('*b')}\nd: ${tenTimes('*c')}`;
+	/** @type {Array<[string, string]>} */
+	const cases = [
+		['title: A\nsources: *x', 'Unresolved alias (the anchor must be set before the alias): x'],
+		[bomb, 'Excessive alias count indicates a resource exhaustion attack'],
+	];
+	for (const [frontmatter, reason] of cases) {
+		const docs = tempDir();
+		writeFileSync(join(docs, 'roadmap.md'), '<!-- progress:start -->\n<!-- progress:end -->\n');
+		writeFileSync(join(docs, '01-a.md'), `---\n${frontmatter}\n---\n`);
+		assert.deepEqual(runQuiet(docs, [{ path: '01-a', title: 'A', type: 'explanation', section: 'X' }]), {
+			code: 1,
+			lines: [`01-a.md: frontmatter is not valid YAML. ${reason}.`],
+		});
+	}
+});
+
 test('runFreshness names roadmap.md when its progress markers are wrong and exits 1 before any other line', () => {
 	const docs = tempDir();
 	writeFileSync(join(docs, 'roadmap.md'), 'no markers\n');
