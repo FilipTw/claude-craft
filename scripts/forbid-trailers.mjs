@@ -2,21 +2,58 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 /**
- * @typedef {{ rule: string, pattern: RegExp }} Rule
+ * @typedef {{ rule: string, matches: (line: string) => boolean }} Rule
  * @typedef {{ line: number, rule: string, text: string }} Violation
  */
 
+const TRAILER_TOKEN = /^\s*([a-z][\w-]*)\s*:/;
+const VERBS = ['generated', 'written', 'created', 'made', 'built', 'authored'];
+const PREPOSITIONS = ['with', 'by', 'using', 'in'];
+const VENDORS = ['anthropic', 'github', 'google', 'openai'];
+const TOOLS = [
+	String.raw`claude\s+code`,
+	'claude',
+	'chatgpt',
+	'gpt',
+	'openai',
+	'anthropic',
+	'codex',
+	'copilot',
+	'cursor',
+	'gemini',
+	'antigravity',
+	'windsurf',
+	'devin',
+	'ai',
+];
+const MODEL = String.raw`[\s-]+(?:\d+(?:\.\d+)*[a-z]?|opus|sonnet|haiku|pro|flash|mini)`;
+const NAME = `(?:(?:${VENDORS.join('|')})\\s+)?(?:${TOOLS.join('|')})(?:${MODEL})*`;
+const LINK = String.raw`\(?<?https?://\S*`;
+// The whole line is the signature. Any word after the tool name makes it prose.
+const SIGNATURE = new RegExp(
+	`^[^\\p{L}\\p{N}]*(?:${VERBS.join('|')})\\s+(?:${PREPOSITIONS.join('|')})\\s+(?:\\[${NAME}\\]\\(\\S*\\)|${NAME}(?:\\s+${LINK})?)[^\\p{L}\\p{N}]*$`,
+	'iu',
+);
+
 /** @type {Rule[]} */
 const RULES = [
-	{ rule: 'Co-Authored-By trailer', pattern: /^\s*co-authored-by\s*:/i },
 	{
-		rule: 'AI attribution',
-		pattern:
-			/^[\s\p{Extended_Pictographic}*-]*(?:generated|written|created) (?:with|by|using)\b.*\b(?:ai|anthropic|chatgpt|claude|codex|copilot|cursor|gemini|gpt|openai)\b/iu,
+		rule: 'attribution trailer',
+		matches: (line) => {
+			const token = TRAILER_TOKEN.exec(line.toLowerCase())?.[1];
+			return token !== undefined && (token.endsWith('-by') || token.split(/[-_]/).includes('ai'));
+		},
 	},
+	{ rule: 'AI attribution', matches: (line) => SIGNATURE.test(line) },
 ];
 // git commit --verbose puts the diff below this line, and git drops it together with the # comment lines.
 const SCISSORS = '# ------------------------ >8 ------------------------';
+
+/**
+ * Folds look-alike characters (fullwidth letters, non-breaking hyphens, en dashes) into the ASCII the rules match.
+ * @param {string} text
+ */
+const normalize = (text) => text.normalize('NFKC').replace(/\p{Pd}/gu, '-');
 
 /**
  * @param {string} message
@@ -29,7 +66,9 @@ export function findViolations(message) {
 	return lines
 		.slice(0, end === -1 ? lines.length : end)
 		.flatMap((text, index) =>
-			RULES.filter(({ pattern }) => pattern.test(text)).map(({ rule }) => ({ line: index + 1, rule, text })),
+			text.startsWith('#')
+				? []
+				: RULES.filter(({ matches }) => matches(normalize(text))).map(({ rule }) => ({ line: index + 1, rule, text })),
 		);
 }
 
