@@ -1,18 +1,22 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { findViolations, runForbidTrailers } from './forbid-trailers.mjs';
 
 const clean = 'build(hooks): add lefthook\n\nWhy: every gate runs before a push.\n';
 const silent = () => undefined;
 
+const scratch = mkdtempSync(join(tmpdir(), 'cc-'));
+after(() => rmSync(scratch, { recursive: true, force: true }));
+const tempDir = () => mkdtempSync(join(scratch, 'case-'));
+
 /** @param {string} message */
 const messageFile = (message) => {
-	const file = join(mkdtempSync(join(tmpdir(), 'cc-')), 'COMMIT_EDITMSG');
+	const file = join(tempDir(), 'COMMIT_EDITMSG');
 	writeFileSync(file, message);
 	return file;
 };

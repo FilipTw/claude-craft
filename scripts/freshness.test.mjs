@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, readFileSync, statSync, utimesSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, utimesSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import { classify, renderProgress, runFreshness, writeProgress } from './freshness.mjs';
 
 /** @import { ProgressRow, Status } from './freshness.mjs' */
@@ -13,6 +13,10 @@ const now = new Date('2026-11-21');
 const verified = (date) => `---\ntitle: A\nlastVerified: ${date}\n---\n`;
 /** @type {(section: string, status: Status) => ProgressRow} */
 const row = (section, status) => ({ path: '01-x', title: 'X', type: 'explanation', section, status });
+
+const scratch = mkdtempSync(join(tmpdir(), 'cc-'));
+after(() => rmSync(scratch, { recursive: true, force: true }));
+const tempDir = () => mkdtempSync(join(scratch, 'case-'));
 
 test('a page without lastVerified or without frontmatter is todo', () => {
 	assert.equal(classify('---\ntitle: A\ntype: explanation\n---\n', now), 'todo');
@@ -79,7 +83,7 @@ test('writeProgress fails unless there is exactly one start and one end marker',
 });
 
 test('runFreshness groups by top-level section and writes the table into roadmap.md', () => {
-	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
+	const docs = tempDir();
 	writeFileSync(join(docs, 'roadmap.md'), 'x\n<!-- progress:start -->\n<!-- progress:end -->\n');
 	writeFileSync(join(docs, '01-a.md'), verified('2026-11-01'));
 	writeFileSync(join(docs, '02-b.md'), '---\ntitle: B\n---\n');
@@ -93,7 +97,7 @@ test('runFreshness groups by top-level section and writes the table into roadmap
 });
 
 test('runFreshness prints each stale page and the fresh count on stdout by default', (t) => {
-	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
+	const docs = tempDir();
 	writeFileSync(join(docs, 'roadmap.md'), '<!-- progress:start -->\n<!-- progress:end -->\n');
 	writeFileSync(join(docs, '01-a.md'), verified('2026-01-01'));
 	writeFileSync(join(docs, '02-b.md'), verified('2026-11-01'));
@@ -115,7 +119,7 @@ test('runFreshness prints each stale page and the fresh count on stdout by defau
 });
 
 test('runFreshness leaves an up-to-date roadmap.md untouched', () => {
-	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
+	const docs = tempDir();
 	const roadmap = join(docs, 'roadmap.md');
 	writeFileSync(roadmap, '<!-- progress:start -->\n<!-- progress:end -->\n');
 	writeFileSync(join(docs, '01-a.md'), verified('2026-11-01'));
@@ -141,7 +145,7 @@ const runQuiet = (docs, pages) => {
 };
 
 test('runFreshness names a page that is in the manifest but missing on disk and exits 1', () => {
-	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
+	const docs = tempDir();
 	writeFileSync(join(docs, 'roadmap.md'), '<!-- progress:start -->\n<!-- progress:end -->\n');
 	assert.deepEqual(runQuiet(docs, [{ path: '01-gone', title: 'G', type: 'explanation', section: 'X' }]), {
 		code: 1,
@@ -150,7 +154,7 @@ test('runFreshness names a page that is in the manifest but missing on disk and 
 });
 
 test('runFreshness names a page whose frontmatter is not valid YAML and exits 1 without touching roadmap.md', () => {
-	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
+	const docs = tempDir();
 	const roadmap = '<!-- progress:start -->\nold\n<!-- progress:end -->\n';
 	writeFileSync(join(docs, 'roadmap.md'), roadmap);
 	writeFileSync(join(docs, '01-a.mdx'), '---\ntitle: Hooki: zdarzenia\n---\n');
@@ -164,7 +168,7 @@ test('runFreshness names a page whose frontmatter is not valid YAML and exits 1 
 });
 
 test('runFreshness names roadmap.md when its progress markers are wrong and exits 1 before any other line', () => {
-	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
+	const docs = tempDir();
 	writeFileSync(join(docs, 'roadmap.md'), 'no markers\n');
 	writeFileSync(join(docs, '01-a.md'), verified('2020-01-01'));
 	assert.deepEqual(runQuiet(docs, [{ path: '01-a', title: 'A', type: 'explanation', section: 'X' }]), {
@@ -174,7 +178,7 @@ test('runFreshness names roadmap.md when its progress markers are wrong and exit
 });
 
 test('runFreshness lets an error that is not a docs problem through with its stack', () => {
-	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
+	const docs = tempDir();
 	writeFileSync(join(docs, 'roadmap.md'), '<!-- progress:start -->\n<!-- progress:end -->\n');
 	mkdirSync(join(docs, '01-a.md'));
 	assert.throws(() => runQuiet(docs, [{ path: '01-a', title: 'A', type: 'explanation', section: 'X' }]), {
