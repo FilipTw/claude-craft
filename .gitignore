@@ -22,3 +22,6 @@ pnpm-debug.log*
 
 # claude code agent worktrees
 .claude/worktrees/
+
+# decision log and gate reports
+reports/
