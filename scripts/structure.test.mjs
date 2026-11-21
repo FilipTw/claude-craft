@@ -138,9 +138,12 @@ test('an error tells the editor where structure.yaml is wrong and what that plac
 	}
 });
 
-test('rejects a file name written as a YAML list, so only text reaches the sidebar', () => {
+test('rejects a folder or file name written as a YAML list and says the name must be text', () => {
+	assert.throws(() => parseStructure(valid.replace('dir: 01-basics', 'dir: [01-basics]')), {
+		message: 'structure.yaml: "[0]" needs a text "dir"',
+	});
 	assert.throws(() => parseStructure(valid.replace('file: 01-intro', 'file: [01-intro]')), {
-		message: 'structure.yaml: "01-basics/01-intro" must look like 01-kebab-case',
+		message: 'structure.yaml: "01-basics/[0]" needs a text "file"',
 	});
 });
 
