@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import { parse } from 'yaml';
 import { runScaffold, scaffold } from './scaffold.mjs';
 import { PAGE_TYPES } from './structure.mjs';
@@ -24,8 +24,12 @@ const templates = {
 };
 const silent = () => undefined;
 
+const scratch = mkdtempSync(join(tmpdir(), 'cc-'));
+after(() => rmSync(scratch, { recursive: true, force: true }));
+const tempDir = () => mkdtempSync(join(scratch, 'case-'));
+
 test('creates missing pages from the template of their type', () => {
-	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
+	const docs = tempDir();
 	const { created } = scaffold({ docsDir: docs, pages, templates });
 	assert.deepEqual(created, ['01-a/01-one', '01-a/02-b/01-two']);
 	assert.equal(
@@ -35,7 +39,7 @@ test('creates missing pages from the template of their type', () => {
 });
 
 test('second run creates nothing and keeps edited pages', () => {
-	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
+	const docs = tempDir();
 	scaffold({ docsDir: docs, pages, templates });
 	writeFileSync(join(docs, '01-a/01-one.md'), 'edited');
 	const { created } = scaffold({ docsDir: docs, pages, templates });
@@ -44,7 +48,7 @@ test('second run creates nothing and keeps edited pages', () => {
 });
 
 test('writes titles with $ patterns verbatim', () => {
-	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
+	const docs = tempDir();
 	scaffold({
 		docsDir: docs,
 		pages: [{ path: '01-x', title: "Koszt $' i $& $$", type: 'explanation', section: 'X' }],
@@ -54,7 +58,7 @@ test('writes titles with $ patterns verbatim', () => {
 });
 
 test('treats an existing .mdx page as present', () => {
-	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
+	const docs = tempDir();
 	mkdirSync(join(docs, '01-a'), { recursive: true });
 	writeFileSync(join(docs, '01-a/01-one.mdx'), 'x');
 	const { created } = scaffold({ docsDir: docs, pages: pages.slice(0, 1), templates });
@@ -63,7 +67,7 @@ test('treats an existing .mdx page as present', () => {
 });
 
 test('runScaffold fills the real template of every page type with the manifest title and type', () => {
-	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
+	const docs = tempDir();
 	const title = 'Hooki: "PreToolUse" #1';
 	/** @type {LocatedPage[]} */
 	const typed = PAGE_TYPES.map((type, index) => ({ path: `0${index + 1}-${type}`, title, type, section: 'A' }));
@@ -76,7 +80,7 @@ test('runScaffold fills the real template of every page type with the manifest t
 });
 
 test('runScaffold prints the created count and each orphan on stdout by default', (t) => {
-	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
+	const docs = tempDir();
 	writeFileSync(join(docs, '09-stray.md'), 'x');
 	const write = t.mock.method(process.stdout, 'write', () => true);
 	const code = runScaffold({ docsDir: docs, pages });
@@ -89,7 +93,7 @@ test('runScaffold prints the created count and each orphan on stdout by default'
 });
 
 test('runScaffold exits 0 on a clean tree and 1 when a file is outside the manifest', () => {
-	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
+	const docs = tempDir();
 	assert.equal(runScaffold({ docsDir: docs, pages, log: silent }), 0);
 	writeFileSync(join(docs, '01-a/09-stray.md'), 'x');
 	assert.equal(runScaffold({ docsDir: docs, pages, log: silent }), 1);

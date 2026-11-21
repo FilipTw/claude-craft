@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
-import { globSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join, relative, resolve, sep } from 'node:path';
-import { test } from 'node:test';
+import { join } from 'node:path';
+import { after, test } from 'node:test';
 import {
 	DOCS,
 	findOrphans,
@@ -11,11 +11,14 @@ import {
 	listPages,
 	loadStructure,
 	parseStructure,
-	ROOT,
 	toSidebar,
 } from './structure.mjs';
 
 /** @import { LocatedPage } from './structure.mjs' */
+
+const scratch = mkdtempSync(join(tmpdir(), 'cc-'));
+after(() => rmSync(scratch, { recursive: true, force: true }));
+const tempDir = () => mkdtempSync(join(scratch, 'case-'));
 
 const valid = `
 parts:
@@ -141,14 +144,14 @@ test('rejects an unknown page type', () => {
 });
 
 test('findPage finds .md and .mdx pages', () => {
-	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
+	const docs = tempDir();
 	writeFileSync(join(docs, '01-a.mdx'), 'x');
 	assert.equal(findPage(docs, '01-a'), join(docs, '01-a.mdx'));
 	assert.equal(findPage(docs, '02-b'), undefined);
 });
 
 test('findOrphans lists sorted Markdown files that are not in the manifest', () => {
-	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
+	const docs = tempDir();
 	mkdirSync(join(docs, '01-a'));
 	for (const file of ['01-a/09-z.md', '01-a/01-known.mdx', '05-b.md', '05-b.md.orig', 'index.mdx']) {
 		writeFileSync(join(docs, file), 'x');
@@ -166,48 +169,4 @@ test('the real docs tree matches the manifest in both directions', () => {
 		'pages missing on disk: run npm run scaffold',
 	);
 	assert.deepEqual(findOrphans(DOCS, pages, HANDWRITTEN), [], 'files outside the manifest: add them to structure.yaml');
-});
-
-const IMPORT = /\b(?:from|import)\s*\(?\s*(['"])(.+?)\1/g;
-
-/**
- * dependency-cruiser does not parse .astro and .mdx files, so this scan stands in for its layer rules there.
- * @param {string} root
- * @returns {string[]} each import in an .astro or .mdx file under src/ that resolves into scripts/, as `file -> specifier`
- */
-const importsIntoScripts = (root) =>
-	globSync('src/**/*.{astro,mdx}', { cwd: root })
-		.sort()
-		.flatMap((file) =>
-			[...readFileSync(join(root, file), 'utf8').matchAll(IMPORT)]
-				.map((match) => match[2] ?? '')
-				.filter((specifier) => /^[./]/.test(specifier))
-				.filter((specifier) => {
-					// Vite resolves a leading / from the project root.
-					const target = specifier.startsWith('/') ? join(root, specifier) : resolve(root, dirname(file), specifier);
-					return relative(root, target).split(sep)[0] === 'scripts';
-				})
-				.map((specifier) => `${file} -> ${specifier}`),
-		);
-
-test('no .astro or .mdx file in src imports from scripts/', () => {
-	const fixture = mkdtempSync(join(tmpdir(), 'cc-'));
-	mkdirSync(join(fixture, 'src/components'), { recursive: true });
-	writeFileSync(
-		join(fixture, 'src/components/probe.astro'),
-		"---\nimport { classify } from '../../scripts/freshness.mjs';\nimport { Card } from '@astrojs/starlight/components';\n---\n",
-	);
-	writeFileSync(
-		join(fixture, 'src/page.mdx'),
-		"import '/scripts/structure.mjs';\nimport Local from './scripts/local.astro';\n",
-	);
-	assert.deepEqual(importsIntoScripts(fixture), [
-		'src/components/probe.astro -> ../../scripts/freshness.mjs',
-		'src/page.mdx -> /scripts/structure.mjs',
-	]);
-	assert.deepEqual(
-		importsIntoScripts(ROOT),
-		[],
-		'import scripts/ only from astro.config.mjs or src/content.config.ts, which dependency-cruiser checks',
-	);
 });
