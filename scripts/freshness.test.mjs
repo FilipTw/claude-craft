@@ -76,6 +76,8 @@ test('writeProgress fails unless there is exactly one start marker followed by o
 		'<!-- progress:start -->\nold\n',
 		'old\n<!-- progress:end -->\n',
 		'<!-- progress:end -->\nold\n<!-- progress:start -->\n',
+		'<!-- progress:start -->\n<!-- progress:end -->\n<!-- progress:end -->\n',
+		'<!-- progress:start -->\n<!-- progress:start -->\n<!-- progress:end -->\n',
 	]) {
 		assert.throws(() => writeProgress(text, 't'), {
 			message: 'roadmap.md: needs exactly one <!-- progress:start --> followed by one <!-- progress:end -->',
