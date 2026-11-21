@@ -1,4 +1,3 @@
-// The commit-msg hook runs this on the message file. Commits in this repo have one author and no AI attribution.
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
@@ -36,7 +35,7 @@ export function findViolations(message) {
 
 /**
  * @param {{ file: string | undefined, log?: (line: string) => void }} options
- * @returns {0 | 1} The process exit code: 1 when the message has a forbidden line.
+ * @returns {0 | 1}
  * @internal
  */
 export function runForbidTrailers({ file, log = (line) => process.stderr.write(`${line}\n`) }) {

@@ -1,18 +1,12 @@
-# External link check, run weekly by .github/workflows/links.yml.
-# starlight-links-validator checks links between pages at build time, so lychee checks only web links.
 scheme = ["https", "http"]
-# localhost and private addresses in examples are not reachable from CI.
 exclude_all_private = true
-# The site's own pages: starlight-links-validator covers them, and a page that is not deployed yet would fail here.
 exclude = ['^https?://filiptw\.github\.io/claude-craft']
 
-# 429 means the host rate-limited the checker, not that the link is dead.
 accept = ["100..=103", "200..=299", "429"]
 max_retries = 3
 retry_wait_time = 5
 timeout = 30
 
-# Local reruns reuse results for a day. A rate-limited result is checked again next time.
 cache = true
 max_cache_age = "1d"
 cache_exclude_status = ["429"]

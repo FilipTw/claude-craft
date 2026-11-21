@@ -10,11 +10,11 @@ export const PAGE_TYPES = /** @type {const} */ (['tutorial', 'how-to', 'referenc
 
 /**
  * @typedef {(typeof PAGE_TYPES)[number]} PageType
- * @typedef {{ file: string, title: string, type: PageType }} PageEntry A page as the manifest lists it.
- * @typedef {{ dir: string, label: string, items: Array<Section | PageEntry> }} Section
- * @typedef {{ label: string, sections: Array<Section | PageEntry> }} Part
+ * @typedef {{ file: string, title: string, type: PageType }} ManifestEntry
+ * @typedef {{ dir: string, label: string, items: Array<Section | ManifestEntry> }} Section
+ * @typedef {{ label: string, sections: Array<Section | ManifestEntry> }} Part
  * @typedef {{ parts: Part[] }} Structure
- * @typedef {{ path: string, title: string, type: PageType, section: string }} Page A manifest page located by docs path and top-level section.
+ * @typedef {{ path: string, title: string, type: PageType, section: string }} LocatedPage
  * @typedef {string | { label: string, collapsed: boolean, items: SidebarItem[] }} SidebarItem
  * @typedef {{ ok: (value: unknown) => boolean, noun: string }} Kind
  */
@@ -90,7 +90,6 @@ function checkPrefixes(items, parent) {
 }
 
 /**
- * Parse and validate once, at the boundary. Everything downstream trusts the result.
  * @param {string} text
  * @returns {Structure}
  * @internal
@@ -114,7 +113,7 @@ export function parseStructure(text) {
 /**
  * @param {any[]} items
  * @param {string} parent
- * @returns {Array<Section | PageEntry>}
+ * @returns {Array<Section | ManifestEntry>}
  */
 function checkItems(items, parent) {
 	return items.map((item) => {
@@ -134,14 +133,13 @@ function checkItems(items, parent) {
 }
 
 /**
- * Every page once, in manifest order.
  * @param {Structure} structure
- * @returns {Page[]}
+ * @returns {LocatedPage[]}
  */
 export function listPages(structure) {
-	/** @type {Page[]} */
+	/** @type {LocatedPage[]} */
 	const pages = [];
-	/** @type {(items: Array<Section | PageEntry>, base: string, section: string | undefined) => void} */
+	/** @type {(items: Array<Section | ManifestEntry>, base: string, section: string | undefined) => void} */
 	const walk = (items, base, section) => {
 		for (const item of items) {
 			if ('dir' in item) {
@@ -162,7 +160,7 @@ export function listPages(structure) {
  * @returns {Array<{ label: string, items: SidebarItem[] }>}
  */
 export function toSidebar(structure) {
-	/** @type {(item: Section | PageEntry, base: string) => SidebarItem} */
+	/** @type {(item: Section | ManifestEntry, base: string) => SidebarItem} */
 	const toItem = (item, base) =>
 		'dir' in item
 			? { label: item.label, collapsed: true, items: item.items.map((child) => toItem(child, `${base}${item.dir}/`)) }
@@ -171,10 +169,9 @@ export function toSidebar(structure) {
 }
 
 /**
- * A page may live in .md or .mdx.
  * @param {string} docsDir
  * @param {string} path
- * @returns {string | undefined} The existing file, or undefined.
+ * @returns {string | undefined}
  */
 export function findPage(docsDir, path) {
 	return ['.md', '.mdx'].map((ext) => join(docsDir, `${path}${ext}`)).find((file) => existsSync(file));
@@ -182,9 +179,9 @@ export function findPage(docsDir, path) {
 
 /**
  * @param {string} docsDir
- * @param {Page[]} pages
+ * @param {LocatedPage[]} pages
  * @param {string[]} ignore
- * @returns {string[]} Markdown files on disk that the manifest does not list, sorted.
+ * @returns {string[]}
  */
 export function findOrphans(docsDir, pages, ignore) {
 	const known = new Set([...pages.flatMap((p) => [`${p.path}.md`, `${p.path}.mdx`]), ...ignore]);

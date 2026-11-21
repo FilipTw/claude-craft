@@ -6,7 +6,7 @@ import { test } from 'node:test';
 import { classify, renderProgress, runFreshness, writeProgress } from './freshness.mjs';
 
 /** @import { ProgressRow, Status } from './freshness.mjs' */
-/** @import { Page } from './structure.mjs' */
+/** @import { LocatedPage } from './structure.mjs' */
 
 const now = new Date('2026-11-21');
 /** @param {string} date */
@@ -83,7 +83,7 @@ test('runFreshness groups by top-level section and writes the table into roadmap
 	writeFileSync(join(docs, 'roadmap.md'), 'x\n<!-- progress:start -->\n<!-- progress:end -->\n');
 	writeFileSync(join(docs, '01-a.md'), verified('2026-11-01'));
 	writeFileSync(join(docs, '02-b.md'), '---\ntitle: B\n---\n');
-	/** @type {Page[]} */
+	/** @type {LocatedPage[]} */
 	const pages = [
 		{ path: '01-a', title: 'A', type: 'explanation', section: 'Hooki' },
 		{ path: '02-b', title: 'B', type: 'explanation', section: 'Hooki' },
@@ -98,7 +98,7 @@ test('runFreshness prints each stale page and the fresh count on stdout by defau
 	writeFileSync(join(docs, '01-a.md'), verified('2026-01-01'));
 	writeFileSync(join(docs, '02-b.md'), verified('2026-11-01'));
 	writeFileSync(join(docs, '03-c.md'), '---\ntitle: C\n---\n');
-	/** @type {Page[]} */
+	/** @type {LocatedPage[]} */
 	const pages = [
 		{ path: '01-a', title: 'A', type: 'explanation', section: 'Hooki' },
 		{ path: '02-b', title: 'B', type: 'explanation', section: 'Hooki' },
@@ -118,7 +118,7 @@ test('runFreshness leaves an up-to-date roadmap.md untouched', () => {
 	const roadmap = join(docs, 'roadmap.md');
 	writeFileSync(roadmap, '<!-- progress:start -->\n<!-- progress:end -->\n');
 	writeFileSync(join(docs, '01-a.md'), verified('2026-11-01'));
-	/** @type {Page[]} */
+	/** @type {LocatedPage[]} */
 	const pages = [{ path: '01-a', title: 'A', type: 'explanation', section: 'Hooki' }];
 	runFreshness({ docsDir: docs, pages, now, log: () => undefined });
 	const past = new Date('2020-01-01');

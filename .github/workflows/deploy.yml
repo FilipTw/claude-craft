@@ -7,7 +7,6 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# Each job grants itself only what it needs.
 permissions: {}
 
 jobs:
@@ -25,15 +24,12 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - run: npm run check
-      - run: npm audit --omit=dev --audit-level=high
-      # Runs npm test again with an lcov reporter added, so the thresholds stay in package.json only.
-      # The flags go through NODE_OPTIONS because npm test ends with the test file pattern.
-      - run: mkdir -p coverage && npm test
+      - run: mkdir -p coverage && npm run check
         env:
           NODE_OPTIONS: >-
             --test-reporter=spec --test-reporter-destination=stdout
             --test-reporter=lcov --test-reporter-destination=coverage/lcov.info
+      - run: npm audit --omit=dev --audit-level=high
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: coverage-lcov
@@ -71,7 +67,6 @@ jobs:
     permissions:
       pages: write
       id-token: write
-    # One deployment at a time. A newer run waits instead of cancelling one in progress.
     concurrency:
       group: pages
       cancel-in-progress: false

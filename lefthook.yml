@@ -1,4 +1,3 @@
-# Git hooks. npm install sets them up through the prepare script in package.json.
 pre-commit:
   parallel: true
   jobs:

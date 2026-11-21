@@ -7,9 +7,9 @@ import { parse } from 'yaml';
 import { runScaffold, scaffold } from './scaffold.mjs';
 import { PAGE_TYPES } from './structure.mjs';
 
-/** @import { Page, PageType } from './structure.mjs' */
+/** @import { LocatedPage, PageType } from './structure.mjs' */
 
-/** @type {Page[]} */
+/** @type {LocatedPage[]} */
 const pages = [
 	{ path: '01-a/01-one', title: 'Jeden', type: 'explanation', section: 'A' },
 	{ path: '01-a/02-b/01-two', title: 'Dwa: "cytat"', type: 'how-to', section: 'A' },
@@ -65,7 +65,7 @@ test('treats an existing .mdx page as present', () => {
 test('runScaffold fills the real template of every page type with the manifest title and type', () => {
 	const docs = mkdtempSync(join(tmpdir(), 'cc-'));
 	const title = 'Hooki: "PreToolUse" #1';
-	/** @type {Page[]} */
+	/** @type {LocatedPage[]} */
 	const typed = PAGE_TYPES.map((type, index) => ({ path: `0${index + 1}-${type}`, title, type, section: 'A' }));
 	runScaffold({ docsDir: docs, pages: typed, log: silent });
 	for (const page of typed) {

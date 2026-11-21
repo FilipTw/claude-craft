@@ -6,10 +6,10 @@ import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
 import { DOCS, findPage, listPages, loadStructure } from './structure.mjs';
 
-/** @import { Page } from './structure.mjs' */
+/** @import { LocatedPage } from './structure.mjs' */
 /**
  * @typedef {'todo' | 'stale' | 'fresh'} Status
- * @typedef {Page & { status: Status }} ProgressRow
+ * @typedef {LocatedPage & { status: Status }} ProgressRow
  */
 
 const MAX_AGE_DAYS = 90;
@@ -25,8 +25,11 @@ const END = '<!-- progress:end -->';
  */
 export function classify(markdown, now) {
 	const text = markdown.replace(/^﻿/, '').replace(/\r\n/g, '\n');
-	// Stryker disable next-line StringLiteral: any fallback text parses to a value with no lastVerified, so the page is todo.
-	const frontmatter = parse(/^---\n([\s\S]*?)\n---/.exec(text)?.[1] ?? '') ?? {};
+	const block = /^---\n([\s\S]*?)\n---/.exec(text)?.[1];
+	if (block === undefined) {
+		return 'todo';
+	}
+	const frontmatter = parse(block) ?? {};
 	if (!frontmatter.lastVerified) {
 		return 'todo';
 	}
@@ -79,7 +82,7 @@ export function writeProgress(text, table) {
 }
 
 /**
- * @param {{ docsDir?: string, pages?: Page[], now?: Date, log?: (line: string) => void }} [options]
+ * @param {{ docsDir?: string, pages?: LocatedPage[], now?: Date, log?: (line: string) => void }} [options]
  * @returns {ProgressRow[]}
  * @internal
  */

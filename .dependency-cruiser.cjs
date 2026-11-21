@@ -1,4 +1,3 @@
-// Layer rules for scripts/, src/ and astro.config.mjs. Any import that no `allowed` rule lists is an error.
 const CORE = '^scripts/structure\\.mjs$';
 const YAML = '^node_modules/yaml/';
 const ASTRO = ['^astro:', '^node_modules/(?:astro|@astrojs/[^/]+|starlight-[^/]+)/'];
@@ -39,8 +38,7 @@ module.exports = {
 		},
 	],
 	allowedSeverity: 'error',
-	// The preset adds no-circular, no-orphans, not-to-unresolvable, no-deprecated-core, not-to-deprecated,
-	// no-non-package-json and no-duplicate-dep-types, all as errors. A rule below with the same name replaces it.
+	// A rule below with the same name as a preset rule replaces it.
 	extends: 'dependency-cruiser/configs/recommended-strict',
 	forbidden: [
 		{

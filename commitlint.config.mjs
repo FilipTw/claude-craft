@@ -15,7 +15,6 @@ const TOOLING = [
 	'node',
 	'mutation',
 ];
-// Each top-level docs section is a scope too, named after its folder without the NN- prefix.
 const SECTIONS = loadStructure()
 	.parts.flatMap((part) => part.sections)
 	.flatMap((item) => ('dir' in item ? [item.dir.replace(/^\d{2}-/, '')] : []));

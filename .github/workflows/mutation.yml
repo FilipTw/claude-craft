@@ -3,7 +3,7 @@ name: Mutation testing
 on:
   workflow_dispatch:
   schedule:
-    # Mondays at 05:17 UTC. Off the hour, when scheduled runs queue the longest.
+    # GitHub delays scheduled runs most at the top of the hour.
     - cron: "17 5 * * 1"
 
 permissions: {}
@@ -11,7 +11,6 @@ permissions: {}
 jobs:
   mutation:
     runs-on: ubuntu-latest
-    # A full run takes about 30 seconds locally. The limit leaves room for a slower runner and a larger suite.
     timeout-minutes: 15
     permissions:
       contents: read
@@ -24,9 +23,7 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      # Fails when the mutation score drops below the break threshold in stryker.config.json.
       - run: npm run mutation
-      # Uploads the report on a failed run too, because that is when it is needed.
       - if: ${{ !cancelled() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:

@@ -5,10 +5,10 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DOCS, findOrphans, findPage, HANDWRITTEN, listPages, loadStructure, PAGE_TYPES, ROOT } from './structure.mjs';
 
-/** @import { Page, PageType } from './structure.mjs' */
+/** @import { LocatedPage, PageType } from './structure.mjs' */
 
 /**
- * @param {{ docsDir: string, pages: Page[], templates: Record<PageType, string> }} options
+ * @param {{ docsDir: string, pages: LocatedPage[], templates: Record<PageType, string> }} options
  * @returns {{ created: string[] }}
  * @internal
  */
@@ -31,8 +31,8 @@ export function scaffold({ docsDir, pages, templates }) {
 }
 
 /**
- * @param {{ docsDir?: string, pages?: Page[], log?: (line: string) => void }} [options]
- * @returns {0 | 1} The process exit code: 1 when files exist outside the manifest.
+ * @param {{ docsDir?: string, pages?: LocatedPage[], log?: (line: string) => void }} [options]
+ * @returns {0 | 1}
  * @internal
  */
 export function runScaffold({

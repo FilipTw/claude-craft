@@ -4,7 +4,6 @@ updates:
     directory: /
     schedule:
       interval: weekly
-    # A new release waits before Dependabot proposes it, so a bad publish has time to be pulled.
     cooldown:
       default-days: 5
       semver-major-days: 30
