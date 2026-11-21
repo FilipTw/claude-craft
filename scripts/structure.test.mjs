@@ -118,6 +118,11 @@ test('an error tells the editor where structure.yaml is wrong and what that plac
 		['- parts', '"(root)" must be a mapping'],
 		['parts: []', '"(root)" needs a non-empty list "parts"'],
 		['parts:\n  - Część I', '"parts[0]" must be a mapping'],
+		[
+			'parts:\n  - label: A: B\n',
+			'"(root)" is not valid YAML. Nested mappings are not allowed in compact mappings at line 2, column 12',
+		],
+		['parts: *x', '"(root)" is not valid YAML. Unresolved alias (the anchor must be set before the alias): x'],
 		['parts:\n  - { label: Część I, sections: [~] }', '"[0]" must look like 01-kebab-case'],
 		['parts:\n  - { label: Część I, sections: [] }', '"parts[0]" needs a non-empty list "sections"'],
 		[valid.replace('label: Część I', "label: ''"), '"parts[0]" needs a text "label"'],

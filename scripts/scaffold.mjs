@@ -3,6 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
 	DOCS,
+	DocsProblem,
 	findOrphans,
 	findPage,
 	listPages,
@@ -38,27 +39,37 @@ export function scaffold({ docsDir, pages, templates }) {
 }
 
 /**
- * @param {{ docsDir?: string, pages?: LocatedPage[], log?: (line: string) => void }} [options]
+ * @param {{ docsDir?: string, manifest?: string | URL, pages?: LocatedPage[], log?: (line: string) => void }} [options]
  * @returns {0 | 1}
  * @internal
  */
 export function runScaffold({
 	docsDir = DOCS,
-	pages = listPages(loadStructure()),
+	manifest,
+	pages,
 	log = (line) => process.stdout.write(`${line}\n`),
 } = {}) {
-	const templates = /** @type {Record<PageType, string>} */ (
-		Object.fromEntries(
-			PAGE_TYPES.map((type) => [type, readFileSync(join(ROOT, `scripts/page-templates/${type}.md`), 'utf8')]),
-		)
-	);
-	const { created } = scaffold({ docsDir, pages, templates });
-	const orphans = findOrphans(docsDir, pages, PAGES_OUTSIDE_MANIFEST);
-	log(`Pages created: ${created.length}.`);
-	for (const orphan of orphans) {
-		log(`Outside the manifest: ${orphan}. Add it to scripts/structure.yaml.`);
+	try {
+		const listed = pages ?? listPages(loadStructure(manifest));
+		const templates = /** @type {Record<PageType, string>} */ (
+			Object.fromEntries(
+				PAGE_TYPES.map((type) => [type, readFileSync(join(ROOT, `scripts/page-templates/${type}.md`), 'utf8')]),
+			)
+		);
+		const { created } = scaffold({ docsDir, pages: listed, templates });
+		const orphans = findOrphans(docsDir, listed, PAGES_OUTSIDE_MANIFEST);
+		log(`Pages created: ${created.length}.`);
+		for (const orphan of orphans) {
+			log(`Outside the manifest: ${orphan}. Add it to scripts/structure.yaml.`);
+		}
+		return orphans.length > 0 ? 1 : 0;
+	} catch (error) {
+		if (error instanceof DocsProblem) {
+			log(error.message);
+			return 1;
+		}
+		throw error;
 	}
-	return orphans.length > 0 ? 1 : 0;
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

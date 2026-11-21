@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DOCS, findPage, listPages, loadStructure, parseYaml, ROADMAP } from './structure.mjs';
+import { DOCS, DocsProblem, findPage, listPages, loadStructure, parseYaml, ROADMAP } from './structure.mjs';
 
 /** @import { LocatedPage } from './structure.mjs' */
 /**
@@ -14,8 +14,6 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const START = '<!-- progress:start -->';
 const END = '<!-- progress:end -->';
 const PROGRESS_BLOCK = new RegExp(`${START}[\\s\\S]*?${END}`);
-
-class DocsProblem extends Error {}
 
 /** @param {number} ageDays */
 const provesRecentCheck = (ageDays) => ageDays >= 0 && ageDays <= MAX_AGE_DAYS;
@@ -105,18 +103,19 @@ function readRow(docsDir, page, now) {
 }
 
 /**
- * @param {{ docsDir?: string, pages?: LocatedPage[], now?: Date, log?: (line: string) => void }} [options]
+ * @param {{ docsDir?: string, manifest?: string | URL, pages?: LocatedPage[], now?: Date, log?: (line: string) => void }} [options]
  * @returns {0 | 1}
  * @internal
  */
 export function runFreshness({
 	docsDir = DOCS,
-	pages = listPages(loadStructure()),
+	manifest,
+	pages,
 	now = new Date(),
 	log = (line) => process.stdout.write(`${line}\n`),
 } = {}) {
 	try {
-		const rows = pages.map((page) => readRow(docsDir, page, now));
+		const rows = (pages ?? listPages(loadStructure(manifest))).map((page) => readRow(docsDir, page, now));
 		const roadmap = join(docsDir, ROADMAP);
 		const text = readFileSync(roadmap, 'utf8');
 		const updated = writeProgress(text, renderProgress(rows));
