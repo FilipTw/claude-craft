@@ -31,3 +31,6 @@ reports/
 
 # stryker sandbox
 .stryker-tmp/
+
+# lychee link cache
+.lycheecache

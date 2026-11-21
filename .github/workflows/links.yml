@@ -1,0 +1,32 @@
+name: External links
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Mondays at 05:43 UTC, after the mutation run.
+    - cron: "43 5 * * 1"
+
+# contents: read is all this needs. A failed run, its job summary and the report artifact carry the result,
+# so the token never gets issues: write to file the report as an issue.
+permissions: {}
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # Policy lives in lychee.toml. The action passes the read-only token, which raises the GitHub rate limit.
+      - uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
+        with:
+          args: --config lychee.toml --no-progress src/content/docs README.md CLAUDE.md docs
+      - if: ${{ failure() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: link-report
+          path: lychee/out.md
+          if-no-files-found: error
