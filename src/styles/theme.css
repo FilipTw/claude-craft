@@ -31,3 +31,133 @@ h5,
 }
 
 /* Motion: every transition in our CSS sits under prefers-reduced-motion: no-preference. */
+
+/* Header */
+.header {
+	border-bottom-color: var(--cc-border);
+}
+
+.site-title {
+	color: var(--cc-heading);
+	font-weight: 600;
+	letter-spacing: -0.02em;
+}
+
+@media (min-width: 50rem) {
+	site-search button[data-open-modal] {
+		border-color: var(--cc-border);
+		border-radius: var(--cc-radius-pill);
+		background-color: var(--cc-surface);
+		color: var(--cc-text-muted);
+		padding-inline: var(--cc-space-4) var(--cc-space-2);
+	}
+
+	site-search button[data-open-modal]:hover {
+		border-color: var(--cc-accent-ui);
+		color: var(--cc-heading);
+	}
+
+	site-search button > kbd {
+		border-radius: var(--cc-radius-pill);
+		background-color: var(--cc-surface-raised);
+	}
+}
+
+/* Sidebar: a panel with small-caps group labels and a CTA under the tree */
+.sidebar-content {
+	gap: var(--cc-space-3);
+	padding-bottom: var(--cc-space-5);
+}
+
+.cc-sidebar-heading {
+	margin: 0;
+	padding-inline: var(--cc-space-2);
+	color: var(--cc-text-muted);
+	font-size: var(--sl-text-2xs);
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.sidebar-content .top-level > li > details > summary .large,
+.sidebar-content .top-level > li > a.large {
+	font-family: var(--cc-font-heading);
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	font-size: var(--sl-text-xs);
+	color: var(--cc-heading);
+}
+
+.sidebar-content summary,
+.sidebar-content a {
+	border-radius: var(--cc-radius-sm);
+	min-height: var(--cc-touch-target);
+	display: flex;
+	align-items: center;
+}
+
+.sidebar-content ul ul li {
+	border-inline-start-color: var(--cc-border);
+}
+
+.sidebar-content a[aria-current="page"],
+.sidebar-content a[aria-current="page"]:hover,
+.sidebar-content a[aria-current="page"]:focus {
+	background-color: var(--cc-accent-soft);
+	box-shadow: inset 3px 0 0 var(--cc-accent-text);
+	color: var(--cc-heading);
+}
+
+.cc-sidebar-cta {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--cc-space-2);
+	min-height: var(--cc-touch-target);
+	padding-inline: var(--cc-space-5);
+	border-radius: var(--cc-radius-pill);
+	background-color: var(--cc-accent-ui);
+	color: var(--cc-on-accent);
+	font-family: var(--cc-font-heading);
+	font-size: var(--sl-text-sm);
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-decoration: none;
+	text-transform: uppercase;
+}
+
+@media (hover: hover) {
+	.sidebar-content summary:hover,
+	.sidebar-content a:not([aria-current="page"]):hover {
+		background-color: var(--cc-surface);
+	}
+
+	.cc-sidebar-cta:hover {
+		background-color: var(--cc-accent-ui-hover);
+		box-shadow: 0 0 1.5rem var(--cc-glow);
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.sidebar-content a,
+	.sidebar-content summary,
+	.cc-sidebar-cta,
+	site-search button[data-open-modal] {
+		transition:
+			background-color var(--cc-transition),
+			border-color var(--cc-transition),
+			box-shadow var(--cc-transition),
+			color var(--cc-transition);
+	}
+}
+
+@media (min-width: 50rem) {
+	.sidebar-content summary,
+	.sidebar-content a {
+		min-height: 2rem;
+	}
+
+	.sidebar-pane {
+		border-inline-end-color: var(--cc-border);
+	}
+}
