@@ -33,6 +33,25 @@
 export const withBase = (base, path) => `${base.replace(/\/+$/, '')}/${path.replace(/^\/+/, '')}`;
 
 /**
+ * Hrefs of pages that have `lastVerified`, in the form the sidebar uses (`<base>/<id>/`).
+ * @param {{ id: string, data: { lastVerified?: Date | undefined } }[]} docs
+ * @param {string} base
+ * @returns {Set<string>}
+ */
+export const verifiedHrefs = (docs, base) =>
+	new Set(docs.filter((doc) => doc.data.lastVerified !== undefined).map((doc) => withBase(base, `${doc.id}/`)));
+
+/**
+ * Verified and total pages across every part.
+ * @param {PartSummary[]} parts
+ */
+export const totalProgress = (parts) =>
+	parts.reduce((sum, part) => ({ verified: sum.verified + part.verified, pages: sum.pages + part.pages }), {
+		verified: 0,
+		pages: 0,
+	});
+
+/**
  * Every link under an entry, depth first, in sidebar order.
  * @param {NavEntry} entry
  * @returns {NavLink[]}
@@ -53,10 +72,10 @@ const splitLabel = (label) => {
 /**
  * One summary per top-level group of the sidebar. Top-level links, such as the roadmap, are skipped.
  * @param {NavEntry[]} sidebar
- * @param {ReadonlySet<string>} verifiedHrefs Hrefs of pages that have `lastVerified`.
+ * @param {ReadonlySet<string>} verified Hrefs of pages that have `lastVerified`, from `verifiedHrefs`.
  * @returns {PartSummary[]}
  */
-export const summarizeParts = (sidebar, verifiedHrefs) =>
+export const summarizeParts = (sidebar, verified) =>
 	sidebar.flatMap((entry) => {
 		if (entry.type === 'link') {
 			return [];
@@ -72,7 +91,7 @@ export const summarizeParts = (sidebar, verifiedHrefs) =>
 				href: first.href,
 				sections: entry.entries.filter((child) => child.type === 'group').length,
 				pages: links.length,
-				verified: links.filter((link) => verifiedHrefs.has(link.href)).length,
+				verified: links.filter((link) => verified.has(link.href)).length,
 			},
 		];
 	});

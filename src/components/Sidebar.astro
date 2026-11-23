@@ -1,15 +1,23 @@
 ---
+import { getCollection } from 'astro:content';
 import { Icon } from '@astrojs/starlight/components';
 import Default from '@astrojs/starlight/components/Sidebar.astro';
-import { withBase } from '../lib/home.mjs';
+import { percent, summarizeParts, totalProgress, verifiedHrefs, withBase } from '../lib/home.mjs';
 
-const roadmapHref = withBase(import.meta.env.BASE_URL, 'roadmap/');
+const { id, sidebar } = Astro.locals.starlightRoute;
+const base = import.meta.env.BASE_URL;
+const progress = totalProgress(summarizeParts(sidebar, verifiedHrefs(await getCollection('docs'), base)));
+const done = percent(progress.verified, progress.pages);
 ---
 
-{/* Starlight already wraps the sidebar in <nav>, so this adds only a label and the CTA. */}
+{/* Starlight already wraps the sidebar in <nav>. The card replaces the roadmap link (ADR 0003, 2026-11-24). */}
+<a class="cc-progress-card" href={withBase(base, 'roadmap/')} aria-current={id === 'roadmap' ? 'page' : undefined}>
+	<span class="cc-progress-card-text">
+		<span class="cc-progress-card-title">Ścieżka nauki</span>
+		<span class="cc-progress-card-meta">Zweryfikowane: {progress.verified} z {progress.pages} stron</span>
+	</span>
+	<Icon name="right-arrow" size="1rem" class="cc-progress-card-arrow" />
+	<span class="cc-progress-card-bar" aria-hidden="true"><span style={`--cc-progress: ${done}%`}></span></span>
+</a>
 <p class="cc-sidebar-heading" aria-hidden="true">Przeglądaj tematy</p>
 <Default />
-<a class="cc-sidebar-cta" href={roadmapHref}>
-	<span>Ścieżka nauki</span>
-	<Icon name="right-arrow" size="1rem" />
-</a>

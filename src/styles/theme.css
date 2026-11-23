@@ -62,14 +62,18 @@ h5,
 	}
 }
 
-/* Sidebar: a panel with small-caps group labels and a CTA under the tree */
+/*
+ * Sidebar: three levels, one size each on every screen (ADR 0003, 2026-11-24).
+ * Part = small-caps label, section = row with a chevron, page = secondary text.
+ * Starlight marks every group label and top-level link as .large; these rules replace its sizes.
+ */
 .sidebar-content {
 	gap: var(--cc-space-3);
-	padding-bottom: var(--cc-space-5);
+	padding-bottom: var(--cc-space-6);
 }
 
 .cc-sidebar-heading {
-	margin: 0;
+	margin: var(--cc-space-2) 0 0;
 	padding-inline: var(--cc-space-2);
 	color: var(--cc-text-muted);
 	font-size: var(--sl-text-2xs);
@@ -78,82 +82,211 @@ h5,
 	text-transform: uppercase;
 }
 
-.sidebar-content .top-level > li > details > summary .large,
-.sidebar-content .top-level > li > a.large {
-	font-family: var(--cc-font-heading);
-	letter-spacing: 0.04em;
-	text-transform: uppercase;
-	font-size: var(--sl-text-xs);
-	color: var(--cc-heading);
+.sidebar-content .top-level > li + li {
+	margin-top: var(--cc-space-4);
 }
 
 .sidebar-content summary,
 .sidebar-content a {
-	border-radius: var(--cc-radius-sm);
-	min-height: var(--cc-touch-target);
 	display: flex;
 	align-items: center;
+	min-height: var(--cc-touch-target);
+	border-radius: var(--cc-radius-sm);
 }
 
-.sidebar-content ul ul li {
-	border-inline-start-color: var(--cc-border);
+/* Selectors below use :where() so every level has the same specificity and source order decides. */
+
+/* Level 1: part */
+.sidebar-content :where(.top-level > li > details > summary) {
+	min-height: 1.75rem;
+	padding-inline: var(--cc-space-2);
 }
 
-.sidebar-content a[aria-current="page"],
-.sidebar-content a[aria-current="page"]:hover,
-.sidebar-content a[aria-current="page"]:focus {
-	background-color: var(--cc-accent-soft);
-	box-shadow: inset 3px 0 0 var(--cc-accent-text);
+.sidebar-content :where(.top-level > li > details > summary) .large {
+	color: var(--cc-text-muted);
+	font-size: var(--sl-text-2xs);
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.sidebar-content :where(.top-level > li > details > summary) .caret {
+	width: 0.875rem;
+	height: 0.875rem;
+	color: var(--cc-text-muted);
+}
+
+/* Level 2: section. Its list sits flush with the part, without a guide line. */
+.sidebar-content :where(.top-level > li > details > ul > li) {
+	margin-inline-start: 0;
+	padding-inline-start: 0;
+	border-inline-start: 0;
+}
+
+.sidebar-content :where(details details > summary) .large {
+	color: var(--cc-text);
+	font-family: var(--cc-font-heading);
+	font-size: 0.9375rem;
+	font-weight: 500;
+	letter-spacing: 0;
+	text-transform: none;
+}
+
+.sidebar-content :where(details details > summary) .caret {
+	width: 1rem;
+	height: 1rem;
+	color: var(--cc-text-muted);
+}
+
+/* A group inside a section, such as "Instalacja", reads like a page with a chevron */
+.sidebar-content :where(details details details > summary) .large {
+	color: var(--cc-text-muted);
+	font-family: var(--cc-font-body);
+	font-size: var(--sl-text-sm);
+}
+
+.sidebar-content :where(details details:has([aria-current="page"]) > summary) .large {
 	color: var(--cc-heading);
 }
 
-.cc-sidebar-cta {
-	display: flex;
+/* Level 3: page, indented by one thin guide line */
+.sidebar-content :where(details details ul li) {
+	margin-inline-start: var(--cc-space-3);
+	border-inline-start-color: var(--cc-border);
+}
+
+.sidebar-content :where(ul ul) a {
+	position: relative;
+	color: var(--cc-text-muted);
+	font-size: var(--sl-text-sm);
+	font-weight: 400;
+}
+
+/* Active page: accent text and a dot, no filled pill */
+.sidebar-content a[aria-current="page"],
+.sidebar-content a[aria-current="page"]:hover,
+.sidebar-content a[aria-current="page"]:focus {
+	background-color: var(--cc-surface);
+	color: var(--cc-accent-text);
+	font-weight: 500;
+}
+
+.sidebar-content :where(ul ul) a[aria-current="page"]::before {
+	content: "";
+	position: absolute;
+	inset-inline-start: calc(-1 * var(--sl-sidebar-item-padding-inline) - 3.5px);
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background-color: var(--cc-accent-text);
+}
+
+/* Progress card at the top: one compact row with a thin bar */
+.cc-progress-card {
+	position: relative;
+	display: grid;
+	grid-template-columns: 1fr auto;
 	align-items: center;
-	justify-content: center;
-	gap: var(--cc-space-2);
-	min-height: var(--cc-touch-target);
-	padding-inline: var(--cc-space-5);
-	border-radius: var(--cc-radius-pill);
-	background-color: var(--cc-accent-ui);
-	color: var(--cc-on-accent);
+	gap: var(--cc-space-1) var(--cc-space-3);
+	padding: var(--cc-space-3) var(--cc-space-3) var(--cc-space-3) var(--cc-space-4);
+	border: 1px solid var(--cc-border);
+	border-radius: var(--cc-radius-md);
+	background-color: var(--cc-surface);
+	color: var(--cc-text);
+	text-decoration: none;
+}
+
+.cc-progress-card-text {
+	display: grid;
+	gap: 0.125rem;
+}
+
+.cc-progress-card-title {
+	color: var(--cc-heading);
 	font-family: var(--cc-font-heading);
 	font-size: var(--sl-text-sm);
 	font-weight: 600;
-	letter-spacing: 0.04em;
-	text-decoration: none;
-	text-transform: uppercase;
+}
+
+.cc-progress-card-meta {
+	color: var(--cc-text-muted);
+	font-size: var(--sl-text-2xs);
+}
+
+.cc-progress-card-arrow {
+	color: var(--cc-accent-text);
+}
+
+.cc-progress-card-bar {
+	grid-column: 1 / -1;
+	height: 3px;
+	border-radius: var(--cc-radius-pill);
+	background-color: var(--cc-border);
+	overflow: hidden;
+}
+
+.cc-progress-card-bar > span {
+	display: block;
+	width: var(--cc-progress);
+	height: 100%;
+	background-color: var(--cc-accent-text);
+}
+
+.cc-progress-card[aria-current="page"] {
+	border-color: var(--cc-accent-ui);
 }
 
 @media (hover: hover) {
 	.sidebar-content summary:hover,
 	.sidebar-content a:not([aria-current="page"]):hover {
 		background-color: var(--cc-surface);
+		color: var(--cc-heading);
 	}
 
-	.cc-sidebar-cta:hover {
-		background-color: var(--cc-accent-ui-hover);
-		box-shadow: 0 0 1.5rem var(--cc-glow);
+	.cc-progress-card:hover {
+		border-color: var(--cc-accent-ui);
+		box-shadow: 0 0 1.25rem var(--cc-glow);
+	}
+
+	.cc-progress-card:hover .cc-progress-card-arrow {
+		transform: translateX(3px);
 	}
 }
 
 @media (prefers-reduced-motion: no-preference) {
 	.sidebar-content a,
 	.sidebar-content summary,
-	.cc-sidebar-cta,
+	.cc-progress-card,
+	.cc-progress-card-arrow,
 	site-search button[data-open-modal] {
 		transition:
 			background-color var(--cc-transition),
 			border-color var(--cc-transition),
 			box-shadow var(--cc-transition),
-			color var(--cc-transition);
+			color var(--cc-transition),
+			transform var(--cc-transition);
+	}
+
+	.sidebar-content details[open] > ul {
+		animation: cc-reveal 160ms ease-out;
+	}
+}
+
+@keyframes cc-reveal {
+	from {
+		opacity: 0;
+		transform: translateY(-4px);
 	}
 }
 
 @media (min-width: 50rem) {
 	.sidebar-content summary,
 	.sidebar-content a {
-		min-height: 2rem;
+		min-height: 2.125rem;
+	}
+
+	.sidebar-content .top-level > li > details > summary {
+		min-height: 1.75rem;
 	}
 
 	.sidebar-pane {
