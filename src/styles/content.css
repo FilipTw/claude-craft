@@ -39,7 +39,6 @@
 	min-width: 8rem;
 	border-bottom-color: var(--cc-border);
 	padding-inline: var(--cc-space-4);
-	hyphens: manual;
 }
 
 .sl-markdown-content :is(th:first-child, td:first-child):not(:where(.not-content *)),

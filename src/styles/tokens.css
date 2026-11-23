@@ -26,7 +26,8 @@
 	--cc-grid-line: rgb(255 255 255 / 0.05);
 
 	/* Type */
-	--cc-font-body: "Inter Variable", var(--sl-font-system);
+	/* Body uses the system font: no download, so body text paints at once (font budget, ADR 0003) */
+	--cc-font-body: var(--sl-font-system);
 	--cc-font-heading: "Outfit Variable", var(--cc-font-body);
 
 	/* Radius */
