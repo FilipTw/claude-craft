@@ -1,6 +1,6 @@
 # ADR 0003: Ciemny motyw z neonowym akcentem i strona startowa jako wejście do nauki
 
-Status: proponowana, 2026-11-23
+Status: przyjęta, 2026-11-24
 
 ## Kontekst
 
@@ -20,9 +20,9 @@ Autor chce profesjonalnego wyglądu w stylu wzorca: prawie czarne tło, akcent m
 
 - Wygląd powstaje przez `customCss` i nadpisania komponentów Starlight (`ThemeProvider`, `Sidebar`, `Hero`). Własny motyw od zera wymagałby utrzymywania nawigacji, wyszukiwania i i18n, które Starlight już daje.
 - Kolory, typografia, promienie i odstępy żyją tylko w `src/styles/tokens.css` jako zmienne `--cc-*`. Plik mapuje je na zmienne `--sl-*` Starlight. Pozostałe pliki CSS i komponenty używają tylko zmiennych.
-- Domyślny motyw to ciemny. Jasny wariant zostaje, bo przy długim czytaniu część osób go woli. Wybór czytelnika zapisuje się jak dotąd w `localStorage`.
+- Domyślny motyw to ciemny. Jasny wariant zostaje, bo przy długim czytaniu część osób go woli. Przełącznik ma dwie opcje, bez „auto”, bo „auto” oddałoby wybór systemowi. Wybór czytelnika zapisuje się jak dotąd w `localStorage`.
 - Neon jest tylko akcentem: słowo w nagłówku, ramka aktywnego elementu, przycisk CTA, focus. Reguła `frontend-ui-engineering` z addyosmani/agent-skills odradza fiolet jako domyślną estetykę. Tu fiolet to świadomy wybór autora, a ograniczenie go do akcentów zmniejsza ten koszt.
-- Fonty: Outfit dla nagłówków i Inter dla treści, w wersji variable z `@fontsource-variable`. Ładujemy tylko podzbiory `latin` i `latin-ext`, bo treść jest po polsku.
+- Fonty: Outfit dla nagłówków, w wersji variable z `@fontsource-variable`. Przeglądarka pobiera tylko podzbiory `latin` i `latin-ext`, potrzebne dla polskich znaków. Treść używa fontu systemowego. Pierwsza wersja miała Inter dla treści, ale razem z Outfit fonty ważyły 177 KB przy budżecie 100 KB, a LCP strony treści wynosił 2,7 s.
 
 | Token | Ciemny | Jasny | Użycie |
 | --- | --- | --- | --- |
@@ -43,3 +43,12 @@ Autor chce profesjonalnego wyglądu w stylu wzorca: prawie czarne tło, akcent m
 - Aktualizacja Starlight może zmienić strukturę komponentów, które nadpisujemy. Nadpisania renderują domyślny komponent i tylko go uzupełniają, więc ryzyko dotyczy głównie selektorów w `theme.css`.
 - Komponenty strony startowej czytają dane z `Astro.locals.starlightRoute.sidebar` i `getCollection('docs')`. Nie importują `scripts/`, więc reguła z `scripts/architecture.test.mjs` zostaje bez zmian.
 - Nowe komponenty używane w MDX trafiają na listę `MD033` w `.markdownlint-cli2.jsonc`.
+- Wewnętrzne linki w treści MDX i we frontmatterze piszemy z prefiksem `/claude-craft/`, bo `starlight-links-validator` odrzuca linki względne.
+
+Zmierzone 2026-11-24 na buildzie produkcyjnym (`astro preview`), strona startowa, strona treści i strona testowa ze wszystkimi elementami treści:
+
+- Lighthouse 12.8.2, profil mobilny: Performance od 98 do 99, Accessibility, Best Practices i SEO po 100. LCP od 1,6 do 2,0 s, CLS do 0,003. Fonty ważą 47 KB, CSS od 15 do 19 KB.
+- `@axe-core/cli` 4.13.0 z tagami WCAG 2.2 AA: 0 naruszeń na stronie startowej i stronie treści. Na stronie testowej axe zgłosił `scrollable-region-focusable` dla przewijanego bloku kodu. Expressive Code dodaje `tabindex="0"` w `requestIdleCallback`, a axe sprawdził stronę wcześniej. `pa11y` 9.1.1 z opóźnieniem 1,5 s nie zgłosił błędów na tych stronach w obu motywach.
+- Brak poziomego przewijania strony startowej, strony treści i `roadmap/` przy szerokościach 320, 375, 667, 768, 1024 i 1440 px. Szerokość 320 px odpowiada powiększeniu 400% przy oknie 1280 px.
+- Kolejność fokusu na stronie startowej: skip link, logo, wyszukiwanie, dwa przyciski hero, karty części, karty szybkiego startu. Przyciski hero mają 44 px wysokości na telefonie.
+- Czytnika ekranu nie testowano. Ten punkt pozostaje ręczny i niesprawdzony.
