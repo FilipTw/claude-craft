@@ -22,6 +22,7 @@ export default defineConfig({
 				'./src/styles/tokens.css',
 				'./src/styles/theme.css',
 				'./src/styles/content.css',
+				'./src/styles/search.css',
 				'./src/styles/home.css',
 			],
 			components: {
@@ -33,6 +34,8 @@ export default defineConfig({
 				Sidebar: './src/components/Sidebar.astro',
 				// biome-ignore lint/style/useNamingConvention: Starlight names overridable components in PascalCase.
 				Hero: './src/components/Hero.astro',
+				// biome-ignore lint/style/useNamingConvention: Starlight names overridable components in PascalCase.
+				Search: './src/components/Search.astro',
 			},
 			expressiveCode: {
 				themes: ['github-dark-default', 'github-light'],

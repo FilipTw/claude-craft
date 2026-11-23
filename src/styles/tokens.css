@@ -25,6 +25,8 @@
 	--cc-on-accent: #ffffff;
 	--cc-glow: rgb(230 57 255 / 0.35);
 	--cc-grid-line: rgb(255 255 255 / 0.05);
+	--cc-backdrop: rgb(6 5 9 / 0.72);
+	--cc-shadow-dialog: 0 1.5rem 4rem rgb(0 0 0 / 0.55);
 
 	/* Type */
 	/* Body uses the system font: no download, so body text paints at once (font budget, ADR 0003) */
@@ -71,6 +73,8 @@
 	--cc-accent-soft: #f4e8ff;
 	--cc-glow: rgb(157 0 194 / 0.2);
 	--cc-grid-line: rgb(12 11 16 / 0.06);
+	--cc-backdrop: rgb(20 18 26 / 0.45);
+	--cc-shadow-dialog: 0 1.5rem 4rem rgb(20 18 26 / 0.18);
 }
 
 /* Mapping onto Starlight. Starlight's light theme swaps the gray scale, so both themes set it. */
