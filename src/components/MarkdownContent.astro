@@ -1,0 +1,8 @@
+---
+import Default from '@astrojs/starlight/components/MarkdownContent.astro';
+---
+
+{/* data-cc-page lets CSS style one page, such as the roadmap, without changing its Markdown (ADR 0003). */}
+<div class="cc-page" data-cc-page={Astro.locals.starlightRoute.id}>
+	<Default><slot /></Default>
+</div>

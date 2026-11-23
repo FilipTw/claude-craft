@@ -140,3 +140,86 @@ mobile-starlight-toc summary .toggle {
 			box-shadow var(--cc-transition);
 	}
 }
+
+/*
+ * Roadmap page: the list of parts is a timeline, the progress table aligns numbers (ADR 0003, 2026-11-24).
+ * Markdown stays plain so GitHub, Obsidian and scripts/freshness.mjs read it as before.
+ */
+[data-cc-page="roadmap"] .sl-markdown-content > p:first-child {
+	color: var(--cc-text-muted);
+	font-size: var(--sl-text-lg);
+}
+
+[data-cc-page="roadmap"] .sl-markdown-content > ol {
+	counter-reset: cc-part;
+	padding: 0;
+	list-style: none;
+}
+
+[data-cc-page="roadmap"] .sl-markdown-content > ol > li {
+	position: relative;
+	margin: 0;
+	padding: 0 0 var(--cc-space-5) 3.25rem;
+	color: var(--cc-text-muted);
+	counter-increment: cc-part;
+}
+
+[data-cc-page="roadmap"] .sl-markdown-content > ol > li::before {
+	content: counter(cc-part, upper-roman);
+	position: absolute;
+	inset-block-start: 0;
+	inset-inline-start: 0;
+	display: grid;
+	place-items: center;
+	width: 2.25rem;
+	height: 2.25rem;
+	border: 1px solid var(--cc-accent-ui);
+	border-radius: 50%;
+	background-color: var(--cc-accent-soft);
+	color: var(--cc-accent-text);
+	font-family: var(--cc-font-heading);
+	font-size: var(--sl-text-xs);
+	font-weight: 600;
+}
+
+/* The line that joins one part to the next */
+[data-cc-page="roadmap"] .sl-markdown-content > ol > li:not(:last-child)::after {
+	content: "";
+	position: absolute;
+	inset-block: 2.5rem 0.25rem;
+	inset-inline-start: calc(1.125rem - 0.5px);
+	width: 1px;
+	background-color: var(--cc-border-strong);
+}
+
+[data-cc-page="roadmap"] .sl-markdown-content > ol > li strong {
+	display: inline-block;
+	padding-top: 0.375rem;
+	color: var(--cc-heading);
+	font-family: var(--cc-font-heading);
+	font-size: var(--sl-text-lg);
+	font-weight: 600;
+}
+
+/* Progress table: numbers to the right, in equal-width digits; the total row closes the table */
+[data-cc-page="roadmap"] .sl-markdown-content :is(th, td):not(:first-child) {
+	min-width: 6rem;
+	text-align: end;
+	font-variant-numeric: tabular-nums;
+}
+
+[data-cc-page="roadmap"] .sl-markdown-content tr:last-child td {
+	border-top: 1px solid var(--cc-border-strong);
+	background-color: var(--cc-surface);
+	color: var(--cc-heading);
+}
+
+/* From 50rem the four columns fit, so the table fills its frame; below that it keeps Starlight's scrolling block */
+@media (min-width: 50rem) {
+	[data-cc-page="roadmap"] .sl-markdown-content table {
+		display: table;
+		width: 100%;
+		border-collapse: separate;
+		overflow: hidden;
+	}
+}
