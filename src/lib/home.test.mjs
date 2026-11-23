@@ -1,6 +1,15 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { countLabel, percent, recentlyVerified, summarizeParts, typeLabel, withBase } from './home.mjs';
+import {
+	countLabel,
+	percent,
+	recentlyVerified,
+	summarizeParts,
+	totalProgress,
+	typeLabel,
+	verifiedHrefs,
+	withBase,
+} from './home.mjs';
 
 /** @param {string} href @returns {import('./home.mjs').NavLink} */
 const link = (href) => ({ type: 'link', label: href, href });
@@ -120,4 +129,23 @@ test('countLabel picks the Polish noun form for one, few and many', () => {
 		],
 	);
 	assert.equal(countLabel(1.5, pages), '1.5 strony');
+});
+
+test('verifiedHrefs keeps pages with lastVerified and builds sidebar hrefs', () => {
+	const docs = [
+		{ id: '01-a/01-x', data: { lastVerified: new Date('2026-01-01') } },
+		{ id: '01-a/02-y', data: {} },
+		{ id: '02-b/01-z', data: { lastVerified: undefined } },
+		{ id: 'roadmap', data: { lastVerified: new Date('2026-02-02') } },
+	];
+
+	assert.deepEqual([...verifiedHrefs(docs, '/claude-craft/')], ['/claude-craft/01-a/01-x/', '/claude-craft/roadmap/']);
+});
+
+test('totalProgress sums verified and total pages and starts at zero', () => {
+	/** @param {number} verified @param {number} pages */
+	const part = (verified, pages) => ({ kicker: undefined, title: 't', href: '/', sections: 1, pages, verified });
+
+	assert.deepEqual(totalProgress([part(1, 12), part(0, 31), part(5, 5)]), { verified: 6, pages: 48 });
+	assert.deepEqual(totalProgress([]), { verified: 0, pages: 0 });
 });

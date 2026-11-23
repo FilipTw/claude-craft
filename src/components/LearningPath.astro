@@ -1,10 +1,8 @@
 ---
 import { getCollection } from 'astro:content';
-import { countLabel, percent, summarizeParts, withBase } from '../lib/home.mjs';
+import { countLabel, percent, summarizeParts, verifiedHrefs } from '../lib/home.mjs';
 
-const base = import.meta.env.BASE_URL;
-const docs = await getCollection('docs');
-const verified = new Set(docs.filter((doc) => doc.data.lastVerified).map((doc) => withBase(base, `${doc.id}/`)));
+const verified = verifiedHrefs(await getCollection('docs'), import.meta.env.BASE_URL);
 const parts = summarizeParts(Astro.locals.starlightRoute.sidebar, verified);
 ---
 

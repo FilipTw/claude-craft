@@ -55,7 +55,7 @@ export default defineConfig({
 					},
 				},
 			},
-			sidebar: ['roadmap', ...toSidebar(loadStructure())],
+			sidebar: toSidebar(loadStructure()),
 			plugins: [starlightLinksValidator()],
 		}),
 	],
