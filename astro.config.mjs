@@ -17,6 +17,13 @@ export default defineConfig({
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/FilipTw/claude-craft' }],
 			editLink: { baseUrl: 'https://github.com/FilipTw/claude-craft/edit/main/' },
 			lastUpdated: true,
+			customCss: ['./src/styles/tokens.css', './src/styles/theme.css'],
+			components: {
+				// biome-ignore lint/style/useNamingConvention: Starlight names overridable components in PascalCase.
+				ThemeProvider: './src/components/ThemeProvider.astro',
+				// biome-ignore lint/style/useNamingConvention: Starlight names overridable components in PascalCase.
+				ThemeSelect: './src/components/ThemeSelect.astro',
+			},
 			sidebar: ['roadmap', ...toSidebar(loadStructure())],
 			plugins: [starlightLinksValidator()],
 		}),
