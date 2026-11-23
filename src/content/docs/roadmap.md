@@ -6,13 +6,22 @@ type: reference
 
 Ucz się częściami, w kolejności z menu bocznego. Każda część kończy się labem w sekcji **Laby**.
 
-1. Fundamenty. Instalacja, pierwsza sesja i sposób działania agenta.
-2. Codzienna praca. Tryb interaktywny, kontekst, pamięć i przepływy pracy.
-3. Konfiguracja i kontrola. Ustawienia, uprawnienia, modele i koszty.
-4. Rozszerzanie. Skille, subagenci, hooki, MCP i pluginy.
-5. Automatyzacja. Git, code review, tryb headless i chmura.
-6. Ekosystem. Skille społeczności i inne narzędzia agentowe.
-7. Praktyka seniora. Bezpieczeństwo, praktyki i rozwiązywanie problemów.
+## Kolejność części
+
+1. **Fundamenty**\
+   Instalacja, pierwsza sesja i sposób działania agenta.
+2. **Codzienna praca**\
+   Tryb interaktywny, kontekst, pamięć i przepływy pracy.
+3. **Konfiguracja i kontrola**\
+   Ustawienia, uprawnienia, modele i koszty.
+4. **Rozszerzanie**\
+   Skille, subagenci, hooki, MCP i pluginy.
+5. **Automatyzacja**\
+   Git, code review, tryb headless i chmura.
+6. **Ekosystem**\
+   Skille społeczności i inne narzędzia agentowe.
+7. **Praktyka seniora**\
+   Bezpieczeństwo, praktyki i rozwiązywanie problemów.
 
 ## Postęp
 

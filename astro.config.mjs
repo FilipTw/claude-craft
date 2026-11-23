@@ -36,6 +36,8 @@ export default defineConfig({
 				Hero: './src/components/Hero.astro',
 				// biome-ignore lint/style/useNamingConvention: Starlight names overridable components in PascalCase.
 				Search: './src/components/Search.astro',
+				// biome-ignore lint/style/useNamingConvention: Starlight names overridable components in PascalCase.
+				MarkdownContent: './src/components/MarkdownContent.astro',
 			},
 			expressiveCode: {
 				themes: ['github-dark-default', 'github-light'],
