@@ -1,0 +1,57 @@
+---
+import { Icon } from '@astrojs/starlight/components';
+import Default from '@astrojs/starlight/components/Search.astro';
+import { withBase } from '../lib/home.mjs';
+import { SEARCH_QUERIES, SEARCH_START_PAGES } from '../lib/search.mjs';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<Default />
+
+{/* Moved into the search dialog by the script below. Shown only while the field is empty. */}
+<template id="cc-search-hints">
+	<div class="cc-search-hints">
+		<p class="cc-search-hints-label" id="cc-search-popular">Popularne</p>
+		<ul class="cc-search-chips" aria-labelledby="cc-search-popular">
+			{SEARCH_QUERIES.map((query) => (
+				<li>
+					<button type="button" class="cc-search-chip" data-query={query}>
+						{query}
+					</button>
+				</li>
+			))}
+		</ul>
+		<p class="cc-search-hints-label" id="cc-search-start">Zacznij od</p>
+		<ul class="cc-search-start" aria-labelledby="cc-search-start">
+			{SEARCH_START_PAGES.map(({ label, path }) => (
+				<li>
+					<a href={withBase(base, path)}>
+						<span>{label}</span>
+						<Icon name="right-arrow" size="1rem" />
+					</a>
+				</li>
+			))}
+		</ul>
+		<p class="cc-search-footer"><kbd>Esc</kbd> zamyka okno</p>
+	</div>
+</template>
+
+<script>
+	const template = document.querySelector<HTMLTemplateElement>('#cc-search-hints');
+	const frame = document.querySelector('site-search .dialog-frame');
+
+	if (template && frame) {
+		frame.append(template.content.cloneNode(true));
+		frame.addEventListener('click', (event) => {
+			const chip = event.target instanceof Element ? event.target.closest<HTMLElement>('[data-query]') : null;
+			const input = frame.querySelector<HTMLInputElement>('.pagefind-ui__search-input');
+			if (!(chip && input)) {
+				return;
+			}
+			input.value = chip.dataset['query'] ?? '';
+			input.dispatchEvent(new Event('input', { bubbles: true }));
+			input.focus();
+		});
+	}
+</script>

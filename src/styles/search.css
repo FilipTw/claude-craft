@@ -1,0 +1,219 @@
+/*
+ * Search dialog: rounded panel, pill field with a glow ring, card results and suggestions (ADR 0003, 2026-11-24).
+ * Starlight's dialog styles sit in @layer starlight.core, so these unlayered rules win without !important.
+ */
+
+site-search dialog {
+	border-color: var(--cc-border);
+	background-color: var(--cc-surface);
+	box-shadow: var(--cc-shadow-dialog);
+}
+
+site-search dialog::backdrop {
+	background-color: var(--cc-backdrop);
+	-webkit-backdrop-filter: blur(6px);
+	backdrop-filter: blur(6px);
+}
+
+site-search .dialog-frame {
+	gap: var(--cc-space-4);
+}
+
+site-search button[data-close-modal] {
+	border-radius: var(--cc-radius-sm);
+	padding-inline: var(--cc-space-2);
+}
+
+/* Field */
+#starlight__search {
+	--pagefind-ui-border-radius: var(--cc-radius-pill);
+	--pagefind-ui-background: var(--cc-bg);
+	--pagefind-ui-border: var(--cc-border);
+}
+
+#starlight__search .pagefind-ui__search-input {
+	height: 3rem;
+	border-radius: var(--cc-radius-pill);
+	font-size: var(--sl-text-base);
+	outline: none;
+}
+
+#starlight__search .pagefind-ui__search-input:focus {
+	border-color: var(--cc-accent-ui);
+	box-shadow:
+		0 0 0 4px var(--cc-accent-soft),
+		0 0 1.5rem var(--cc-glow);
+}
+
+#starlight__search .pagefind-ui__form::before {
+	top: 1rem;
+}
+
+#starlight__search .pagefind-ui__search-clear {
+	top: 0.375rem;
+	height: 2.25rem;
+	border-radius: var(--cc-radius-pill);
+	background-color: transparent;
+	color: var(--cc-text-muted);
+}
+
+/* Results */
+#starlight__search .pagefind-ui__message {
+	color: var(--cc-text-muted);
+	font-size: var(--sl-text-sm);
+}
+
+#starlight__search .pagefind-ui__result-title:not(:where(.pagefind-ui__result-nested *)),
+#starlight__search .pagefind-ui__result-nested {
+	border: 1px solid var(--cc-border);
+	border-radius: var(--cc-radius-md);
+	background-color: var(--cc-bg);
+}
+
+#starlight__search .pagefind-ui__result-title:not(:where(.pagefind-ui__result-nested *)):hover,
+#starlight__search .pagefind-ui__result-title:not(:where(.pagefind-ui__result-nested *)):focus-within,
+#starlight__search .pagefind-ui__result-nested:hover,
+#starlight__search .pagefind-ui__result-nested:focus-within {
+	outline: none;
+	border-color: var(--cc-accent-ui);
+}
+
+#starlight__search .pagefind-ui__result-link {
+	color: var(--cc-heading);
+	font-family: var(--cc-font-heading);
+}
+
+#starlight__search mark {
+	border-radius: 0.25rem;
+	background-color: var(--cc-accent-soft);
+	color: var(--cc-accent-text);
+}
+
+/* Suggestions: visible only while the field is empty */
+.cc-search-hints {
+	display: grid;
+	gap: var(--cc-space-3);
+	padding-inline: var(--cc-space-1);
+}
+
+.dialog-frame:has(.pagefind-ui__search-input:not(:placeholder-shown)) .cc-search-hints {
+	display: none;
+}
+
+.cc-search-hints-label {
+	margin: var(--cc-space-2) 0 0;
+	color: var(--cc-text-muted);
+	font-size: var(--sl-text-2xs);
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.cc-search-chips,
+.cc-search-start {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--cc-space-2);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.cc-search-chip {
+	min-height: 2.25rem;
+	padding: 0 var(--cc-space-4);
+	border: 1px solid var(--cc-border);
+	border-radius: var(--cc-radius-pill);
+	background-color: var(--cc-bg);
+	color: var(--cc-text);
+	font: inherit;
+	font-size: var(--sl-text-sm);
+	cursor: pointer;
+}
+
+.cc-search-start {
+	flex-direction: column;
+	gap: var(--cc-space-1);
+}
+
+.cc-search-start a {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	min-height: 2.75rem;
+	padding: 0 var(--cc-space-4);
+	border: 1px solid transparent;
+	border-radius: var(--cc-radius-md);
+	color: var(--cc-heading);
+	font-family: var(--cc-font-heading);
+	text-decoration: none;
+}
+
+.cc-search-start a svg {
+	color: var(--cc-accent-text);
+}
+
+.cc-search-footer {
+	display: none;
+	margin: var(--cc-space-2) 0 0;
+	color: var(--cc-text-muted);
+	font-size: var(--sl-text-xs);
+}
+
+.cc-search-footer kbd {
+	padding: 0.125rem 0.375rem;
+	border: 1px solid var(--cc-border);
+	border-radius: 0.375rem;
+	background-color: var(--cc-bg);
+	font-family: inherit;
+}
+
+@media (hover: hover) {
+	.cc-search-chip:hover {
+		border-color: var(--cc-accent-ui);
+		color: var(--cc-heading);
+	}
+
+	.cc-search-start a:hover {
+		border-color: var(--cc-border);
+		background-color: var(--cc-bg);
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	#starlight__search .pagefind-ui__search-input,
+	.cc-search-chip,
+	.cc-search-start a {
+		transition:
+			background-color var(--cc-transition),
+			border-color var(--cc-transition),
+			box-shadow var(--cc-transition);
+	}
+
+	site-search dialog[open] {
+		animation: cc-dialog-in 180ms ease-out;
+	}
+}
+
+@keyframes cc-dialog-in {
+	from {
+		opacity: 0;
+		transform: translateY(-6px) scale(0.99);
+	}
+}
+
+@media (min-width: 50rem) {
+	site-search dialog {
+		margin-top: 10vh;
+		max-width: 42rem;
+		border-radius: var(--cc-radius-lg);
+	}
+
+	site-search .dialog-frame {
+		padding: var(--cc-space-5);
+	}
+
+	.cc-search-footer {
+		display: block;
+	}
+}
