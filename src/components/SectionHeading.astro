@@ -1,0 +1,20 @@
+---
+interface Props {
+	/** Anchor and accessible-name target, for example "sciezka-nauki". */
+	id: string;
+	/** Short label above the title, for example "Program". */
+	kicker: string;
+	title: string;
+	lead?: string;
+}
+
+const { id, kicker, title, lead } = Astro.props;
+---
+
+<header class="cc-section-heading not-content">
+	<div class="cc-section-heading-title">
+		<p class="cc-section-kicker">{kicker}</p>
+		<h2 id={id}>{title}</h2>
+	</div>
+	{lead && <p class="cc-section-lead">{lead}</p>}
+</header>

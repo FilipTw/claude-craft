@@ -183,14 +183,52 @@
 	}
 }
 
-/* Section headings on the homepage */
-[data-has-hero] .sl-markdown-content > h2 {
-	margin-top: var(--cc-space-7);
-	font-size: clamp(var(--sl-text-2xl), 1.2rem + 1.5vw, var(--sl-text-4xl));
+/* Section headings on the homepage: kicker + h2 on the left, lead on the right from 64rem */
+.sl-markdown-content .cc-section-heading {
+	display: grid;
+	gap: var(--cc-space-3);
+	margin-top: var(--cc-space-8);
+	margin-bottom: var(--cc-space-5);
 }
 
-[data-has-hero] .sl-markdown-content > h2:first-child {
-	margin-top: var(--cc-space-4);
+.sl-markdown-content > .cc-section-heading:first-child {
+	margin-top: var(--cc-space-6);
+}
+
+.cc-section-kicker {
+	margin: 0;
+	color: var(--cc-accent-text);
+	font-family: var(--cc-font-heading);
+	font-size: var(--sl-text-xs);
+	font-weight: 600;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+}
+
+.cc-section-heading h2 {
+	margin: var(--cc-space-1) 0 0;
+	color: var(--cc-heading);
+	font-size: clamp(var(--sl-text-2xl), 1.2rem + 1.5vw, var(--sl-text-4xl));
+	font-weight: 600;
+	line-height: 1.1;
+}
+
+.cc-section-lead {
+	max-width: 46ch;
+	margin: 0;
+	color: var(--cc-text-muted);
+	font-size: var(--sl-text-base);
+	line-height: 1.6;
+}
+
+@media (min-width: 64rem) {
+	.sl-markdown-content .cc-section-heading {
+		grid-template-columns: 1fr auto;
+		align-items: end;
+		gap: var(--cc-space-6);
+		padding-bottom: var(--cc-space-4);
+		border-bottom: 1px solid var(--cc-border);
+	}
 }
 
 /* Shared card frame and stretched link: the whole card is clickable, the name stays the title */

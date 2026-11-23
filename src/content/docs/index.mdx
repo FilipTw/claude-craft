@@ -18,14 +18,23 @@ hero:
 import { LinkCard, CardGrid } from '@astrojs/starlight/components';
 import LearningPath from '../../components/LearningPath.astro';
 import RecentlyVerified from '../../components/RecentlyVerified.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
 
-## Ścieżka nauki
-
-Siedem części w stałej kolejności i dodatek z referencją i labami. Każda część kończy się labem, a pasek pokazuje, ile stron ma już datę weryfikacji ze źródłami.
+<SectionHeading
+  id="sciezka-nauki"
+  kicker="Program"
+  title="Ścieżka nauki"
+  lead="Siedem części w stałej kolejności. Każda kończy się labem, a pasek pokazuje, ile stron sprawdzono ze źródłami."
+/>
 
 <LearningPath />
 
-## Szybki start
+<SectionHeading
+  id="szybki-start"
+  kicker="Na skróty"
+  title="Szybki start"
+  lead="Trzy wejścia dla tych, którzy wiedzą, czego szukają."
+/>
 
 <CardGrid>
   <LinkCard title="Pierwsza sesja" description="Tutorial: uruchom Claude Code i przeprowadź pierwszą zmianę w repo." href="/claude-craft/01-foundations/09-first-session/" />
@@ -33,6 +42,11 @@ Siedem części w stałej kolejności i dodatek z referencją i labami. Każda c
   <LinkCard title="Referencja" description="Flagi CLI, komendy, ustawienia i zdarzenia hooków w jednym miejscu." href="/claude-craft/20-reference/01-cli-flags/" />
 </CardGrid>
 
-## Ostatnio zweryfikowane
+<SectionHeading
+  id="ostatnio-zweryfikowane"
+  kicker="Aktualność"
+  title="Ostatnio zweryfikowane"
+  lead="Strony, które ktoś ostatnio porównał ze źródłami."
+/>
 
 <RecentlyVerified />
