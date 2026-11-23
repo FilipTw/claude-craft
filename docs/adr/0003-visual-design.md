@@ -52,3 +52,15 @@ Zmierzone 2026-11-24 na buildzie produkcyjnym (`astro preview`), strona startowa
 - Brak poziomego przewijania strony startowej, strony treści i `roadmap/` przy szerokościach 320, 375, 667, 768, 1024 i 1440 px. Szerokość 320 px odpowiada powiększeniu 400% przy oknie 1280 px.
 - Kolejność fokusu na stronie startowej: skip link, logo, wyszukiwanie, dwa przyciski hero, karty części, karty szybkiego startu. Przyciski hero mają 44 px wysokości na telefonie.
 - Czytnika ekranu nie testowano. Ten punkt pozostaje ręczny i niesprawdzony.
+
+## Zmiany 2026-11-24
+
+Po przeglądzie pierwszej wersji autor wskazał siedem słabych miejsc. Kontrakt dostaje te reguły:
+
+- **Stany interakcji:** każdy link i przycisk ma hover, `:active` i `:focus-visible`. Hover działa tylko pod `@media (hover: hover)`, a ruch tylko pod `prefers-reduced-motion: no-preference`.
+- **Nagłówek sekcji:** sekcja strony startowej ma etykietę w akcencie, tytuł `h2` i lead do 46 znaków szerokości. Od 64rem tytuł i lead stoją obok siebie.
+- **Sidebar:** trzy poziomy, każdy w jednym rozmiarze na telefonie i komputerze. Część to mała etykieta wersalikami, sekcja to wiersz z chevronem, strona to tekst drugorzędny. Aktywna strona ma kolor akcentu i kropkę zamiast wypełnionej pigułki.
+- **Postęp w sidebarze:** zwarta karta ze stanem weryfikacji całej ścieżki zastępuje duży przycisk i zdublowany link do `roadmap/`.
+- **Wyszukiwanie:** okno ma zaokrąglone pole i podpowiedzi, gdy pole jest puste: popularne frazy i trzy strony na start.
+- **Nawigacja na dole strony:** poprzednia i następna strona to zwarte karty w tym samym stylu co karty strony startowej.
+- **Ścieżka nauki:** lista części to oś czasu. Tabela postępu wyrównuje liczby do prawej.
