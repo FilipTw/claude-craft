@@ -1,0 +1,143 @@
+/*
+ * Content pages: article rhythm, inline code, tables, asides, cards and pagination (ADR 0003).
+ * Code blocks are styled through expressiveCode in astro.config.mjs.
+ */
+
+/* Page title and lead */
+.content-panel h1#_top {
+	font-weight: 600;
+	letter-spacing: -0.02em;
+}
+
+.sl-markdown-content :is(h2, h3) {
+	letter-spacing: -0.015em;
+}
+
+.sl-markdown-content h2:not(:where(.not-content *)) {
+	margin-top: var(--cc-space-7);
+}
+
+/* Inline code */
+.sl-markdown-content code:not(:where(.not-content *, pre *)) {
+	border: 1px solid var(--cc-border);
+	border-radius: 0.375rem;
+}
+
+/* Flags and commands in tables stay on one line; the table scrolls instead */
+.sl-markdown-content td code:not(:where(.not-content *)) {
+	white-space: nowrap;
+}
+
+/* Tables: rounded frame; the table itself scrolls sideways (Starlight sets display: block) */
+.sl-markdown-content table:not(:where(.not-content *)) {
+	border: 1px solid var(--cc-border);
+	border-radius: var(--cc-radius-md);
+	max-width: 100%;
+}
+
+.sl-markdown-content :is(th, td):not(:where(.not-content *)) {
+	min-width: 8rem;
+	border-bottom-color: var(--cc-border);
+	padding-inline: var(--cc-space-4);
+	hyphens: manual;
+}
+
+.sl-markdown-content :is(th:first-child, td:first-child):not(:where(.not-content *)),
+.sl-markdown-content :is(th:last-child, td:last-child):not(:where(.not-content *)) {
+	padding-inline: var(--cc-space-4);
+}
+
+.sl-markdown-content tr:last-child td:not(:where(.not-content *)) {
+	border-bottom: 0;
+}
+
+.sl-markdown-content th:not(:where(.not-content *)) {
+	background-color: var(--cc-surface);
+	font-family: var(--cc-font-heading);
+}
+
+.sl-markdown-content blockquote:not(:where(.not-content *)) {
+	border-inline-start: 3px solid var(--cc-accent-ui);
+	color: var(--cc-text-muted);
+}
+
+.sl-markdown-content img {
+	max-width: 100%;
+	height: auto;
+	border-radius: var(--cc-radius-md);
+}
+
+/* Asides: rounded panel with a thin frame in the aside's own color */
+.starlight-aside {
+	border: 1px solid color-mix(in srgb, var(--sl-color-asides-border) 45%, transparent);
+	border-inline-start-width: 3px;
+	border-inline-start-color: var(--sl-color-asides-border);
+	border-radius: var(--cc-radius-md);
+	background-color: color-mix(in srgb, var(--sl-color-asides-border) 10%, var(--cc-surface));
+}
+
+.starlight-aside__title {
+	font-family: var(--cc-font-heading);
+}
+
+/* Card and LinkCard: dark panels, accent frame on hover */
+.card,
+.sl-link-card {
+	border: 1px solid var(--cc-border);
+	border-radius: var(--cc-radius-lg);
+	background-color: var(--cc-surface);
+	box-shadow: none;
+}
+
+.card .title,
+.sl-link-card .title {
+	font-family: var(--cc-font-heading);
+}
+
+.sl-link-card .icon {
+	color: var(--cc-accent-text);
+}
+
+/* Previous / next */
+.pagination-links a {
+	border-color: var(--cc-border);
+	border-radius: var(--cc-radius-lg);
+	background-color: var(--cc-surface);
+	box-shadow: none;
+}
+
+.pagination-links .link-title {
+	font-family: var(--cc-font-heading);
+	font-size: var(--sl-text-xl);
+}
+
+/* Table of contents: current item with an accent bar */
+starlight-toc a[aria-current="true"] {
+	box-shadow: inset 2px 0 0 var(--cc-accent-text);
+	color: var(--cc-accent-text);
+}
+
+/* Mobile "Na tej stronie" bar */
+mobile-starlight-toc summary .toggle {
+	border-radius: var(--cc-radius-pill);
+	border-color: var(--cc-border);
+	background-color: var(--cc-surface);
+}
+
+@media (hover: hover) {
+	.card:hover,
+	.sl-link-card:hover,
+	.pagination-links a:hover {
+		border-color: var(--cc-accent-ui);
+		box-shadow: 0 0 1.5rem var(--cc-glow);
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.sl-link-card,
+	.pagination-links a {
+		transition:
+			border-color var(--cc-transition),
+			box-shadow var(--cc-transition);
+	}
+}
