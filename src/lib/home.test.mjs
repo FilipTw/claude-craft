@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { percent, recentlyVerified, summarizeParts, typeLabel, withBase } from './home.mjs';
+import { countLabel, percent, recentlyVerified, summarizeParts, typeLabel, withBase } from './home.mjs';
 
 /** @param {string} href @returns {import('./home.mjs').NavLink} */
 const link = (href) => ({ type: 'link', label: href, href });
@@ -94,4 +94,30 @@ test('typeLabel names every Diátaxis type in Polish and passes an unknown type 
 	assert.equal(typeLabel('explanation'), 'Wyjaśnienie');
 	assert.equal(typeLabel('toString'), 'toString');
 	assert.equal(typeLabel('other'), 'other');
+});
+
+test('countLabel picks the Polish noun form for one, few and many', () => {
+	const pages = { one: 'strona', few: 'strony', many: 'stron' };
+
+	assert.deepEqual(
+		[0, 1, 2, 4, 5, 12, 14, 21, 22, 24, 25, 31, 32, 112, 122].map((n) => countLabel(n, pages)),
+		[
+			'0 stron',
+			'1 strona',
+			'2 strony',
+			'4 strony',
+			'5 stron',
+			'12 stron',
+			'14 stron',
+			'21 stron',
+			'22 strony',
+			'24 strony',
+			'25 stron',
+			'31 stron',
+			'32 strony',
+			'112 stron',
+			'122 strony',
+		],
+	);
+	assert.equal(countLabel(1.5, pages), '1.5 strony');
 });

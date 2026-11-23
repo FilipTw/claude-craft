@@ -110,3 +110,28 @@ const TYPE_LABELS = /** @type {const} */ ({
  */
 export const typeLabel = (type) =>
 	Object.hasOwn(TYPE_LABELS, type) ? TYPE_LABELS[/** @type {keyof typeof TYPE_LABELS} */ (type)] : type;
+
+const polishPlural = new Intl.PluralRules('pl-PL');
+
+/**
+ * Which noun form each CLDR plural category takes in Polish. Fractions ("other") take the "few" form:
+ * "1,5 strony". Polish never yields "zero" or "two", but the map stays total.
+ * @type {Record<Intl.LDMLPluralRule, 'one' | 'few' | 'many'>}
+ */
+const POLISH_FORM = {
+	one: 'one',
+	few: 'few',
+	many: 'many',
+	other: 'few',
+	// Stryker disable next-line StringLiteral: Polish never yields "zero", so this value cannot be observed.
+	zero: 'many',
+	// Stryker disable next-line StringLiteral: Polish never yields "two", so this value cannot be observed.
+	two: 'few',
+};
+
+/**
+ * A count with the right Polish noun form, for example "1 sekcja", "3 sekcje", "12 sekcji", "22 strony".
+ * @param {number} count
+ * @param {{ one: string, few: string, many: string }} forms
+ */
+export const countLabel = (count, forms) => `${count} ${forms[POLISH_FORM[polishPlural.select(count)]]}`;
