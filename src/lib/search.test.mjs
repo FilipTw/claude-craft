@@ -5,7 +5,8 @@ import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { SEARCH_QUERIES, SEARCH_START_PAGES } from './search.mjs';
 
-test('search queries are unique, case-insensitively, and not blank', () => {
+test('search queries exist, are unique case-insensitively, and are not blank', () => {
+	assert.ok(SEARCH_QUERIES.length > 0, 'an empty list leaves the "Popularne" label without chips');
 	const lower = SEARCH_QUERIES.map((query) => query.toLowerCase());
 
 	assert.equal(new Set(lower).size, SEARCH_QUERIES.length);
