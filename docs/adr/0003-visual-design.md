@@ -64,3 +64,16 @@ Po przeglądzie pierwszej wersji autor wskazał siedem słabych miejsc. Kontrakt
 - **Wyszukiwanie:** okno ma zaokrąglone pole i podpowiedzi, gdy pole jest puste: popularne frazy i trzy strony na start.
 - **Nawigacja na dole strony:** poprzednia i następna strona to zwarte karty w tym samym stylu co karty strony startowej.
 - **Ścieżka nauki:** lista części to oś czasu. Tabela postępu wyrównuje liczby do prawej.
+
+Konsekwencje zmian:
+
+- Link do `roadmap/` zniknął z drzewa sidebara, więc pierwsza strona Fundamentów nie ma już poprzedniej strony w nawigacji na dole.
+- Komunikaty Pagefind są po polsku dzięki kolekcji `i18n` (`src/content/i18n/pl.json`). Liczba wyników stoi po dwukropku („Wyniki dla „Hooki”: 6”), bo Pagefind zna tylko formy „one” i „many”, a polski potrzebuje trzech.
+- `MarkdownContent` dodaje `data-cc-page` z identyfikatorem strony. Styl osi czasu działa tylko na `roadmap/`, a sam plik zostaje zwykłym Markdownem dla `scripts/freshness.mjs`.
+
+Zmierzone 2026-11-24 po zmianach, na `astro preview`:
+
+- Lighthouse 12.8.2: Performance od 98 do 100, pozostałe kategorie po 100. LCP od 1,7 do 2,0 s, CLS do 0,004, fonty 47 KB, CSS 16 KB.
+- axe 4.13.0: 0 naruszeń na stronie startowej, `roadmap/` i stronie treści. pa11y 9.1.1: brak błędów na tych trzech stronach w obu motywach i w otwartym oknie wyszukiwania z wynikami w obu motywach.
+- Brak poziomego przewijania czterech stron przy 320, 375, 667, 768, 1024 i 1440 px.
+- Stryker: `home.mjs` i `search.mjs` po 100%, całość 98,10%.
