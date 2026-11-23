@@ -18,7 +18,12 @@ export default defineConfig({
 			editLink: { baseUrl: 'https://github.com/FilipTw/claude-craft/edit/main/' },
 			logo: { src: './src/assets/logo.svg' },
 			lastUpdated: true,
-			customCss: ['./src/styles/tokens.css', './src/styles/theme.css', './src/styles/home.css'],
+			customCss: [
+				'./src/styles/tokens.css',
+				'./src/styles/theme.css',
+				'./src/styles/content.css',
+				'./src/styles/home.css',
+			],
 			components: {
 				// biome-ignore lint/style/useNamingConvention: Starlight names overridable components in PascalCase.
 				ThemeProvider: './src/components/ThemeProvider.astro',
@@ -28,6 +33,27 @@ export default defineConfig({
 				Sidebar: './src/components/Sidebar.astro',
 				// biome-ignore lint/style/useNamingConvention: Starlight names overridable components in PascalCase.
 				Hero: './src/components/Hero.astro',
+			},
+			expressiveCode: {
+				themes: ['github-dark-default', 'github-light'],
+				styleOverrides: {
+					borderColor: 'var(--cc-border)',
+					borderRadius: 'var(--cc-radius-md)',
+					codeBackground: 'var(--cc-surface)',
+					uiFontFamily: 'var(--cc-font-body)',
+					textMarkers: {
+						markBackground: 'var(--cc-accent-soft)',
+						markBorderColor: 'var(--cc-accent-ui)',
+					},
+					frames: {
+						editorActiveTabBackground: 'var(--cc-surface)',
+						editorActiveTabIndicatorTopColor: 'var(--cc-accent-text)',
+						editorTabBarBackground: 'var(--cc-surface-raised)',
+						terminalBackground: 'var(--cc-surface)',
+						terminalTitlebarBackground: 'var(--cc-surface-raised)',
+						frameBoxShadowCssValue: 'none',
+					},
+				},
 			},
 			sidebar: ['roadmap', ...toSidebar(loadStructure())],
 			plugins: [starlightLinksValidator()],
