@@ -47,7 +47,9 @@
 
 .cc-hero-title {
 	position: relative;
-	max-width: 14ch;
+	/* About two lines on wide screens; fit-content keeps the closing bracket next to the last word */
+	width: fit-content;
+	max-width: min(100%, 10em);
 	margin: 0;
 	padding: var(--cc-space-3) var(--cc-space-4);
 	font-family: var(--cc-font-heading);
