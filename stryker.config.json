@@ -1,8 +1,8 @@
 {
 	"$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
 	"testRunner": "tap",
-	"tap": { "testFiles": ["scripts/*.test.mjs"] },
-	"mutate": ["scripts/*.mjs", "!scripts/*.test.mjs"],
+	"tap": { "testFiles": ["scripts/*.test.mjs", "src/lib/*.test.mjs"] },
+	"mutate": ["scripts/*.mjs", "!scripts/*.test.mjs", "src/lib/*.mjs", "!src/lib/*.test.mjs"],
 	"coverageAnalysis": "perTest",
 	"incremental": true,
 	"incrementalFile": "reports/stryker-incremental.json",

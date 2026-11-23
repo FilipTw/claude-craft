@@ -16,8 +16,10 @@
 				"Code",
 				"FileTree",
 				"Icon",
+				"LearningPath",
 				"LinkButton",
 				"LinkCard",
+				"RecentlyVerified",
 				"Steps",
 				"TabItem",
 				"Tabs"

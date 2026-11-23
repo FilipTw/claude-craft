@@ -1,0 +1,37 @@
+---
+import { getCollection } from 'astro:content';
+import { Badge } from '@astrojs/starlight/components';
+import { recentlyVerified, typeLabel, withBase } from '../lib/home.mjs';
+
+const base = import.meta.env.BASE_URL;
+const docs = (await getCollection('docs')).map((doc) => ({
+	id: doc.id,
+	title: doc.data.title,
+	type: doc.data.type,
+	lastVerified: doc.data.lastVerified,
+}));
+const recent = recentlyVerified(docs, 4);
+const dateFormat = new Intl.DateTimeFormat('pl-PL', { day: 'numeric', month: 'short', year: 'numeric' });
+---
+
+{recent.length === 0 ? (
+	<p class="cc-empty">
+		Żadna strona nie ma jeszcze daty weryfikacji. Postęp każdej sekcji jest w{' '}
+		<a href={withBase(base, 'roadmap/')}>ścieżce nauki</a>.
+	</p>
+) : (
+	<ul class="cc-updates not-content" role="list">
+		{recent.map((doc) => (
+			<li class="cc-update">
+				<p class="cc-update-meta">
+					<Badge text={typeLabel(doc.type)} variant="note" />
+					<time datetime={doc.lastVerified.toISOString().slice(0, 10)}>{dateFormat.format(doc.lastVerified)}</time>
+				</p>
+				<h3 class="cc-update-title">
+					<a href={withBase(base, `${doc.id}/`)} class="cc-stretched">{doc.title}</a>
+				</h3>
+				<p class="cc-update-more" aria-hidden="true">Czytaj →</p>
+			</li>
+		))}
+	</ul>
+)}
