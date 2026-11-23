@@ -1,0 +1,324 @@
+/*
+ * Homepage: hero, learning-path cards and "recently verified" cards (ADR 0003).
+ * Mobile first. Breakpoints: 30rem (480), 48rem (768), 64rem (1024).
+ */
+
+/* Hero */
+.content-panel:has(.cc-hero) {
+	position: relative;
+	overflow: clip;
+	border-bottom: 1px solid var(--cc-border);
+}
+
+.cc-hero {
+	position: relative;
+	padding-block: var(--cc-space-7) var(--cc-space-6);
+}
+
+.cc-hero-grid {
+	position: absolute;
+	inset: calc(-1 * var(--cc-space-7)) -50vw;
+	background-image: linear-gradient(to right, var(--cc-grid-line) 1px, transparent 1px);
+	background-size: 12.5rem 100%;
+	background-position: center;
+	pointer-events: none;
+	mask-image: linear-gradient(to bottom, black 40%, transparent);
+}
+
+.cc-hero-burst {
+	display: none;
+	position: absolute;
+	inset-block-end: 0;
+	inset-inline-end: -2rem;
+	width: min(45%, 26rem);
+	height: auto;
+	stroke: var(--cc-accent-ui);
+	stroke-width: 1;
+	opacity: 0.55;
+	pointer-events: none;
+}
+
+.cc-hero-copy {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: var(--cc-space-5);
+}
+
+.cc-hero-title {
+	position: relative;
+	max-width: 14ch;
+	margin: 0;
+	padding: var(--cc-space-3) var(--cc-space-4);
+	font-family: var(--cc-font-heading);
+	font-size: clamp(2.5rem, 1.6rem + 4.5vw, 5.5rem);
+	font-weight: 500;
+	line-height: 1.05;
+	letter-spacing: -0.03em;
+	color: var(--cc-heading);
+	overflow-wrap: anywhere;
+}
+
+/* Corner brackets around the title, as in the reference */
+.cc-hero-title::before,
+.cc-hero-title::after {
+	content: "";
+	position: absolute;
+	width: 1.25rem;
+	height: 1.25rem;
+	border-color: var(--cc-accent-text);
+	border-style: solid;
+	border-width: 0;
+}
+
+.cc-hero-title::before {
+	inset-block-start: 0;
+	inset-inline-start: 0;
+	border-block-start-width: 3px;
+	border-inline-start-width: 3px;
+}
+
+.cc-hero-title::after {
+	inset-block-end: 0;
+	inset-inline-end: 0;
+	border-block-end-width: 3px;
+	border-inline-end-width: 3px;
+}
+
+.cc-hero-title .cc-accent {
+	color: var(--cc-accent-text);
+	font-weight: 700;
+}
+
+.cc-hero-tagline {
+	max-width: 38rem;
+	margin: 0;
+	color: var(--cc-text-muted);
+	font-size: clamp(var(--sl-text-base), 0.9rem + 0.6vw, var(--sl-text-xl));
+}
+
+.cc-hero-actions {
+	display: flex;
+	flex-direction: column;
+	gap: var(--cc-space-3);
+}
+
+.cc-hero-actions .sl-link-button {
+	justify-content: center;
+	min-height: var(--cc-touch-target);
+	margin: 0;
+	border-radius: var(--cc-radius-pill);
+	font-family: var(--cc-font-heading);
+	font-weight: 600;
+}
+
+.cc-hero-actions .sl-link-button.primary {
+	border-color: var(--cc-accent-ui);
+	background-color: var(--cc-accent-ui);
+	color: var(--cc-on-accent);
+}
+
+.cc-hero-actions .sl-link-button.minimal {
+	border: 1px solid var(--cc-border-strong);
+	padding-inline: var(--cc-space-5);
+	color: var(--cc-heading);
+}
+
+@media (min-width: 30rem) {
+	.cc-hero-actions {
+		flex-direction: row;
+		flex-wrap: wrap;
+	}
+}
+
+@media (min-width: 48rem) {
+	.cc-hero {
+		padding-block: var(--cc-space-8) var(--cc-space-7);
+	}
+
+	.cc-hero-burst {
+		display: block;
+	}
+}
+
+/* Section headings on the homepage */
+[data-has-hero] .sl-markdown-content > h2 {
+	margin-top: var(--cc-space-7);
+	font-size: clamp(var(--sl-text-2xl), 1.2rem + 1.5vw, var(--sl-text-4xl));
+}
+
+[data-has-hero] .sl-markdown-content > h2:first-child {
+	margin-top: var(--cc-space-4);
+}
+
+/* Shared card frame and stretched link: the whole card is clickable, the name stays the title */
+.cc-part,
+.cc-update {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	border: 1px solid var(--cc-border);
+	border-radius: var(--cc-radius-lg);
+	background-color: var(--cc-surface);
+}
+
+.cc-stretched {
+	color: inherit;
+	text-decoration: none;
+}
+
+.cc-stretched::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+}
+
+.cc-part:has(.cc-stretched:focus-visible),
+.cc-update:has(.cc-stretched:focus-visible) {
+	outline: 2px solid var(--cc-accent-text);
+	outline-offset: 2px;
+}
+
+.cc-stretched:focus-visible {
+	outline: none;
+}
+
+@media (hover: hover) {
+	.cc-part:hover,
+	.cc-update:hover {
+		border-color: var(--cc-accent-ui);
+		box-shadow: 0 0 2rem var(--cc-glow);
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.cc-part,
+	.cc-update {
+		transition:
+			border-color var(--cc-transition),
+			box-shadow var(--cc-transition);
+	}
+}
+
+/* Learning path */
+.sl-markdown-content .cc-parts,
+.sl-markdown-content .cc-updates {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+	gap: var(--cc-space-4);
+	padding: 0;
+	list-style: none;
+}
+
+.sl-markdown-content .cc-parts > li,
+.sl-markdown-content .cc-updates > li {
+	margin: 0;
+}
+
+.cc-part-art {
+	display: flex;
+	align-items: flex-end;
+	height: 6.5rem;
+	margin: var(--cc-space-2);
+	padding: var(--cc-space-3) var(--cc-space-4);
+	border-radius: var(--cc-radius-md);
+	background-color: var(--cc-bg);
+	background-image:
+		radial-gradient(circle at 85% 15%, var(--cc-glow), transparent 60%),
+		linear-gradient(to right, var(--cc-grid-line) 1px, transparent 1px);
+	background-size:
+		100% 100%,
+		1.5rem 100%;
+}
+
+.cc-part-numeral {
+	font-family: var(--cc-font-heading);
+	font-size: var(--sl-text-4xl);
+	font-weight: 600;
+	line-height: 1;
+	color: var(--cc-accent-text);
+}
+
+.cc-part-body {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: var(--cc-space-2);
+	padding: var(--cc-space-2) var(--cc-space-4) var(--cc-space-4);
+}
+
+.sl-markdown-content .cc-part-body > *,
+.sl-markdown-content .cc-update > * {
+	margin: 0;
+}
+
+.cc-part-kicker,
+.cc-part-meta,
+.cc-part-status {
+	color: var(--cc-text-muted);
+	font-size: var(--sl-text-xs);
+}
+
+.cc-part-kicker {
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.sl-markdown-content .cc-part-title,
+.sl-markdown-content .cc-update-title {
+	color: var(--cc-heading);
+	font-size: var(--sl-text-xl);
+	font-weight: 600;
+	line-height: 1.25;
+}
+
+.cc-progress {
+	height: 0.375rem;
+	margin-top: auto;
+	border-radius: var(--cc-radius-pill);
+	background-color: var(--cc-surface-raised);
+	overflow: hidden;
+}
+
+.cc-progress > span {
+	display: block;
+	width: var(--cc-progress);
+	height: 100%;
+	border-radius: inherit;
+	background-color: var(--cc-accent-text);
+}
+
+/* Recently verified */
+.cc-update {
+	gap: var(--cc-space-3);
+	padding: var(--cc-space-4);
+}
+
+.cc-update-meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--cc-space-3);
+	color: var(--cc-text-muted);
+	font-size: var(--sl-text-xs);
+}
+
+.cc-update-more {
+	margin-top: auto;
+	color: var(--cc-accent-text);
+	font-size: var(--sl-text-sm);
+}
+
+.cc-empty {
+	padding: var(--cc-space-4) var(--cc-space-5);
+	border: 1px dashed var(--cc-border-strong);
+	border-radius: var(--cc-radius-md);
+	color: var(--cc-text-muted);
+}
+
+/* Quick start: three cards in a row once they fit */
+[data-has-hero] .card-grid {
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+}

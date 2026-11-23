@@ -14,9 +14,15 @@ h5,
 	letter-spacing: -0.01em;
 }
 
-:root[lang="pl"] .sl-markdown-content {
-	hyphens: auto;
+.sl-markdown-content {
 	overflow-wrap: break-word;
+}
+
+/* Hyphenation only where lines are short: on a phone a long Polish word would otherwise leave a gap */
+@media (max-width: 47.99rem) {
+	:root[lang="pl"] .sl-markdown-content {
+		hyphens: auto;
+	}
 }
 
 ::selection {

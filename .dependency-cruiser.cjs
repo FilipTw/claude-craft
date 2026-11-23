@@ -32,6 +32,16 @@ const config = {
 			to: { path: CORE },
 		},
 		{
+			comment: 'A lib test may use node builtins (node:test, node:assert). Lib code may not.',
+			from: { path: '^src/lib/[^/]+\\.test\\.mjs$' },
+			to: { dependencyTypes: ['core'] },
+		},
+		{
+			comment: 'Homepage data is pure: src/lib depends on nothing. A lib test imports only its subject.',
+			from: { path: '^src/lib/([^/]+)\\.test\\.mjs$' },
+			to: { path: ['^src/lib/$1\\.mjs$'] },
+		},
+		{
 			comment: 'A test imports its own subject, the core and yaml.',
 			from: { path: '^scripts/([^/]+)\\.test\\.mjs$' },
 			to: { path: ['^scripts/$1\\.mjs$', CORE, YAML] },

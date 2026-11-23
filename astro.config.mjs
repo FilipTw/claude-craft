@@ -18,7 +18,7 @@ export default defineConfig({
 			editLink: { baseUrl: 'https://github.com/FilipTw/claude-craft/edit/main/' },
 			logo: { src: './src/assets/logo.svg' },
 			lastUpdated: true,
-			customCss: ['./src/styles/tokens.css', './src/styles/theme.css'],
+			customCss: ['./src/styles/tokens.css', './src/styles/theme.css', './src/styles/home.css'],
 			components: {
 				// biome-ignore lint/style/useNamingConvention: Starlight names overridable components in PascalCase.
 				ThemeProvider: './src/components/ThemeProvider.astro',
@@ -26,6 +26,8 @@ export default defineConfig({
 				ThemeSelect: './src/components/ThemeSelect.astro',
 				// biome-ignore lint/style/useNamingConvention: Starlight names overridable components in PascalCase.
 				Sidebar: './src/components/Sidebar.astro',
+				// biome-ignore lint/style/useNamingConvention: Starlight names overridable components in PascalCase.
+				Hero: './src/components/Hero.astro',
 			},
 			sidebar: ['roadmap', ...toSidebar(loadStructure())],
 			plugins: [starlightLinksValidator()],

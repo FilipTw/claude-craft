@@ -1,0 +1,32 @@
+---
+import { LinkButton } from '@astrojs/starlight/components';
+
+const { data } = Astro.locals.starlightRoute.entry;
+const { title = data.title, tagline, actions = [] } = data.hero ?? {};
+
+// Rays of the decorative starburst: angles in degrees, fanning out from the bottom-right corner.
+const rays = Array.from({ length: 13 }, (_, index) => 180 + index * 7.5);
+---
+
+<section class="cc-hero" aria-labelledby="_top">
+	<div class="cc-hero-grid" aria-hidden="true"></div>
+	<svg class="cc-hero-burst" viewBox="0 0 400 300" aria-hidden="true" focusable="false">
+		{rays.map((angle) => {
+			const radians = (angle * Math.PI) / 180;
+			return <line x1="400" y1="300" x2={400 + Math.cos(radians) * 420} y2={300 + Math.sin(radians) * 420} />;
+		})}
+	</svg>
+	<div class="cc-hero-copy">
+		<h1 id="_top" data-page-title class="cc-hero-title" set:html={title} />
+		{tagline && <p class="cc-hero-tagline" set:html={tagline} />}
+		{actions.length > 0 && (
+			<div class="cc-hero-actions">
+				{actions.map(({ link, text, variant, icon }) => (
+					<LinkButton href={link} variant={variant} icon={icon?.name}>
+						{text}
+					</LinkButton>
+				))}
+			</div>
+		)}
+	</div>
+</section>

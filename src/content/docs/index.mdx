@@ -4,5 +4,35 @@ description: Claude Code i praca z agentami na poziomie Senior Dev.
 type: explanation
 template: splash
 hero:
+  title: Opanuj Claude Code na poziomie <span class="cc-accent">SENIOR</span>
   tagline: Jedna ścieżka nauki Claude Code, sprawdzona ze źródłami i z datą weryfikacji na każdej stronie.
+  actions:
+    - text: Zacznij naukę
+      link: /claude-craft/01-foundations/01-prerequisites/
+      icon: right-arrow
+    - text: Ścieżka nauki
+      link: /claude-craft/roadmap/
+      variant: minimal
 ---
+
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+import LearningPath from '../../components/LearningPath.astro';
+import RecentlyVerified from '../../components/RecentlyVerified.astro';
+
+## Ścieżka nauki
+
+Siedem części w stałej kolejności i dodatek z referencją i labami. Każda część kończy się labem, a pasek pokazuje, ile stron ma już datę weryfikacji ze źródłami.
+
+<LearningPath />
+
+## Szybki start
+
+<CardGrid>
+  <LinkCard title="Pierwsza sesja" description="Tutorial: uruchom Claude Code i przeprowadź pierwszą zmianę w repo." href="/claude-craft/01-foundations/09-first-session/" />
+  <LinkCard title="Laby" description="Ćwiczenia na koniec każdej części, od CLAUDE.md po review w CI." href="/claude-craft/21-labs/01-first-claude-md/" />
+  <LinkCard title="Referencja" description="Flagi CLI, komendy, ustawienia i zdarzenia hooków w jednym miejscu." href="/claude-craft/20-reference/01-cli-flags/" />
+</CardGrid>
+
+## Ostatnio zweryfikowane
+
+<RecentlyVerified />

@@ -24,6 +24,10 @@ I["structure.test.mjs"]
 end
 subgraph J["src"]
 K["content.config.ts"]
+subgraph L["lib"]
+M["home.mjs"]
+N["home.test.mjs"]
+end
 end
 0-->H
 0-->5
@@ -45,3 +49,4 @@ K-->H
 K-->5
 K-->1
 K-->6
+N-->M

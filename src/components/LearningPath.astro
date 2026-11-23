@@ -1,0 +1,38 @@
+---
+import { getCollection } from 'astro:content';
+import { percent, summarizeParts, withBase } from '../lib/home.mjs';
+
+const base = import.meta.env.BASE_URL;
+const docs = await getCollection('docs');
+const verified = new Set(docs.filter((doc) => doc.data.lastVerified).map((doc) => withBase(base, `${doc.id}/`)));
+const parts = summarizeParts(Astro.locals.starlightRoute.sidebar, verified);
+---
+
+<ol class="cc-parts not-content" role="list">
+	{parts.map((part) => {
+		const done = percent(part.verified, part.pages);
+		const numeral = part.kicker?.split(' ').at(-1) ?? '+';
+		return (
+			<li class="cc-part">
+				<div class="cc-part-art" aria-hidden="true">
+					<span class="cc-part-numeral">{numeral}</span>
+				</div>
+				<div class="cc-part-body">
+					<p class="cc-part-kicker">{part.kicker ?? 'Dodatek'}</p>
+					<h3 class="cc-part-title">
+						<a href={part.href} class="cc-stretched">{part.title}</a>
+					</h3>
+					<p class="cc-part-meta">
+						{part.sections} {part.sections === 1 ? 'sekcja' : part.sections < 5 ? 'sekcje' : 'sekcji'} · {part.pages} stron
+					</p>
+					<div class="cc-progress" aria-hidden="true">
+						<span style={`--cc-progress: ${done}%`}></span>
+					</div>
+					<p class="cc-part-status">
+						Zweryfikowane: {part.verified} z {part.pages} ({done}%)
+					</p>
+				</div>
+			</li>
+		);
+	})}
+</ol>
