@@ -1,0 +1,104 @@
+/*
+ * Design tokens (ADR 0003). The only place with raw color values.
+ * The --cc-* tokens are mapped onto Starlight's --sl-* variables below,
+ * so default components pick up the palette without overrides.
+ */
+
+:root {
+	/* Palette, dark (default) */
+	--cc-bg: #0c0b10;
+	--cc-surface: #15131b;
+	--cc-surface-raised: #1c1a24;
+	--cc-border: #2a2733;
+	--cc-border-strong: #3b3746;
+	--cc-text: #ececf1;
+	--cc-text-muted: #a19fae;
+	--cc-heading: #ffffff;
+
+	/* Accent text: #e639ff on --cc-bg = 5.1:1 */
+	--cc-accent-text: #e639ff;
+	/* Accent UI: white text on #8b3dff = 5.0:1 */
+	--cc-accent-ui: #8b3dff;
+	--cc-accent-ui-hover: #9d57ff;
+	--cc-accent-soft: #24123a;
+	--cc-on-accent: #ffffff;
+	--cc-glow: rgb(230 57 255 / 0.35);
+	--cc-grid-line: rgb(255 255 255 / 0.05);
+
+	/* Type */
+	--cc-font-body: "Inter Variable", var(--sl-font-system);
+	--cc-font-heading: "Outfit Variable", var(--cc-font-body);
+
+	/* Radius */
+	--cc-radius-sm: 0.75rem;
+	--cc-radius-md: 1rem;
+	--cc-radius-lg: 1.25rem;
+	--cc-radius-pill: 999px;
+
+	/* Spacing scale */
+	--cc-space-1: 0.25rem;
+	--cc-space-2: 0.5rem;
+	--cc-space-3: 0.75rem;
+	--cc-space-4: 1rem;
+	--cc-space-5: 1.5rem;
+	--cc-space-6: 2rem;
+	--cc-space-7: 3rem;
+	--cc-space-8: 4rem;
+
+	/* Layout */
+	--cc-page-max: 80rem;
+	--cc-touch-target: 2.75rem;
+	--cc-transition: 150ms ease;
+}
+
+:root[data-theme="light"] {
+	--cc-bg: #ffffff;
+	--cc-surface: #f6f5f9;
+	--cc-surface-raised: #eeecf3;
+	--cc-border: #dddae4;
+	--cc-border-strong: #c6c2d0;
+	--cc-text: #14121a;
+	--cc-text-muted: #55525f;
+	--cc-heading: #0c0b10;
+
+	/* #9d00c2 on white = 6.5:1 */
+	--cc-accent-text: #9d00c2;
+	/* White text on #7a2be0 = 6.6:1 */
+	--cc-accent-ui: #7a2be0;
+	--cc-accent-ui-hover: #6a1fcc;
+	--cc-accent-soft: #f4e8ff;
+	--cc-glow: rgb(157 0 194 / 0.2);
+	--cc-grid-line: rgb(12 11 16 / 0.06);
+}
+
+/* Mapping onto Starlight. Starlight's light theme swaps the gray scale, so both themes set it. */
+:root,
+:root[data-theme="light"] {
+	--sl-font: var(--cc-font-body);
+
+	--sl-color-white: var(--cc-heading);
+	--sl-color-gray-1: var(--cc-text);
+	--sl-color-gray-2: var(--cc-text);
+	--sl-color-gray-3: var(--cc-text-muted);
+	--sl-color-gray-4: var(--cc-border-strong);
+	--sl-color-gray-5: var(--cc-border);
+	--sl-color-gray-6: var(--cc-surface);
+	--sl-color-gray-7: var(--cc-surface);
+	--sl-color-black: var(--cc-bg);
+
+	--sl-color-accent-low: var(--cc-accent-soft);
+	--sl-color-accent: var(--cc-accent-ui);
+	--sl-color-accent-high: var(--cc-accent-text);
+
+	--sl-color-text: var(--cc-text);
+	--sl-color-text-accent: var(--cc-accent-text);
+	--sl-color-text-invert: var(--cc-on-accent);
+	--sl-color-bg: var(--cc-bg);
+	--sl-color-bg-nav: var(--cc-bg);
+	--sl-color-bg-sidebar: var(--cc-bg);
+	--sl-color-bg-inline-code: var(--cc-surface-raised);
+	--sl-color-bg-accent: var(--cc-accent-ui);
+	--sl-color-hairline-light: var(--cc-border);
+	--sl-color-hairline: var(--cc-border);
+	--sl-color-hairline-shade: var(--cc-border);
+}

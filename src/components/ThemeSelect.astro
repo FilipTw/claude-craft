@@ -1,0 +1,65 @@
+---
+import { Icon } from '@astrojs/starlight/components';
+import Select from '@astrojs/starlight/components/Select.astro';
+---
+
+{/* Two themes only: dark is the default, so "auto" would hand the choice back to the OS (ADR 0003). */}
+<cc-theme-select>
+	<Select
+		label={Astro.locals.t('themeSelect.accessibleLabel')}
+		options={[
+			{ label: Astro.locals.t('themeSelect.dark'), selected: true, value: 'dark' },
+			{ label: Astro.locals.t('themeSelect.light'), selected: false, value: 'light' },
+		]}
+		width="6.25em"
+	>
+		<Fragment slot="icon">
+			<Icon name="moon" class="cc-theme-icon-dark" />
+			<Icon name="sun" class="cc-theme-icon-light" />
+		</Fragment>
+	</Select>
+</cc-theme-select>
+
+<style>
+	cc-theme-select:has([value="dark"]:not(:checked)) :global(.cc-theme-icon-dark),
+	cc-theme-select:has([value="light"]:not(:checked)) :global(.cc-theme-icon-light) {
+		display: none;
+	}
+</style>
+
+<script>
+	const storageKey = 'starlight-theme';
+
+	const loadTheme = (): 'dark' | 'light' => {
+		try {
+			return localStorage.getItem(storageKey) === 'light' ? 'light' : 'dark';
+		} catch {
+			return 'dark';
+		}
+	};
+
+	function applyTheme(theme: 'dark' | 'light'): void {
+		for (const select of document.querySelectorAll<HTMLSelectElement>('cc-theme-select select')) {
+			select.value = theme;
+		}
+		document.documentElement.setAttribute('data-theme', theme);
+		try {
+			localStorage.setItem(storageKey, theme);
+		} catch {
+			// Private mode or blocked storage: the theme still applies for this page.
+		}
+	}
+
+	class CcThemeSelect extends HTMLElement {
+		connectedCallback(): void {
+			applyTheme(loadTheme());
+			this.querySelector('select')?.addEventListener('change', (event) => {
+				const target = event.currentTarget;
+				if (target instanceof HTMLSelectElement) {
+					applyTheme(target.value === 'light' ? 'light' : 'dark');
+				}
+			});
+		}
+	}
+	customElements.define('cc-theme-select', CcThemeSelect);
+</script>

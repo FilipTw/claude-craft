@@ -1,0 +1,33 @@
+/*
+ * Global look built on the tokens from tokens.css (ADR 0003).
+ * Only var(--cc-*) and var(--sl-*) here: no raw colors.
+ */
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+.site-title {
+	font-family: var(--cc-font-heading);
+	letter-spacing: -0.01em;
+}
+
+:root[lang="pl"] .sl-markdown-content {
+	hyphens: auto;
+	overflow-wrap: break-word;
+}
+
+::selection {
+	background-color: var(--cc-accent-soft);
+	color: var(--cc-heading);
+}
+
+/* Focus: always visible, in the accent color (WCAG 2.4.7, 2.4.11) */
+:focus-visible {
+	outline: 2px solid var(--cc-accent-text);
+	outline-offset: 2px;
+}
+
+/* Motion: every transition in our CSS sits under prefers-reduced-motion: no-preference. */

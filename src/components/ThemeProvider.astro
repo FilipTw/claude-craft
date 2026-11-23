@@ -1,0 +1,16 @@
+---
+// Fonts load here, on every page, so the imports stay visible to knip and dependency-cruiser.
+import '@fontsource-variable/inter/wght.css';
+import '@fontsource-variable/outfit/wght.css';
+---
+
+{/* Dark is the default theme (ADR 0003). A stored "light" choice wins. Inlined to avoid FOUC. */}
+<script is:inline>
+	(() => {
+		let stored = null;
+		try {
+			stored = localStorage.getItem('starlight-theme');
+		} catch {}
+		document.documentElement.setAttribute('data-theme', stored === 'light' ? 'light' : 'dark');
+	})();
+</script>
