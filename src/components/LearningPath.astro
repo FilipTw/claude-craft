@@ -1,6 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
-import { percent, summarizeParts, withBase } from '../lib/home.mjs';
+import { countLabel, percent, summarizeParts, withBase } from '../lib/home.mjs';
 
 const base = import.meta.env.BASE_URL;
 const docs = await getCollection('docs');
@@ -23,7 +23,8 @@ const parts = summarizeParts(Astro.locals.starlightRoute.sidebar, verified);
 						<a href={part.href} class="cc-stretched">{part.title}</a>
 					</h3>
 					<p class="cc-part-meta">
-						{part.sections} {part.sections === 1 ? 'sekcja' : part.sections < 5 ? 'sekcje' : 'sekcji'} · {part.pages} stron
+						{countLabel(part.sections, { one: 'sekcja', few: 'sekcje', many: 'sekcji' })} ·{' '}
+						{countLabel(part.pages, { one: 'strona', few: 'strony', many: 'stron' })}
 					</p>
 					<div class="cc-progress" aria-hidden="true">
 						<span style={`--cc-progress: ${done}%`}></span>
