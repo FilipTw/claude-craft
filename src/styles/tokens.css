@@ -19,7 +19,8 @@
 	--cc-accent-text: #e639ff;
 	/* Accent UI: white text on #8b3dff = 5.0:1 */
 	--cc-accent-ui: #8b3dff;
-	--cc-accent-ui-hover: #9d57ff;
+	/* White text on #7a2be0 = 6.5:1; a lighter hover would drop under 4.5:1 */
+	--cc-accent-ui-hover: #7a2be0;
 	--cc-accent-soft: #24123a;
 	--cc-on-accent: #ffffff;
 	--cc-glow: rgb(230 57 255 / 0.35);
