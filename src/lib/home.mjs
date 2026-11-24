@@ -11,7 +11,8 @@ import { verificationStatus } from './verification.mjs';
 
 /**
  * @typedef {object} PartSummary
- * @property {string | undefined} kicker For example "Część I". Undefined when the label has no colon.
+ * @property {string} kicker For example "Część I". "Dodatek" when the label has no colon.
+ * @property {string} numeral For example "I", the last word of the kicker. "+" when the label has no colon.
  * @property {string} title For example "Fundamenty".
  * @property {string} href The first page of the part.
  * @property {number} sections
@@ -49,6 +50,7 @@ export const docHref = (base, id) => withBase(base, `${id.replace(/(^|\/)index$/
  * @param {string} base
  * @param {Date} now
  * @returns {Set<string>}
+ * @internal
  */
 export const verifiedHrefs = (docs, base, now) =>
 	new Set(
@@ -87,14 +89,18 @@ export const pagePosition = (sidebar) => {
 };
 
 /**
- * Splits "Część I: Fundamenty" into a kicker and a title.
+ * Splits "Część I: Fundamenty" into a kicker, its numeral and a title.
+ * A part without a colon, such as "Referencja i praktyka", is an appendix.
  * @param {string} label
+ * @returns {{ kicker: string, numeral: string, title: string }}
  */
 const splitLabel = (label) => {
 	const colon = label.indexOf(': ');
-	return colon === -1
-		? { kicker: undefined, title: label }
-		: { kicker: label.slice(0, colon), title: label.slice(colon + 2) };
+	if (colon === -1) {
+		return { kicker: 'Dodatek', numeral: '+', title: label };
+	}
+	const kicker = label.slice(0, colon);
+	return { kicker, numeral: kicker.slice(kicker.lastIndexOf(' ') + 1), title: label.slice(colon + 2) };
 };
 
 /**
@@ -102,6 +108,7 @@ const splitLabel = (label) => {
  * @param {NavEntry[]} sidebar
  * @param {ReadonlySet<string>} verified Hrefs of pages whose check is current, from `verifiedHrefs`.
  * @returns {PartSummary[]}
+ * @internal
  */
 export const summarizeParts = (sidebar, verified) =>
 	sidebar.flatMap((entry) => {
@@ -123,6 +130,16 @@ export const summarizeParts = (sidebar, verified) =>
 			},
 		];
 	});
+
+/**
+ * Part summaries for the sidebar and the homepage, with progress counted by the freshness rule on `now`.
+ * @param {NavEntry[]} sidebar Starlight's sidebar for the current page.
+ * @param {{ id: string, data: { lastVerified?: Date | undefined } }[]} docs The docs collection.
+ * @param {string} base
+ * @param {Date} now
+ * @returns {PartSummary[]}
+ */
+export const summarizeSidebar = (sidebar, docs, base, now) => summarizeParts(sidebar, verifiedHrefs(docs, base, now));
 
 /**
  * Pages with `lastVerified`, newest first. Ties keep collection order.

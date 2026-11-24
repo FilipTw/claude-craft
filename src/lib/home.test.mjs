@@ -7,6 +7,7 @@ import {
 	percent,
 	recentlyVerified,
 	summarizeParts,
+	summarizeSidebar,
 	totalProgress,
 	typeLabel,
 	verifiedHrefs,
@@ -47,8 +48,16 @@ test('summarizeParts makes one summary per top-level group and skips top-level l
 	];
 
 	assert.deepEqual(summarizeParts(sidebar, new Set(['/b/', '/d/', '/f/', '/roadmap/'])), [
-		{ kicker: 'Część I', title: 'Fundamenty', href: '/a/', sections: 1, pages: 4, verified: 2 },
-		{ kicker: undefined, title: 'Referencja i praktyka', href: '/e/', sections: 2, pages: 2, verified: 1 },
+		{ kicker: 'Część I', numeral: 'I', title: 'Fundamenty', href: '/a/', sections: 1, pages: 4, verified: 2 },
+		{
+			kicker: 'Dodatek',
+			numeral: '+',
+			title: 'Referencja i praktyka',
+			href: '/e/',
+			sections: 2,
+			pages: 2,
+			verified: 1,
+		},
 	]);
 });
 
@@ -72,7 +81,36 @@ test('summarizeParts splits the label at the first colon only', () => {
 	const [part] = summarizeParts([group('Część V: Git: GitHub', [link('/a/')])], new Set());
 
 	assert.equal(part?.kicker, 'Część V');
+	assert.equal(part?.numeral, 'V');
 	assert.equal(part?.title, 'Git: GitHub');
+});
+
+test('summarizeParts takes the last word of the kicker as its numeral, and the whole kicker when it is one word', () => {
+	const parts = summarizeParts(
+		[group('Część XII: Agenci', [link('/a/')]), group('Aneks: Słownik', [link('/b/')])],
+		new Set(),
+	);
+
+	assert.deepEqual(
+		parts.map(({ kicker, numeral }) => [kicker, numeral]),
+		[
+			['Część XII', 'XII'],
+			['Aneks', 'Aneks'],
+		],
+	);
+});
+
+test('summarizeSidebar counts progress from the docs collection by the freshness rule', () => {
+	const sidebar = [group('Część I: A', [link('/base/01-a/'), link('/base/02-b/'), link('/base/03-c/')])];
+	const docs = [
+		{ id: '01-a', data: { lastVerified: new Date('2026-11-01') } },
+		{ id: '02-b', data: { lastVerified: new Date('2026-01-01') } },
+		{ id: '03-c', data: {} },
+	];
+
+	assert.deepEqual(summarizeSidebar(sidebar, docs, '/base/', new Date('2026-11-21')), [
+		{ kicker: 'Część I', numeral: 'I', title: 'A', href: '/base/01-a/', sections: 0, pages: 3, verified: 1 },
+	]);
 });
 
 test('recentlyVerified keeps verified pages, newest first, up to the limit', () => {
@@ -173,7 +211,15 @@ test('verifiedHrefs drops a page the roadmap table counts as stale, so both show
 
 test('totalProgress sums verified and total pages and starts at zero', () => {
 	/** @param {number} verified @param {number} pages */
-	const part = (verified, pages) => ({ kicker: undefined, title: 't', href: '/', sections: 1, pages, verified });
+	const part = (verified, pages) => ({
+		kicker: 'K',
+		numeral: 'K',
+		title: 't',
+		href: '/',
+		sections: 1,
+		pages,
+		verified,
+	});
 
 	assert.deepEqual(totalProgress([part(1, 12), part(0, 31), part(5, 5)]), { verified: 6, pages: 48 });
 	assert.deepEqual(totalProgress([]), { verified: 0, pages: 0 });
