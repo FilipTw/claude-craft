@@ -9,7 +9,7 @@ const base = import.meta.env.BASE_URL;
 <ul class="cc-quick not-content" role="list">
 	{QUICK_LINKS.map(({ label, title, path }) => (
 		<li>
-			<a class="cc-capsule cc-glass" href={withBase(base, path)}>
+			<a class="cc-capsule" href={withBase(base, path)}>
 				<span class="cc-capsule-text">
 					<span class="cc-capsule-label">{label}<span class="sr-only">: </span></span>{" "}
 					<span class="cc-capsule-title">{title}</span>

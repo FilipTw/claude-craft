@@ -28,17 +28,31 @@
 	white-space: nowrap;
 }
 
-/* Tables: rounded frame; the table itself scrolls sideways (Starlight sets display: block) */
+/*
+ * Tables: a rounded card with a violet header row and a faint violet stripe (ADR 0005, third pass).
+ * The table itself scrolls sideways (Starlight sets display: block).
+ */
 .sl-markdown-content table:not(:where(.not-content *)) {
-	border: 1px solid var(--cc-border);
+	border: 1px solid var(--cc-table-border);
 	border-radius: var(--cc-radius-md);
 	max-width: 100%;
+	background-color: var(--cc-surface);
+	box-shadow: var(--cc-shadow-panel);
 }
 
 .sl-markdown-content :is(th, td):not(:where(.not-content *)) {
 	min-width: 8rem;
-	border-bottom-color: var(--cc-border);
+	border-bottom-color: var(--cc-table-border);
 	padding-inline: var(--cc-space-4);
+}
+
+.sl-markdown-content tbody tr:nth-child(even):not(:where(.not-content *)) {
+	background-color: var(--cc-table-stripe);
+}
+
+.sl-markdown-content td:first-child:not(:where(.not-content *)) {
+	color: var(--cc-heading);
+	font-weight: 500;
 }
 
 .sl-markdown-content :is(th:first-child, td:first-child):not(:where(.not-content *)),
@@ -50,9 +64,19 @@
 	border-bottom: 0;
 }
 
+/* #9333ea on --cc-accent-soft = 4.6:1, #e639ff on the dark one = 5.2:1 */
 .sl-markdown-content th:not(:where(.not-content *)) {
-	background-color: var(--cc-surface);
+	border-bottom: 2px solid var(--cc-accent-ui);
+	background-color: var(--cc-accent-soft);
+	color: var(--cc-accent-text);
 	font-family: var(--cc-font-heading);
+	font-weight: 600;
+}
+
+@media (hover: hover) {
+	.sl-markdown-content tbody tr:hover:not(:where(.not-content *)) {
+		background-color: var(--cc-accent-soft);
+	}
 }
 
 .sl-markdown-content blockquote:not(:where(.not-content *)) {
@@ -85,7 +109,7 @@
 	border: 1px solid var(--cc-border);
 	border-radius: var(--cc-radius-lg);
 	background-color: var(--cc-surface);
-	box-shadow: none;
+	box-shadow: var(--cc-shadow-panel);
 }
 
 .card .title,
@@ -109,7 +133,7 @@
 .right-sidebar-panel .cc-toc h2 {
 	margin: 0 0 var(--cc-space-3);
 	padding-inline-end: 2.5rem;
-	color: var(--cc-text-muted);
+	color: var(--cc-label);
 	font-family: var(--cc-font-heading);
 	font-size: var(--sl-text-2xs);
 	font-weight: 600;
@@ -130,7 +154,7 @@
 }
 
 .cc-toc-ring-track {
-	stroke: var(--cc-border-strong);
+	stroke: var(--cc-ring-track);
 }
 
 .cc-toc-ring-arc {
@@ -172,7 +196,7 @@
 	inset-block: 0.25rem;
 	inset-inline-start: 0.1875rem;
 	width: 1px;
-	background-color: var(--cc-border-strong);
+	background: var(--cc-rail);
 }
 
 .cc-toc starlight-toc a {
@@ -182,6 +206,8 @@
 }
 
 .cc-toc starlight-toc a[aria-current="true"] {
+	border-radius: var(--cc-radius-sm);
+	background-color: var(--cc-toc-current-bg);
 	color: var(--cc-accent-text);
 	font-weight: 500;
 }
@@ -215,18 +241,197 @@
 	}
 }
 
-/* Mobile "Na tej stronie" bar */
+/*
+ * Mobile "Na tej stronie" (ADR 0005): an opaque bar with a pill toggle, the current heading and a reading
+ * line along its bottom edge. The list opens as a solid card over a dimmed page, with the same rail and
+ * glowing dot as the desktop panel. Starlight's rules sit in @layer starlight.core, so these win.
+ */
+mobile-starlight-toc nav {
+	border-top-color: var(--cc-border);
+	background-color: transparent;
+}
+
+mobile-starlight-toc summary {
+	position: relative;
+	gap: var(--cc-space-3);
+	border-bottom-color: var(--cc-border);
+	padding-inline: var(--cc-space-4);
+	background-color: var(--cc-bg-chrome);
+}
+
 mobile-starlight-toc summary .toggle {
+	gap: var(--cc-space-2);
+	min-height: 2rem;
+	border-color: var(--cc-border-strong);
 	border-radius: var(--cc-radius-pill);
-	border-color: var(--cc-border);
+	padding-inline: var(--cc-space-3) var(--cc-space-2);
 	background-color: var(--cc-surface);
+	color: var(--cc-heading);
+	font-weight: 500;
+}
+
+mobile-starlight-toc details[open] .toggle {
+	border-color: var(--cc-accent-ui);
+	background-color: var(--cc-accent-soft);
+	color: var(--cc-accent-text);
+}
+
+mobile-starlight-toc .display-current {
+	color: var(--cc-text-muted);
+	font-size: var(--sl-text-sm);
+}
+
+/* Reading line: the mobile counterpart of the ring, driven by the same scroll timeline */
+mobile-starlight-toc summary::after {
+	content: "";
+	position: absolute;
+	inset-inline: 0;
+	bottom: -1px;
+	height: 2px;
+	background-color: var(--cc-accent-text);
+	box-shadow: 0 0 6px var(--cc-glow);
+	transform: scaleX(0);
+	transform-origin: left;
+}
+
+:root[dir="rtl"] mobile-starlight-toc summary::after {
+	transform-origin: right;
+}
+
+@supports (animation-timeline: scroll()) {
+	@media (prefers-reduced-motion: no-preference) {
+		/* Longhands without a duration, for the same minifier reason as .cc-toc-ring-arc */
+		mobile-starlight-toc summary::after {
+			animation-name: cc-reading-line;
+			animation-timing-function: linear;
+			animation-fill-mode: both;
+			animation-timeline: scroll(root);
+		}
+	}
+}
+
+@keyframes cc-reading-line {
+	to {
+		transform: scaleX(1);
+	}
+}
+
+/* Dim the page under the open list, so the list never reads as part of the text */
+mobile-starlight-toc nav:has(details[open])::before {
+	content: "";
+	position: fixed;
+	inset: calc(var(--sl-nav-height) + var(--sl-mobile-toc-height)) 0 0;
+	z-index: -1;
+	background-color: var(--cc-backdrop);
+}
+
+mobile-starlight-toc .dropdown {
+	margin: var(--cc-space-2) var(--cc-space-4) 0;
+	max-height: min(70vh, calc(100vh - var(--sl-nav-height) - var(--sl-mobile-toc-height) - 2rem));
+	border: 1px solid var(--cc-border);
+	border-radius: var(--cc-radius-lg);
+	padding-block: var(--cc-space-2);
+	background-color: var(--cc-surface);
+	box-shadow: var(--cc-shadow-dialog);
+}
+
+mobile-starlight-toc .dropdown > .isMobile {
+	position: relative;
+}
+
+/* Rail at the same inset as the desktop panel */
+mobile-starlight-toc .dropdown > .isMobile::before {
+	content: "";
+	position: absolute;
+	inset-block: var(--cc-space-3);
+	inset-inline-start: var(--cc-space-5);
+	width: 1px;
+	background-color: var(--cc-border-strong);
+}
+
+mobile-starlight-toc .isMobile a {
+	--pad-inline: var(--cc-space-4);
+	position: relative;
+	align-items: center;
+	min-height: var(--cc-touch-target);
+	border-top: 0;
+	padding-inline-start: calc(1rem * var(--depth) + var(--cc-space-5) + var(--cc-space-5));
+	color: var(--cc-text-muted);
+	line-height: 1.3;
+}
+
+mobile-starlight-toc .isMobile a[aria-current="true"],
+mobile-starlight-toc .isMobile a[aria-current="true"]:hover,
+mobile-starlight-toc .isMobile a[aria-current="true"]:focus {
+	background-color: var(--cc-accent-soft);
+	color: var(--cc-accent-text);
+	font-weight: 500;
+}
+
+/* Glowing dot on the rail instead of Starlight's check mark */
+mobile-starlight-toc .isMobile a[aria-current="true"]::after {
+	position: absolute;
+	top: calc(50% - 3.5px);
+	inset-inline-start: calc(var(--cc-space-5) - 3px);
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background-color: var(--cc-accent-text);
+	box-shadow:
+		0 0 0 3px var(--cc-accent-soft),
+		0 0 10px var(--cc-glow);
+	-webkit-mask-image: none;
+	mask-image: none;
+}
+
+@media (hover: hover) {
+	/* Unlayered, because our toggle colors above beat Starlight's layered hover */
+	mobile-starlight-toc details:not([open]) .toggle:hover {
+		border-color: var(--cc-accent-ui);
+		color: var(--cc-accent-text);
+	}
+
+	mobile-starlight-toc .isMobile a:hover {
+		background-color: var(--cc-surface-raised);
+		color: var(--cc-heading);
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	mobile-starlight-toc details[open] .dropdown {
+		animation: cc-reveal 160ms ease-out;
+	}
+
+	mobile-starlight-toc summary .toggle,
+	mobile-starlight-toc .isMobile a {
+		transition:
+			background-color var(--cc-transition),
+			border-color var(--cc-transition),
+			color var(--cc-transition);
+	}
+}
+
+@media (forced-colors: active) {
+	mobile-starlight-toc .dropdown {
+		border-color: CanvasText;
+		background-color: Canvas;
+	}
+
+	mobile-starlight-toc summary::after,
+	mobile-starlight-toc nav:has(details[open])::before {
+		content: none;
+	}
+
+	mobile-starlight-toc .isMobile a[aria-current="true"]::after {
+		background-color: Highlight;
+	}
 }
 
 @media (hover: hover) {
 	.card:hover,
 	.sl-link-card:hover {
 		border-color: var(--cc-accent-ui);
-		box-shadow: 0 0 1.5rem var(--cc-glow);
+		box-shadow: var(--cc-shadow-link-hover);
 	}
 }
 
@@ -342,14 +547,15 @@ footer > .meta :where(a) {
 }
 
 /*
- * Previous / position / next. Capsules and the glass frame come from theme.css.
+ * Previous / position / next. The call-to-action look of the capsules and the pill comes from theme.css.
  * Sized like pagination, not like cards: one row the height of a touch target and a bit.
  * Phone: the position pill on top, then "Następna", then "Poprzednia".
  */
 .cc-pagination {
 	display: grid;
 	grid-template-areas: "pill" "next" "prev";
-	gap: var(--cc-space-2);
+	/* Room for the 5px rings of neighbouring capsules */
+	gap: var(--cc-space-4);
 }
 
 .cc-pagination-prev {
@@ -366,14 +572,15 @@ footer > .meta :where(a) {
 }
 
 .cc-pagination .cc-capsule {
+	--cc-sparkle-size: 1.25rem;
 	gap: var(--cc-space-3);
 	min-height: 3.25rem;
-	padding: var(--cc-space-2) var(--cc-space-2) var(--cc-space-2) var(--cc-space-5);
+	padding: var(--cc-space-2) var(--cc-space-2) var(--cc-space-2) calc(var(--cc-sparkle-size) + var(--cc-space-5));
 }
 
 .cc-pagination .cc-capsule-start {
 	justify-content: flex-start;
-	padding: var(--cc-space-2) var(--cc-space-5) var(--cc-space-2) var(--cc-space-2);
+	padding: var(--cc-space-2) calc(var(--cc-sparkle-size) + var(--cc-space-5)) var(--cc-space-2) var(--cc-space-2);
 }
 
 .cc-pagination .cc-capsule-label {
@@ -400,20 +607,19 @@ footer > .meta :where(a) {
 	min-height: var(--cc-touch-target);
 	padding-inline: var(--cc-space-4);
 	border-radius: var(--cc-radius-pill);
-	color: var(--cc-text-muted);
 	font-family: var(--cc-font-heading);
 	font-variant-numeric: tabular-nums;
-	text-decoration: none;
 }
 
 .cc-page-pill-index {
-	color: var(--cc-accent-text);
+	color: var(--cc-on-cta);
 	font-size: var(--sl-text-base);
 	font-weight: 600;
 	line-height: 1;
 }
 
 .cc-page-pill-total {
+	color: var(--cc-on-cta-muted);
 	font-size: var(--sl-text-xs);
 }
 
@@ -439,18 +645,7 @@ footer > .meta :where(a) {
 }
 
 @media (hover: hover) {
-	.cc-page-pill:hover {
-		--cc-frame: var(--cc-frame-active);
-		color: var(--cc-heading);
-	}
-
 	.cc-pagination-prev:hover .cc-capsule-arrow {
 		transform: translateX(-2px);
-	}
-}
-
-@media (prefers-reduced-motion: no-preference) {
-	.cc-page-pill {
-		transition: color var(--cc-transition);
 	}
 }

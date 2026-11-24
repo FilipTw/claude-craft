@@ -7,6 +7,8 @@
 :root {
 	/* Palette, dark (default) */
 	--cc-bg: #0c0b10;
+	/* Header, sidebars and the mobile "Na tej stronie" bar; in the light theme they sit whiter than the page */
+	--cc-bg-chrome: #0c0b10;
 	--cc-surface: #15131b;
 	--cc-surface-raised: #1c1a24;
 	--cc-border: #2a2733;
@@ -22,6 +24,8 @@
 	/* White text on #7a2be0 = 6.5:1; a lighter hover would drop under 4.5:1 */
 	--cc-accent-ui-hover: #7a2be0;
 	--cc-accent-soft: #24123a;
+	/* Fill of the accent word in the hero: one color here, a gradient in the light theme */
+	--cc-accent-word: linear-gradient(var(--cc-accent-text), var(--cc-accent-text));
 	--cc-on-accent: #ffffff;
 	--cc-glow: rgb(230 57 255 / 0.35);
 	--cc-grid-line: rgb(255 255 255 / 0.05);
@@ -32,6 +36,63 @@
 	/* Glass panels: over --cc-bg the fill composes to about #17151e, close to --cc-surface, so text contrast matches it (muted text ~7:1) */
 	--cc-glass-fill: rgb(32 29 42 / 0.55);
 	--cc-glass-blur: blur(14px) saturate(150%);
+	/* Depth (ADR 0005): the dark theme lifts panels with a glow, so the resting shadow is empty */
+	--cc-shadow-panel: 0 0 #0000;
+	--cc-shadow-panel-hover: 0 0 1.25rem var(--cc-glow);
+	/* Hover depth of the home cards and Starlight cards, kept at their earlier glow radius in the dark theme */
+	--cc-shadow-card-hover: 0 0 2rem var(--cc-glow);
+	--cc-shadow-link-hover: 0 0 1.5rem var(--cc-glow);
+
+	/*
+	 * Role tokens (ADR 0005, second pass). Here each one holds the value the dark theme already used,
+	 * so the dark theme looks the same; the light theme gives the same roles more color and depth.
+	 */
+	--cc-panel-wash: radial-gradient(90% 120% at 50% -45%, var(--cc-glow), transparent 70%);
+	--cc-frame-rest: linear-gradient(to bottom, var(--cc-accent-ui), var(--cc-border) 60%);
+	--cc-frame-hover: linear-gradient(to bottom, var(--cc-accent-text), var(--cc-accent-ui) 60%);
+	--cc-lift: 0px;
+	--cc-label: var(--cc-text-muted);
+	--cc-track: var(--cc-surface-raised);
+	--cc-track-hairline: var(--cc-border);
+	--cc-ring-track: var(--cc-border-strong);
+	--cc-progress-fill: linear-gradient(var(--cc-accent-text), var(--cc-accent-text));
+	--cc-art-base: var(--cc-bg);
+	--cc-art-light: radial-gradient(circle at 85% 15%, var(--cc-glow), transparent 60%);
+	--cc-art-shade: linear-gradient(transparent, transparent);
+	--cc-tile-bg: radial-gradient(120% 90% at 30% 0%, var(--cc-glow), transparent 70%), var(--cc-accent-soft);
+	--cc-tile-fg: var(--cc-heading);
+	--cc-tile-label: var(--cc-text-muted);
+	--cc-tile-ring-display: none;
+	--cc-chip-bg: transparent;
+	--cc-chip-fg: var(--cc-text-muted);
+	--cc-chip-border: var(--cc-border-strong);
+	--cc-rail: linear-gradient(var(--cc-border-strong), var(--cc-border-strong));
+	--cc-toc-current-bg: transparent;
+
+	/*
+	 * Call-to-action capsules: quick start, previous/next and the page pill (ADR 0005, third pass).
+	 * One filled violet pill on both themes; only the ring and drop shadow follow the background.
+	 * White on #7c3aed = 5.7:1, on #5b21b6 = 9.0:1; --cc-on-cta-muted on #7c3aed = 5.0:1.
+	 */
+	--cc-cta-top: #7c3aed;
+	--cc-cta-bottom: #5b21b6;
+	--cc-cta-light: rgb(196 181 253 / 0.55);
+	--cc-cta-light-hover: rgb(216 204 255 / 0.5);
+	--cc-cta-edge: rgb(255 255 255 / 0.22);
+	--cc-cta-highlight: rgb(255 255 255 / 0.3);
+	--cc-cta-shade: rgb(46 16 101 / 0.45);
+	--cc-cta-ring: rgb(139 61 255 / 0.3);
+	--cc-cta-ring-hover: rgb(139 61 255 / 0.42);
+	--cc-cta-shadow: rgb(139 61 255 / 0.55);
+	--cc-cta-chip: rgb(255 255 255 / 0.16);
+	--cc-cta-chip-edge: rgb(255 255 255 / 0.32);
+	--cc-cta-lift: -2px;
+	--cc-on-cta: #ffffff;
+	--cc-on-cta-muted: #f3ecff;
+
+	/* Tables: violet header and a faint violet stripe */
+	--cc-table-border: #3a2d52;
+	--cc-table-stripe: rgb(139 61 255 / 0.05);
 
 	/* Type */
 	/* Body uses the system font: no download, so body text paints at once (font budget, ADR 0003) */
@@ -62,28 +123,76 @@
 }
 
 :root[data-theme="light"] {
-	--cc-bg: #ffffff;
-	--cc-surface: #f6f5f9;
-	--cc-surface-raised: #eeecf3;
-	--cc-border: #dddae4;
-	--cc-border-strong: #c6c2d0;
-	--cc-text: #14121a;
-	--cc-text-muted: #55525f;
-	--cc-heading: #0c0b10;
+	/* Lavender-white page under white chrome and panels (ADR 0005) */
+	--cc-bg: #f7f6fb;
+	--cc-bg-chrome: #ffffff;
+	--cc-surface: #ffffff;
+	--cc-surface-raised: #f1eff8;
+	--cc-border: #e4e1ee;
+	--cc-border-strong: #cdc8dc;
+	/* #1b1830 on --cc-bg = 16:1; muted #5b5770 = 6.4:1, 5.9:1 on --cc-accent-soft */
+	--cc-text: #1b1830;
+	--cc-text-muted: #5b5770;
+	--cc-heading: #0f0c1f;
 
-	/* #9d00c2 on white = 6.5:1 */
-	--cc-accent-text: #9d00c2;
-	/* White text on #7a2be0 = 6.6:1 */
-	--cc-accent-ui: #7a2be0;
-	--cc-accent-ui-hover: #6a1fcc;
-	--cc-accent-soft: #f4e8ff;
-	--cc-glow: rgb(157 0 194 / 0.2);
-	--cc-grid-line: rgb(12 11 16 / 0.06);
-	--cc-backdrop: rgb(20 18 26 / 0.45);
-	--cc-highlight: rgb(255 255 255 / 0.7);
-	--cc-shadow-dialog: 0 1.5rem 4rem rgb(20 18 26 / 0.18);
-	/* Over white this composes lighter than --cc-surface, so text contrast only rises */
-	--cc-glass-fill: rgb(246 245 249 / 0.7);
+	/* #9333ea on --cc-bg = 5.0:1, on white 5.4:1, on --cc-accent-soft 4.6:1 */
+	--cc-accent-text: #9333ea;
+	/* White text on #7c3aed = 5.7:1 */
+	--cc-accent-ui: #7c3aed;
+	/* White text on #6d28d9 = 7.1:1 */
+	--cc-accent-ui-hover: #6d28d9;
+	--cc-accent-soft: #f1eafe;
+	/* Both ends pass 4.5:1 on --cc-bg, so the word keeps its contrast along the whole gradient */
+	--cc-accent-word: linear-gradient(100deg, var(--cc-accent-text), var(--cc-accent-ui));
+	--cc-glow: rgb(124 58 237 / 0.16);
+	--cc-grid-line: rgb(76 29 149 / 0.07);
+	--cc-backdrop: rgb(27 24 48 / 0.3);
+	--cc-highlight: rgb(255 255 255 / 0.9);
+	--cc-shadow-dialog: 0 1.5rem 4rem rgb(76 29 149 / 0.18);
+	/* White panel over the lavender page; text contrast is at least as on --cc-surface minus 2% */
+	--cc-glass-fill: rgb(255 255 255 / 0.82);
+	/* Depth in the light theme is a layered violet shadow instead of a glow: contact, mid and a wide tinted one */
+	--cc-shadow-panel:
+		0 1px 2px rgb(27 24 48 / 0.06), 0 6px 14px -4px rgb(76 29 149 / 0.1), 0 22px 44px -18px rgb(124 58 237 / 0.28);
+	--cc-shadow-panel-hover:
+		0 0 0 4px rgb(124 58 237 / 0.08), 0 2px 4px rgb(27 24 48 / 0.06), 0 14px 28px -8px rgb(76 29 149 / 0.18),
+		0 32px 60px -20px rgb(124 58 237 / 0.45);
+
+	--cc-shadow-card-hover: var(--cc-shadow-panel-hover);
+	--cc-shadow-link-hover: var(--cc-shadow-panel-hover);
+
+	/* Role tokens: color where the dark theme relies on a glow that white swallows */
+	--cc-panel-wash:
+		radial-gradient(110% 120% at 0% -20%, rgb(147 51 234 / 0.08), transparent 55%),
+		radial-gradient(80% 110% at 100% -30%, rgb(217 70 239 / 0.07), transparent 55%);
+	--cc-frame-rest: linear-gradient(135deg, #c026d3, #7c3aed 30%, #ddd2f7 70%, var(--cc-border));
+	--cc-frame-hover: linear-gradient(135deg, #c026d3, #7c3aed 55%, #a78bfa);
+	--cc-lift: -3px;
+	/* #9333ea: 5.0:1 on --cc-bg, 4.7:1 or more on the panel wash */
+	--cc-label: var(--cc-accent-text);
+	--cc-track: #ece3ff;
+	--cc-track-hairline: #ece3ff;
+	--cc-ring-track: #e4d8fb;
+	--cc-progress-fill: linear-gradient(90deg, #c026d3, #7c3aed);
+	--cc-art-base: #f3ecff;
+	--cc-art-light: radial-gradient(circle at 88% 12%, rgb(217 70 239 / 0.38), transparent 55%);
+	--cc-art-shade: radial-gradient(circle at 10% 120%, rgb(124 58 237 / 0.3), transparent 60%);
+	/* White text on #9333ea = 5.4:1, on #6d28d9 = 7.1:1 */
+	--cc-tile-bg: linear-gradient(135deg, #9333ea, #6d28d9);
+	--cc-tile-fg: #ffffff;
+	--cc-tile-label: #ffffff;
+	/* Progress ring around the tile; the gradient lives in theme.css, where --cc-progress is set */
+	--cc-tile-ring-display: block;
+	--cc-chip-bg: var(--cc-accent-soft);
+	--cc-chip-fg: var(--cc-accent-text);
+	--cc-chip-border: var(--cc-accent-soft);
+	--cc-rail: linear-gradient(to bottom, var(--cc-accent-ui), var(--cc-border-strong) 70%);
+	--cc-toc-current-bg: var(--cc-accent-soft);
+	--cc-cta-ring: rgb(124 58 237 / 0.16);
+	--cc-cta-ring-hover: rgb(124 58 237 / 0.26);
+	--cc-cta-shadow: rgb(91 33 182 / 0.45);
+	--cc-table-border: #e2d6fb;
+	--cc-table-stripe: #faf7ff;
 }
 
 /* Mapping onto Starlight. Starlight's light theme swaps the gray scale, so both themes set it. */
@@ -109,8 +218,8 @@
 	--sl-color-text-accent: var(--cc-accent-text);
 	--sl-color-text-invert: var(--cc-on-accent);
 	--sl-color-bg: var(--cc-bg);
-	--sl-color-bg-nav: var(--cc-bg);
-	--sl-color-bg-sidebar: var(--cc-bg);
+	--sl-color-bg-nav: var(--cc-bg-chrome);
+	--sl-color-bg-sidebar: var(--cc-bg-chrome);
 	--sl-color-bg-inline-code: var(--cc-surface-raised);
 	--sl-color-bg-accent: var(--cc-accent-ui);
 	--sl-color-hairline-light: var(--cc-border);
