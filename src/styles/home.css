@@ -133,15 +133,6 @@
 	font-weight: 700;
 }
 
-@supports (background-clip: text) {
-	.cc-hero-title .cc-accent {
-		background-image: var(--cc-accent-word);
-		-webkit-background-clip: text;
-		background-clip: text;
-		color: transparent;
-	}
-}
-
 .cc-hero-tagline {
 	max-width: 38rem;
 	margin: 0;
@@ -438,7 +429,12 @@
 	color: var(--cc-accent-text);
 }
 
+/*
+ * One fill for the accent word and the part numerals. It comes after both base rules so it wins at equal
+ * specificity; their solid --cc-accent-text is the fallback where background-clip: text is missing.
+ */
 @supports (background-clip: text) {
+	.cc-hero-title .cc-accent,
 	.cc-part-numeral {
 		background-image: var(--cc-accent-word);
 		-webkit-background-clip: text;
