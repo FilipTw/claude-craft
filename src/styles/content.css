@@ -342,13 +342,14 @@ footer > .meta :where(a) {
 }
 
 /*
- * Previous / position / next (spec: design pass 3). Capsules come from theme.css.
+ * Previous / position / next. Capsules and the glass frame come from theme.css.
+ * Sized like pagination, not like cards: one row the height of a touch target and a bit.
  * Phone: the position pill on top, then "Następna", then "Poprzednia".
  */
 .cc-pagination {
 	display: grid;
 	grid-template-areas: "pill" "next" "prev";
-	gap: var(--cc-space-3);
+	gap: var(--cc-space-2);
 }
 
 .cc-pagination-prev {
@@ -365,45 +366,55 @@ footer > .meta :where(a) {
 }
 
 .cc-pagination .cc-capsule {
-	min-height: 4.5rem;
+	gap: var(--cc-space-3);
+	min-height: 3.25rem;
+	padding: var(--cc-space-2) var(--cc-space-2) var(--cc-space-2) var(--cc-space-5);
+}
+
+.cc-pagination .cc-capsule-start {
+	justify-content: flex-start;
+	padding: var(--cc-space-2) var(--cc-space-5) var(--cc-space-2) var(--cc-space-2);
+}
+
+.cc-pagination .cc-capsule-label {
+	font-size: var(--sl-text-2xs);
 }
 
 .cc-pagination .cc-capsule-title {
-	font-size: var(--sl-text-base);
+	font-size: var(--sl-text-sm);
 }
 
-.cc-capsule-start {
-	padding: var(--cc-space-3) var(--cc-space-6) var(--cc-space-3) var(--cc-space-3);
-	justify-content: flex-start;
+.cc-pagination .cc-capsule-arrow {
+	width: 2.25rem;
+	height: 2.25rem;
 }
 
 .cc-page-pill {
 	display: inline-flex;
 	grid-area: pill;
-	align-items: baseline;
+	align-items: center;
 	justify-content: center;
 	justify-self: center;
 	gap: 0.25rem;
-	min-width: 6.5rem;
-	padding: var(--cc-space-3) var(--cc-space-5);
-	border: 1px solid var(--cc-accent-text);
+	min-width: 5rem;
+	min-height: var(--cc-touch-target);
+	padding-inline: var(--cc-space-4);
 	border-radius: var(--cc-radius-pill);
-	background: radial-gradient(120% 100% at 50% -30%, var(--cc-glow), transparent 70%), var(--cc-accent-ui);
-	box-shadow: inset 0 1px 0 var(--cc-highlight);
-	color: var(--cc-on-accent);
+	color: var(--cc-text-muted);
 	font-family: var(--cc-font-heading);
+	font-variant-numeric: tabular-nums;
 	text-decoration: none;
 }
 
 .cc-page-pill-index {
-	font-size: var(--sl-text-xl);
+	color: var(--cc-accent-text);
+	font-size: var(--sl-text-base);
 	font-weight: 600;
 	line-height: 1;
 }
 
 .cc-page-pill-total {
-	font-size: var(--sl-text-sm);
-	font-variant-numeric: tabular-nums;
+	font-size: var(--sl-text-xs);
 }
 
 @media (min-width: 50rem) {
@@ -415,11 +426,6 @@ footer > .meta :where(a) {
 		grid-template-areas: "prev pill next";
 		grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
 		align-items: stretch;
-	}
-
-	.cc-page-pill {
-		align-items: center;
-		align-self: stretch;
 	}
 
 	.cc-pagination-next {
@@ -434,7 +440,8 @@ footer > .meta :where(a) {
 
 @media (hover: hover) {
 	.cc-page-pill:hover {
-		background: radial-gradient(120% 100% at 50% -30%, var(--cc-glow), transparent 75%), var(--cc-accent-ui-hover);
+		--cc-frame: var(--cc-frame-active);
+		color: var(--cc-heading);
 	}
 
 	.cc-pagination-prev:hover .cc-capsule-arrow {
@@ -444,14 +451,6 @@ footer > .meta :where(a) {
 
 @media (prefers-reduced-motion: no-preference) {
 	.cc-page-pill {
-		transition: background-color var(--cc-transition);
-	}
-}
-
-@media (forced-colors: active) {
-	.cc-page-pill {
-		border-color: CanvasText;
-		background: Canvas;
-		color: CanvasText;
+		transition: color var(--cc-transition);
 	}
 }
