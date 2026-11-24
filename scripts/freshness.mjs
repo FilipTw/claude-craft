@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { verificationStatus } from '../src/lib/verification.mjs';
+import { isRunDirectly } from './cli.mjs';
 import { DOCS, DocsProblem, findPage, listPages, loadStructure, parseYaml, ROADMAP } from './structure.mjs';
 
 /** @import { LocatedPage } from './structure.mjs' */
@@ -134,6 +134,6 @@ export function runFreshness({
 	}
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+if (isRunDirectly(import.meta.url)) {
 	process.exitCode = runFreshness();
 }

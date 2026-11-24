@@ -240,6 +240,16 @@ test('the CLI that CI runs after the build reports on the real project', () => {
 	assert.match(result.stdout, /^(?:No HTML in .*Run npm run build first\.|Starlight and Pagefind classes: )/m);
 });
 
+test('importing check-build.mjs does not run the CLI', () => {
+	const cli = new URL('./check-build.mjs', import.meta.url);
+	const importOnly = `await import(${JSON.stringify(cli.href)});`;
+
+	const result = spawnSync(process.execPath, ['--input-type=module', '--eval', importOnly], { encoding: 'utf8' });
+
+	assert.equal(result.status, 0);
+	assert.equal(result.stdout, '');
+});
+
 test('runCheckBuild asks for a build when dist has no HTML, and exits 1', () => {
 	const root = tempDir();
 

@@ -1,9 +1,22 @@
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, utimesSync, writeFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import {
+	copyFileSync,
+	mkdirSync,
+	mkdtempSync,
+	readFileSync,
+	rmSync,
+	statSync,
+	symlinkSync,
+	utimesSync,
+	writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { after, test } from 'node:test';
+import { pathToFileURL } from 'node:url';
 import { classify, renderProgress, runFreshness, writeProgress } from './freshness.mjs';
+import { ROOT } from './structure.mjs';
 
 /** @import { ProgressRow, Status } from './freshness.mjs' */
 /** @import { LocatedPage } from './structure.mjs' */
@@ -230,4 +243,54 @@ test('runFreshness lets an error that is not a docs problem through with its sta
 	assert.throws(() => runQuiet(docs, [{ path: '01-a', title: 'A', type: 'explanation', section: 'X' }]), {
 		code: 'EISDIR',
 	});
+});
+
+const ROADMAP_BEFORE = '# Ścieżka\n\n<!-- progress:start -->\n<!-- progress:end -->\n';
+
+/**
+ * A copy of the files the CLI runs, with a one-page manifest, in a temporary folder.
+ * The CLI writes roadmap.md, so it runs there and never touches this repo.
+ */
+const cliProject = () => {
+	const root = tempDir();
+	for (const file of [
+		'scripts/freshness.mjs',
+		'scripts/cli.mjs',
+		'scripts/structure.mjs',
+		'src/lib/verification.mjs',
+	]) {
+		mkdirSync(dirname(join(root, file)), { recursive: true });
+		copyFileSync(join(ROOT, file), join(root, file));
+	}
+	symlinkSync(join(ROOT, 'node_modules'), join(root, 'node_modules'), 'junction');
+	writeFileSync(
+		join(root, 'scripts/structure.yaml'),
+		"parts:\n  - label: 'Część I: A'\n    sections:\n      - dir: 01-a\n        label: A\n        items:\n          - file: 01-one\n            title: Jeden\n",
+	);
+	const docs = join(root, 'src/content/docs');
+	mkdirSync(join(docs, '01-a'), { recursive: true });
+	writeFileSync(join(docs, '01-a/01-one.md'), '---\ntitle: Jeden\ntype: explanation\n---\n');
+	writeFileSync(join(docs, 'roadmap.md'), ROADMAP_BEFORE);
+	return { cli: join(root, 'scripts/freshness.mjs'), roadmap: join(docs, 'roadmap.md') };
+};
+
+test('the CLI behind npm run freshness writes the progress table of its own project and exits 0', () => {
+	const { cli, roadmap } = cliProject();
+
+	const result = spawnSync(process.execPath, [cli], { encoding: 'utf8' });
+
+	assert.equal(result.status, 0);
+	assert.equal(result.stdout, 'Fresh: 0/1. Progress table in src/content/docs/roadmap.md.\n');
+	assert.match(readFileSync(roadmap, 'utf8'), /<!-- progress:start -->\n\| .+\n[\s\S]*<!-- progress:end -->/);
+});
+
+test('importing freshness.mjs does not run the CLI, so a test cannot rewrite roadmap.md', () => {
+	const { cli, roadmap } = cliProject();
+	const importOnly = `await import(${JSON.stringify(pathToFileURL(cli).href)});`;
+
+	const result = spawnSync(process.execPath, ['--input-type=module', '--eval', importOnly], { encoding: 'utf8' });
+
+	assert.equal(result.status, 0);
+	assert.equal(result.stdout, '');
+	assert.equal(readFileSync(roadmap, 'utf8'), ROADMAP_BEFORE);
 });

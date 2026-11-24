@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { isRunDirectly } from './cli.mjs';
 
 /**
  * @typedef {{ rule: string, matches: (line: string) => boolean }} Rule
@@ -119,6 +119,6 @@ export function runForbidTrailers({ file, log = (line) => process.stderr.write(`
 	return 0;
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+if (isRunDirectly(import.meta.url)) {
 	process.exitCode = runForbidTrailers({ file: process.argv[2] });
 }
