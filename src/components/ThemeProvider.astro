@@ -3,7 +3,10 @@
 import '@fontsource-variable/outfit/wght.css';
 ---
 
-{/* Dark is the default theme (ADR 0003). A stored "light" choice wins. Inlined to avoid FOUC. */}
+{/*
+	Dark is the default theme (ADR 0003). A stored "light" choice wins. Inlined to avoid FOUC, so it cannot import
+	THEME_STORAGE_KEY from src/lib/theme.mjs; theme.test.mjs checks that the key here is the same.
+*/}
 <script is:inline>
 	(() => {
 		let stored = null;

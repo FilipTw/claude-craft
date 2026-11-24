@@ -28,35 +28,25 @@ import Select from '@astrojs/starlight/components/Select.astro';
 </style>
 
 <script>
-	const storageKey = 'starlight-theme';
+	import { loadTheme, saveTheme, toTheme } from '../lib/theme.mjs';
 
-	const loadTheme = (): 'dark' | 'light' => {
-		try {
-			return localStorage.getItem(storageKey) === 'light' ? 'light' : 'dark';
-		} catch {
-			return 'dark';
-		}
-	};
+	const storage = () => localStorage;
 
 	function applyTheme(theme: 'dark' | 'light'): void {
 		for (const select of document.querySelectorAll<HTMLSelectElement>('cc-theme-select select')) {
 			select.value = theme;
 		}
 		document.documentElement.setAttribute('data-theme', theme);
-		try {
-			localStorage.setItem(storageKey, theme);
-		} catch {
-			// Private mode or blocked storage: the theme still applies for this page.
-		}
+		saveTheme(storage, theme);
 	}
 
 	class CcThemeSelect extends HTMLElement {
 		connectedCallback(): void {
-			applyTheme(loadTheme());
+			applyTheme(loadTheme(storage));
 			this.querySelector('select')?.addEventListener('change', (event) => {
 				const target = event.currentTarget;
 				if (target instanceof HTMLSelectElement) {
-					applyTheme(target.value === 'light' ? 'light' : 'dark');
+					applyTheme(toTheme(target.value));
 				}
 			});
 		}
