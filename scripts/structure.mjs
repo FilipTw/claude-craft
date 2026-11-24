@@ -124,7 +124,7 @@ function nameItem(item, parent, index) {
 	const kind = dir == null ? 'file' : 'dir';
 	const name = node[kind];
 	if (typeof name !== 'string') {
-		fail(`${parent}[${index}]`, name == null ? 'must look like 01-kebab-case' : `needs a text "${kind}"`);
+		fail(`${parent}[${index}]`, name == null ? 'needs a text "file" or "dir"' : `needs a text "${kind}"`);
 	}
 	const where = `${parent}${name}`;
 	const match = NAME.exec(name);

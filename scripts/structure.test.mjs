@@ -137,14 +137,14 @@ test('an error tells the editor where structure.yaml is wrong and what that plac
 			'"(root)" is not valid YAML. Nested mappings are not allowed in compact mappings at line 2, column 12',
 		],
 		['parts: *x', '"(root)" is not valid YAML. Unresolved alias (the anchor must be set before the alias): x'],
-		['parts:\n  - { label: Część I, sections: [~] }', '"[0]" must look like 01-kebab-case'],
+		['parts:\n  - { label: Część I, sections: [~] }', '"[0]" needs a text "file" or "dir"'],
 		['parts:\n  - { label: Część I, sections: [] }', '"parts[0]" needs a non-empty list "sections"'],
 		[valid.replace('label: Część I', "label: ''"), '"parts[0]" needs a text "label"'],
 		[valid.replace(install, 'items: []'), '"01-basics/02-install" needs a non-empty list "items"'],
 		[valid.replace('title: Wstęp', "title: ''"), '"01-basics/01-intro" needs a text "title"'],
 		[
 			valid.replace('{ file: 01-intro, title: Wstęp }', '{ title: Wstęp }'),
-			'"01-basics/[0]" must look like 01-kebab-case',
+			'"01-basics/[0]" needs a text "file" or "dir"',
 		],
 	];
 	for (const [text, problem] of cases) {
