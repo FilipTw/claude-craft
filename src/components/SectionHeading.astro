@@ -1,20 +1,28 @@
 ---
 interface Props {
-	/** Anchor and accessible-name target, for example "sciezka-nauki". */
+	/** Anchor target, for example "sciezka-nauki". */
 	id: string;
+	/** Position of this section on the page, for example "01". */
+	index: string;
+	/** Number of sections on the page, for example "03". */
+	total: string;
 	/** Short label above the title, for example "Program". */
 	kicker: string;
 	title: string;
 	lead?: string;
 }
 
-const { id, kicker, title, lead } = Astro.props;
+const { id, index, total, kicker, title, lead } = Astro.props;
 ---
 
 <header class="cc-section-heading not-content">
-	<div class="cc-section-heading-title">
+	<p class="cc-section-index" aria-hidden="true">
+		<span class="cc-section-number">{index}</span>
+		<span class="cc-section-total">/ {total}</span>
+	</p>
+	<div class="cc-section-body">
 		<p class="cc-section-kicker">{kicker}</p>
 		<h2 id={id}>{title}</h2>
+		{lead && <p class="cc-section-lead">{lead}</p>}
 	</div>
-	{lead && <p class="cc-section-lead">{lead}</p>}
 </header>

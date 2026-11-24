@@ -183,51 +183,165 @@
 	}
 }
 
-/* Section headings on the homepage: kicker + h2 on the left, lead on the right from 64rem */
+/*
+ * Section headings on the homepage (spec: design pass 3).
+ * Phone: small index inline with the kicker chip. From 64rem: a large outlined index on the left,
+ * kicker, title and lead stacked on the right. A line that fades out closes the header.
+ */
 .sl-markdown-content .cc-section-heading {
+	position: relative;
 	display: grid;
+	grid-template-columns: auto 1fr;
+	align-items: center;
 	gap: var(--cc-space-3);
 	margin-top: var(--cc-space-8);
-	margin-bottom: var(--cc-space-5);
+	margin-bottom: var(--cc-space-6);
+	padding-bottom: var(--cc-space-5);
 }
 
 .sl-markdown-content > .cc-section-heading:first-child {
 	margin-top: var(--cc-space-6);
 }
 
-.cc-section-kicker {
+.cc-section-heading::after {
+	content: "";
+	position: absolute;
+	inset-inline: 0;
+	bottom: 0;
+	height: 1px;
+	background-image: linear-gradient(to right, var(--cc-accent-ui), var(--cc-border) 35%, transparent);
+}
+
+.cc-section-index {
+	display: flex;
+	align-items: baseline;
+	gap: var(--cc-space-1);
 	margin: 0;
-	color: var(--cc-accent-text);
 	font-family: var(--cc-font-heading);
-	font-size: var(--sl-text-xs);
+	line-height: 1;
+}
+
+.cc-section-number {
+	color: var(--cc-accent-text);
+	font-size: var(--sl-text-sm);
+	font-weight: 600;
+}
+
+.cc-section-total {
+	color: var(--cc-text-muted);
+	font-size: var(--sl-text-2xs);
+}
+
+/* Phone: the body's children join the header grid, so the index shares the chip's row and the title spans it */
+.cc-section-body {
+	display: contents;
+}
+
+.cc-section-heading h2,
+.cc-section-lead {
+	grid-column: 1 / -1;
+}
+
+.cc-section-kicker {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--cc-space-2);
+	justify-self: start;
+	margin: 0;
+	padding: 0.25rem var(--cc-space-3);
+	border: 1px solid var(--cc-border-strong);
+	border-radius: var(--cc-radius-pill);
+	color: var(--cc-text);
+	font-family: var(--cc-font-heading);
+	font-size: var(--sl-text-2xs);
 	font-weight: 600;
 	letter-spacing: 0.12em;
 	text-transform: uppercase;
 }
 
+.cc-section-kicker::before {
+	content: "";
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background-color: var(--cc-accent-text);
+	box-shadow: 0 0 8px var(--cc-glow);
+}
+
 .cc-section-heading h2 {
-	margin: var(--cc-space-1) 0 0;
+	margin: 0;
 	color: var(--cc-heading);
-	font-size: clamp(var(--sl-text-2xl), 1.2rem + 1.5vw, var(--sl-text-4xl));
+	font-size: clamp(2rem, 1.2rem + 3vw, 3.5rem);
 	font-weight: 600;
-	line-height: 1.1;
+	letter-spacing: -0.03em;
+	line-height: 1.02;
 }
 
 .cc-section-lead {
-	max-width: 46ch;
+	max-width: 40ch;
 	margin: 0;
 	color: var(--cc-text-muted);
-	font-size: var(--sl-text-base);
-	line-height: 1.6;
+	font-family: var(--cc-font-heading);
+	font-size: clamp(var(--sl-text-base), 0.95rem + 0.35vw, var(--sl-text-xl));
+	font-weight: 400;
+	line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.cc-section-kicker::before {
+		animation: cc-pulse 2.4s ease-in-out infinite;
+	}
+}
+
+@keyframes cc-pulse {
+	50% {
+		opacity: 0.35;
+		box-shadow: 0 0 2px var(--cc-glow);
+	}
 }
 
 @media (min-width: 64rem) {
 	.sl-markdown-content .cc-section-heading {
-		grid-template-columns: 1fr auto;
-		align-items: end;
+		grid-template-columns: 9rem 1fr;
+		align-items: start;
 		gap: var(--cc-space-6);
-		padding-bottom: var(--cc-space-4);
-		border-bottom: 1px solid var(--cc-border);
+	}
+
+	.cc-section-body {
+		display: grid;
+		gap: var(--cc-space-3);
+		min-width: 0;
+	}
+
+	.cc-section-heading h2,
+	.cc-section-lead {
+		grid-column: auto;
+	}
+
+	.cc-section-index {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: var(--cc-space-2);
+		padding-top: 0;
+	}
+
+	/* Outlined numeral; browsers without text-stroke fall back to the solid accent fill */
+	.cc-section-number {
+		font-size: 4.5rem;
+		font-weight: 600;
+		letter-spacing: -0.04em;
+	}
+
+	@supports (-webkit-text-stroke: 1px black) {
+		.cc-section-number {
+			-webkit-text-stroke: 1.5px var(--cc-accent-ui);
+			color: transparent;
+		}
+	}
+
+	.cc-section-total {
+		font-size: var(--sl-text-xs);
+		letter-spacing: 0.08em;
 	}
 }
 
