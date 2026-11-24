@@ -1,6 +1,6 @@
 # ADR 0003: Ciemny motyw z neonowym akcentem i strona startowa jako wejście do nauki
 
-Status: przyjęta, 2026-11-24
+Status: przyjęta, 2026-11-24. Częściowo zastąpiona przez ADR 0005 (jasna paleta, reguła „Bez cieni” w jasnym motywie, reguła „Kapsuła”).
 
 ## Kontekst
 
