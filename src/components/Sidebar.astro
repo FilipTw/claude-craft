@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import { Icon } from '@astrojs/starlight/components';
 import Default from '@astrojs/starlight/components/Sidebar.astro';
 import { percent, summarizeSidebar, totalProgress, withBase } from '../lib/home.mjs';
+import { ROADMAP_ID, ROADMAP_PATH } from '../lib/pages.mjs';
 
 const { id, sidebar } = Astro.locals.starlightRoute;
 const base = import.meta.env.BASE_URL;
@@ -13,8 +14,8 @@ const done = percent(progress.verified, progress.pages);
 {/* Starlight already wraps the sidebar in <nav>. The card replaces the roadmap link (ADR 0003, 2026-11-24). */}
 <a
 	class="cc-progress-card cc-glass"
-	href={withBase(base, 'roadmap/')}
-	aria-current={id === 'roadmap' ? 'page' : undefined}
+	href={withBase(base, ROADMAP_PATH)}
+	aria-current={id === ROADMAP_ID ? 'page' : undefined}
 	aria-label={`Ścieżka nauki: zweryfikowano ${progress.verified} z ${progress.pages} stron (${done}%)`}
 >
 	<span class="cc-progress-tile" aria-hidden="true">
