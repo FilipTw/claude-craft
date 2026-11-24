@@ -42,6 +42,11 @@ const config = {
 			to: { path: '^src/lib/verification\\.mjs$' },
 		},
 		{
+			comment: 'Named pages live in one module, so a lib module links to the roadmap without its own copy of the path.',
+			from: { path: '^src/lib/[^/]+\\.mjs$', pathNot: '\\.test\\.mjs$' },
+			to: { path: '^src/lib/pages\\.mjs$' },
+		},
+		{
 			comment: 'Homepage data is pure. A lib test imports only its subject.',
 			from: { path: '^src/lib/([^/]+)\\.test\\.mjs$' },
 			to: { path: ['^src/lib/$1\\.mjs$'] },

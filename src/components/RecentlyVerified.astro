@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import { Badge } from '@astrojs/starlight/components';
 import { docHref, recentlyVerified, typeLabel, withBase } from '../lib/home.mjs';
+import { ROADMAP_PATH } from '../lib/pages.mjs';
 
 const base = import.meta.env.BASE_URL;
 const docs = (await getCollection('docs')).map((doc) => ({
@@ -23,7 +24,7 @@ const dateFormat = new Intl.DateTimeFormat('pl-PL', {
 {recent.length === 0 ? (
 	<p class="cc-empty">
 		Żadna strona nie ma jeszcze daty weryfikacji. Postęp każdej sekcji jest w{' '}
-		<a href={withBase(base, 'roadmap/')}>ścieżce nauki</a>.
+		<a href={withBase(base, ROADMAP_PATH)}>ścieżce nauki</a>.
 	</p>
 ) : (
 	<ul class="cc-updates not-content" role="list">
