@@ -102,7 +102,7 @@
 	overflow-wrap: anywhere;
 }
 
-/* Corner brackets around the title, as in the reference */
+/* Corner brackets around the title */
 .cc-hero-title::before,
 .cc-hero-title::after {
 	content: "";
@@ -252,7 +252,7 @@
 	background-image: linear-gradient(to right, var(--cc-accent-ui), var(--cc-border) 35%, transparent);
 }
 
-/* The eyebrow is the display line of the section, set larger than the h2 below it (fifth pass) */
+/* The eyebrow is the display line of the section, set larger than the h2 below it (ADR 0003, fifth pass) */
 .cc-section-kicker {
 	display: flex;
 	flex-wrap: wrap;

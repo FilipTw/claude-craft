@@ -86,7 +86,7 @@ h5,
 	margin-top: var(--cc-space-4);
 }
 
-/* Rows: compact radius, 2px between neighbours so hover backgrounds never touch (spec: design pass 3) */
+/* Rows: compact radius, 2px between neighbours so hover backgrounds never touch (ADR 0003, third pass) */
 .sidebar-content summary,
 .sidebar-content a {
 	display: flex;
