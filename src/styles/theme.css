@@ -293,3 +293,102 @@ h5,
 		border-inline-end-color: var(--cc-border);
 	}
 }
+
+/*
+ * Capsule: a pill-shaped navigation link with a small label over a title and an arrow in a circle.
+ * Used by "Szybki start" and the previous/next links (spec: design pass 3).
+ * The frame is a gradient: a padding-box fill over a border-box gradient, since border-image ignores radius.
+ */
+.cc-capsule {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--cc-space-4);
+	min-height: 4.5rem;
+	padding: var(--cc-space-3) var(--cc-space-3) var(--cc-space-3) var(--cc-space-6);
+	border: 1px solid transparent;
+	border-radius: var(--cc-radius-pill);
+	background:
+		radial-gradient(90% 120% at 50% -45%, var(--cc-glow), transparent 70%) padding-box,
+		linear-gradient(var(--cc-bg), var(--cc-bg)) padding-box,
+		linear-gradient(to bottom, var(--cc-accent-ui), var(--cc-border) 55%) border-box;
+	color: var(--cc-heading);
+	text-decoration: none;
+}
+
+.cc-capsule-text {
+	display: grid;
+	gap: 0.125rem;
+	min-width: 0;
+}
+
+.cc-capsule-label {
+	color: var(--cc-text-muted);
+	font-size: var(--sl-text-xs);
+	line-height: 1.2;
+}
+
+.cc-capsule-title {
+	font-family: var(--cc-font-heading);
+	font-size: var(--sl-text-xl);
+	font-weight: 500;
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	overflow-wrap: anywhere;
+}
+
+.cc-capsule-arrow {
+	display: grid;
+	flex-shrink: 0;
+	place-items: center;
+	width: 2.75rem;
+	height: 2.75rem;
+	border: 1px solid var(--cc-border-strong);
+	border-radius: 50%;
+	color: var(--cc-heading);
+}
+
+.cc-capsule:active {
+	transform: translateY(1px);
+}
+
+@media (hover: hover) {
+	.cc-capsule:hover {
+		background:
+			radial-gradient(90% 140% at 50% -40%, var(--cc-glow), transparent 75%) padding-box,
+			linear-gradient(var(--cc-bg), var(--cc-bg)) padding-box,
+			linear-gradient(to bottom, var(--cc-accent-text), var(--cc-accent-ui) 60%) border-box;
+	}
+
+	.cc-capsule:hover .cc-capsule-arrow {
+		border-color: var(--cc-accent-ui);
+		background-color: var(--cc-accent-soft);
+		color: var(--cc-accent-text);
+		transform: translateX(2px);
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.cc-capsule,
+	.cc-capsule-arrow {
+		transition:
+			background-color var(--cc-transition),
+			border-color var(--cc-transition),
+			color var(--cc-transition),
+			transform var(--cc-transition);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.cc-capsule:active {
+		transform: none;
+	}
+}
+
+@media (forced-colors: active) {
+	.cc-capsule {
+		border-color: CanvasText;
+		background: Canvas;
+	}
+}

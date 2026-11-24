@@ -15,8 +15,8 @@ hero:
       variant: minimal
 ---
 
-import { LinkCard, CardGrid } from '@astrojs/starlight/components';
 import LearningPath from '../../components/LearningPath.astro';
+import QuickLinks from '../../components/QuickLinks.astro';
 import RecentlyVerified from '../../components/RecentlyVerified.astro';
 import SectionHeading from '../../components/SectionHeading.astro';
 
@@ -37,14 +37,10 @@ import SectionHeading from '../../components/SectionHeading.astro';
   total="03"
   kicker="Na skróty"
   title="Szybki start"
-  lead="Trzy wejścia dla tych, którzy wiedzą, czego szukają."
+  lead="Trzy wejścia dla tych, którzy wiedzą, czego szukają: tutorial, laby i referencja."
 />
 
-<CardGrid>
-  <LinkCard title="Pierwsza sesja" description="Tutorial: uruchom Claude Code i przeprowadź pierwszą zmianę w repo." href="/claude-craft/01-foundations/09-first-session/" />
-  <LinkCard title="Laby" description="Ćwiczenia na koniec każdej części, od CLAUDE.md po review w CI." href="/claude-craft/21-labs/01-first-claude-md/" />
-  <LinkCard title="Referencja" description="Flagi CLI, komendy, ustawienia i zdarzenia hooków w jednym miejscu." href="/claude-craft/20-reference/01-cli-flags/" />
-</CardGrid>
+<QuickLinks />
 
 <SectionHeading
   id="ostatnio-zweryfikowane"
