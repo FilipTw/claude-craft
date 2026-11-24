@@ -35,7 +35,7 @@ Baza wiedzy o Claude Code jako strona Astro Starlight. Treść po polsku, nazwy 
 - Nie obniżaj progów i nie wyłączaj reguł, żeby kod przeszedł. Napraw kod albo dopisz test zachowania.
 - Wyjątek wymaga reguły i powodu w komentarzu: `// biome-ignore <reguła>: <powód>` albo `// Stryker disable next-line <mutator>: <powód>`.
 - Nowy skrypt w `scripts/` potrzebuje wpisu na białej liście w `.dependency-cruiser.cjs`, testu i typów JSDoc.
-- Decyzje architektoniczne zapisuj jako ADR w `docs/adr/`.
+- Decyzje architektoniczne zapisuj jako ADR w `docs/adr/`. Zmiana przyjętej decyzji to nowy ADR, który wskazuje, co zastępuje. Nie dopisuj kolejnych rund do starego ADR.
 
 ## Commity
 
