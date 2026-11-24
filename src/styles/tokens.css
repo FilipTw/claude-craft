@@ -29,6 +29,9 @@
 	/* Top-edge highlight inside glowing tiles and pills */
 	--cc-highlight: rgb(255 255 255 / 0.08);
 	--cc-shadow-dialog: 0 1.5rem 4rem rgb(0 0 0 / 0.55);
+	/* Glass panels: a see-through fill over --cc-bg. Text on it stays on a near-#1a1822 tone, so contrast matches --cc-surface. */
+	--cc-glass-fill: rgb(32 29 42 / 0.55);
+	--cc-glass-blur: blur(14px) saturate(150%);
 
 	/* Type */
 	/* Body uses the system font: no download, so body text paints at once (font budget, ADR 0003) */
@@ -39,6 +42,7 @@
 	--cc-radius-sm: 0.75rem;
 	--cc-radius-md: 1rem;
 	--cc-radius-lg: 1.25rem;
+	--cc-radius-xl: 1.75rem;
 	--cc-radius-pill: 999px;
 
 	/* Spacing scale */
@@ -78,6 +82,7 @@
 	--cc-backdrop: rgb(20 18 26 / 0.45);
 	--cc-highlight: rgb(255 255 255 / 0.7);
 	--cc-shadow-dialog: 0 1.5rem 4rem rgb(20 18 26 / 0.18);
+	--cc-glass-fill: rgb(246 245 249 / 0.7);
 }
 
 /* Mapping onto Starlight. Starlight's light theme swaps the gray scale, so both themes set it. */

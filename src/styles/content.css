@@ -98,15 +98,12 @@
 }
 
 /*
- * "Na tej stronie": a framed panel with a reading ring, a rail on the left and a glowing dot
- * at the current heading (spec: design pass 3).
+ * "Na tej stronie": a glass panel (.cc-glass) with a reading ring, a rail on the left and a glowing dot
+ * at the current heading.
  */
 .cc-toc {
-	position: relative;
-	padding: var(--cc-space-4);
-	border: 1px solid var(--cc-border);
-	border-radius: var(--cc-radius-lg);
-	background: radial-gradient(110% 60% at 50% -20%, var(--cc-accent-soft), transparent 70%), var(--cc-surface);
+	padding: var(--cc-space-5);
+	border-radius: var(--cc-radius-xl);
 }
 
 .right-sidebar-panel .cc-toc h2 {
@@ -123,8 +120,8 @@
 
 .cc-toc-ring {
 	position: absolute;
-	top: var(--cc-space-4);
-	inset-inline-end: var(--cc-space-4);
+	top: var(--cc-space-5);
+	inset-inline-end: var(--cc-space-5);
 	width: 1.75rem;
 	height: 1.75rem;
 	transform: rotate(-90deg);
