@@ -221,6 +221,10 @@
 	line-height: 1;
 }
 
+.cc-section-number::before {
+	content: attr(data-index);
+}
+
 .cc-section-number {
 	color: var(--cc-accent-text);
 	font-size: var(--sl-text-sm);

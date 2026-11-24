@@ -17,7 +17,8 @@ const { id, index, total, kicker, title, lead } = Astro.props;
 
 <header class="cc-section-heading not-content">
 	<p class="cc-section-index" aria-hidden="true">
-		<span class="cc-section-number">{index}</span>
+		{/* Decorative outlined numeral (WCAG 1.4.3 "pure decoration"): drawn by CSS from data-index, not DOM text. */}
+		<span class="cc-section-number" data-index={index}></span>
 		<span class="cc-section-total">/ {total}</span>
 	</p>
 	<div class="cc-section-body">
