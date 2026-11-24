@@ -119,3 +119,21 @@ Zmierzone 2026-11-24:
 - Stryker: `home.mjs`, `search.mjs` i `quick-links.mjs` po 100%, całość 98,17%.
 - Wygląd sprawdzony na zrzutach z headless Chrome przy 390 i 1440 px w ciemnym motywie. Jasnego motywu nie sprawdzono na zrzucie. Kontrast tekstu na `--cc-glass-fill` jest tam co najmniej taki jak na `--cc-surface`, bo wypełnienie jest jaśniejsze od niego.
 - Lighthouse, axe i pa11y nie były uruchamiane w tej rundzie.
+
+## Zmiany 2026-11-24, piąta runda
+
+Autor wskazał pięć miejsc: eyebrow sekcji był mniejszy od tytułu i za blisko niego, w sidebarze część była mniejsza od swoich sekcji, przejścia między stronami były sztywne, promienie w hero były za cienkie, a karta postępu miała za mały odstęp w pionie.
+
+Te reguły zastępują reguły czwartej rundy:
+
+- **Nagłówek sekcji:** eyebrow to linia display (`clamp(2.25rem, …, 5rem)`, wersaliki), większa od `h2`. Tytuł `h2` ma od 1,5 do 2,25rem i kolor tekstu. Numer ma gradient od `--cc-accent-text` do `--cc-accent-ui`. Ciemniejszy koniec ma 3,9:1 na `--cc-bg`, a duży tekst potrzebuje 3:1.
+- **Sidebar:** część jest największym wierszem: 0,875rem, 700, wersaliki, kolor nagłówka. Sekcja, grupa i strona mają 0,8125rem i różnią się kolorem, grubością i wcięciem.
+- **Przejścia między stronami:** natywne przejścia między dokumentami (`@view-transition`) w `src/styles/transitions.css`, bez JS. Nagłówek i sidebar stoją w miejscu. Treść strony unosi się o 12px i wyostrza z rozmycia w 360ms, a spis treści się przenika. Przy `prefers-reduced-motion: reduce` i w przeglądarkach bez wsparcia strona ładuje się zwyczajnie. `prefetch` z `defaultStrategy: 'hover'` pobiera stronę, gdy kursor stoi na linku, więc przejście nie czeka na sieć. Strony są statyczne, więc nie ma skeletonów.
+- **Promienie w hero:** każdy promień to zwężająca się wiązka (5px przy źródle, 0,5px na końcu) z gradientem radialnym. Pod spodem leży rozmyta kopia jako poświata, a źródło ma świecący punkt. Poświata wolno pulsuje tylko bez `prefers-reduced-motion`. Geometrię liczy `src/lib/hero.mjs`. W `forced-colors` promienie znikają.
+- **Karta postępu:** wewnętrzny odstęp 16px.
+
+Zmierzone 2026-11-24:
+
+- `npm run check` i `npm run build` przechodzą. Reguły przejść są w zbudowanym CSS.
+- Stryker: `hero.mjs`, `home.mjs`, `search.mjs` i `quick-links.mjs` po 100%, całość 98,26%.
+- Wygląd sprawdzony na zrzutach z headless Chrome przy 1440 px w ciemnym motywie. Samych przejść nie da się sprawdzić na zrzucie. Lighthouse, axe i pa11y nie były uruchamiane.
