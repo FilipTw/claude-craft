@@ -133,6 +133,15 @@
 	font-weight: 700;
 }
 
+@supports (background-clip: text) {
+	.cc-hero-title .cc-accent {
+		background-image: var(--cc-accent-word);
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
+	}
+}
+
 .cc-hero-tagline {
 	max-width: 38rem;
 	margin: 0;
@@ -287,10 +296,16 @@
 	content: "";
 	display: inline-block;
 	width: clamp(2rem, 6vw, 5rem);
-	height: 2px;
+	/* A raised bar that grows with the display-size eyebrow (ADR 0005, third pass) */
+	height: clamp(4px, 0.09em, 8px);
 	margin-inline: 0.3em;
+	border-radius: var(--cc-radius-pill);
 	vertical-align: middle;
-	background-image: linear-gradient(to right, var(--cc-accent-text), var(--cc-border-strong));
+	background-image: linear-gradient(to right, var(--cc-accent-text), var(--cc-accent-ui) 60%, transparent);
+	box-shadow:
+		inset 0 1px 0 var(--cc-highlight),
+		0 0 12px var(--cc-glow),
+		0 2px 6px var(--cc-glow);
 }
 
 .cc-section-heading h2 {
@@ -331,6 +346,16 @@
 	border: 1px solid var(--cc-border);
 	border-radius: var(--cc-radius-lg);
 	background-color: var(--cc-surface);
+	box-shadow: var(--cc-shadow-panel);
+}
+
+/* The hover lift moves the hit area up; this strip under the card fills the gap, so hover does not flicker */
+.cc-part::before,
+.cc-update::before {
+	content: "";
+	position: absolute;
+	inset: 100% 0 auto;
+	height: 4px;
 }
 
 .cc-stretched {
@@ -359,7 +384,8 @@
 	.cc-part:hover,
 	.cc-update:hover {
 		border-color: var(--cc-accent-ui);
-		box-shadow: 0 0 2rem var(--cc-glow);
+		box-shadow: var(--cc-shadow-card-hover);
+		transform: translateY(var(--cc-lift));
 	}
 }
 
@@ -368,7 +394,8 @@
 	.cc-update {
 		transition:
 			border-color var(--cc-transition),
-			box-shadow var(--cc-transition);
+			box-shadow var(--cc-transition),
+			transform var(--cc-transition);
 	}
 }
 
@@ -394,11 +421,11 @@
 	margin: var(--cc-space-2);
 	padding: var(--cc-space-3) var(--cc-space-4);
 	border-radius: var(--cc-radius-md);
-	background-color: var(--cc-bg);
+	background-color: var(--cc-art-base);
 	background-image:
-		radial-gradient(circle at 85% 15%, var(--cc-glow), transparent 60%),
-		linear-gradient(to right, var(--cc-grid-line) 1px, transparent 1px);
+		var(--cc-art-light), var(--cc-art-shade), linear-gradient(to right, var(--cc-grid-line) 1px, transparent 1px);
 	background-size:
+		100% 100%,
 		100% 100%,
 		1.5rem 100%;
 }
@@ -409,6 +436,15 @@
 	font-weight: 600;
 	line-height: 1;
 	color: var(--cc-accent-text);
+}
+
+@supports (background-clip: text) {
+	.cc-part-numeral {
+		background-image: var(--cc-accent-word);
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
+	}
 }
 
 .cc-part-body {
@@ -432,6 +468,7 @@
 }
 
 .cc-part-kicker {
+	color: var(--cc-label);
 	font-weight: 600;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
@@ -449,7 +486,7 @@
 	height: 0.375rem;
 	margin-top: auto;
 	border-radius: var(--cc-radius-pill);
-	background-color: var(--cc-surface-raised);
+	background-color: var(--cc-track);
 	overflow: hidden;
 }
 
@@ -458,7 +495,7 @@
 	width: var(--cc-progress);
 	height: 100%;
 	border-radius: inherit;
-	background-color: var(--cc-accent-text);
+	background: var(--cc-progress-fill);
 }
 
 /* Recently verified */
@@ -493,7 +530,8 @@
 .sl-markdown-content .cc-quick {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
-	gap: var(--cc-space-3);
+	/* Room for the 5px rings of neighbouring capsules */
+	gap: var(--cc-space-4);
 	margin: 0;
 	padding: 0;
 	list-style: none;

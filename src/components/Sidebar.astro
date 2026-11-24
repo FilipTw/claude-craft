@@ -16,6 +16,7 @@ const done = percent(progress.verified, progress.pages);
 	class="cc-progress-card cc-glass"
 	href={withBase(base, ROADMAP_PATH)}
 	aria-current={id === ROADMAP_ID ? 'page' : undefined}
+	style={`--cc-progress: ${done}%`}
 	aria-label={`Ścieżka nauki: zweryfikowano ${progress.verified} z ${progress.pages} stron (${done}%)`}
 >
 	<span class="cc-progress-tile" aria-hidden="true">
@@ -25,7 +26,7 @@ const done = percent(progress.verified, progress.pages);
 	<span class="cc-progress-card-text" aria-hidden="true">
 		<span class="cc-progress-card-title">Ścieżka nauki</span>
 		<span class="cc-progress-card-chip">{progress.verified} / {progress.pages} stron</span>
-		<span class="cc-progress-card-bar"><span style={`--cc-progress: ${done}%`}></span></span>
+		<span class="cc-progress-card-bar"><span></span></span>
 	</span>
 	<Icon name="right-arrow" size="1rem" class="cc-progress-card-arrow" />
 </a>
