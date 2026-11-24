@@ -8,6 +8,8 @@ import { loadStructure, toSidebar } from './scripts/structure.mjs';
 export default defineConfig({
 	site: 'https://filiptw.github.io',
 	base: '/claude-craft',
+	// Fetch a page when the pointer rests on its link, so the view transition (transitions.css) starts without a wait
+	prefetch: { prefetchAll: true, defaultStrategy: 'hover' },
 	integrations: [
 		starlight({
 			title: 'claude-craft',
@@ -24,6 +26,7 @@ export default defineConfig({
 				'./src/styles/content.css',
 				'./src/styles/search.css',
 				'./src/styles/home.css',
+				'./src/styles/transitions.css',
 			],
 			components: {
 				// biome-ignore lint/style/useNamingConvention: Starlight names overridable components in PascalCase.
