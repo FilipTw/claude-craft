@@ -33,13 +33,21 @@
 export const withBase = (base, path) => `${base.replace(/\/+$/, '')}/${path.replace(/^\/+/, '')}`;
 
 /**
- * Hrefs of pages that have `lastVerified`, in the form the sidebar uses (`<base>/<id>/`).
+ * The URL Starlight serves a docs entry at. An `index` entry lives at its folder:
+ * id `index` is the homepage, id `05-labs/index` is `05-labs/`.
+ * @param {string} base
+ * @param {string} id Collection id, for example `01-foundations/01-prerequisites`.
+ */
+export const docHref = (base, id) => withBase(base, `${id.replace(/(^|\/)index$/, '')}/`);
+
+/**
+ * Hrefs of pages that have `lastVerified`, in the form the sidebar uses.
  * @param {{ id: string, data: { lastVerified?: Date | undefined } }[]} docs
  * @param {string} base
  * @returns {Set<string>}
  */
 export const verifiedHrefs = (docs, base) =>
-	new Set(docs.filter((doc) => doc.data.lastVerified !== undefined).map((doc) => withBase(base, `${doc.id}/`)));
+	new Set(docs.filter((doc) => doc.data.lastVerified !== undefined).map((doc) => docHref(base, doc.id)));
 
 /**
  * Verified and total pages across every part.
