@@ -145,7 +145,8 @@ test('countLabel picks the Polish noun form for one, few and many', () => {
 	assert.equal(countLabel(1.5, pages), '1.5 strony');
 });
 
-test('verifiedHrefs keeps pages with lastVerified and builds sidebar hrefs', () => {
+test('verifiedHrefs keeps pages whose check is current and builds sidebar hrefs', () => {
+	const now = new Date('2026-03-01');
 	const docs = [
 		{ id: '01-a/01-x', data: { lastVerified: new Date('2026-01-01') } },
 		{ id: '01-a/02-y', data: {} },
@@ -155,9 +156,19 @@ test('verifiedHrefs keeps pages with lastVerified and builds sidebar hrefs', () 
 	];
 
 	assert.deepEqual(
-		[...verifiedHrefs(docs, '/claude-craft/')],
+		[...verifiedHrefs(docs, '/claude-craft/', now)],
 		['/claude-craft/01-a/01-x/', '/claude-craft/roadmap/', '/claude-craft/'],
 	);
+});
+
+test('verifiedHrefs drops a page the roadmap table counts as stale, so both show the same progress', () => {
+	const now = new Date('2026-11-21');
+	const docs = [
+		{ id: '01-a/01-day-90', data: { lastVerified: new Date('2026-08-23') } },
+		{ id: '01-a/02-day-91', data: { lastVerified: new Date('2026-08-22') } },
+	];
+
+	assert.deepEqual([...verifiedHrefs(docs, '/', now)], ['/01-a/01-day-90/']);
 });
 
 test('totalProgress sums verified and total pages and starts at zero', () => {

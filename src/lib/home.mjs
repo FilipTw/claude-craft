@@ -3,6 +3,8 @@
  * so the components stay thin and this logic has tests.
  */
 
+import { verificationStatus } from './verification.mjs';
+
 /** @typedef {{ type: 'link', label: string, href: string, isCurrent?: boolean }} NavLink */
 /** @typedef {{ type: 'group', label: string, entries: NavEntry[] }} NavGroup */
 /** @typedef {NavLink | NavGroup} NavEntry */
@@ -14,7 +16,7 @@
  * @property {string} href The first page of the part.
  * @property {number} sections
  * @property {number} pages
- * @property {number} verified
+ * @property {number} verified Pages whose check is current, by the same rule as the roadmap table.
  */
 
 /**
@@ -41,13 +43,19 @@ export const withBase = (base, path) => `${base.replace(/\/+$/, '')}/${path.repl
 export const docHref = (base, id) => withBase(base, `${id.replace(/(^|\/)index$/, '')}/`);
 
 /**
- * Hrefs of pages that have `lastVerified`, in the form the sidebar uses.
+ * Hrefs of pages whose check is current on `now` (verification.mjs), in the form the sidebar uses.
+ * A page checked more than 90 days ago drops out, as it does from "Aktualne" in the roadmap table.
  * @param {{ id: string, data: { lastVerified?: Date | undefined } }[]} docs
  * @param {string} base
+ * @param {Date} now
  * @returns {Set<string>}
  */
-export const verifiedHrefs = (docs, base) =>
-	new Set(docs.filter((doc) => doc.data.lastVerified !== undefined).map((doc) => docHref(base, doc.id)));
+export const verifiedHrefs = (docs, base, now) =>
+	new Set(
+		docs
+			.filter((doc) => verificationStatus(doc.data.lastVerified, now) === 'fresh')
+			.map((doc) => docHref(base, doc.id)),
+	);
 
 /**
  * Verified and total pages across every part.
@@ -92,7 +100,7 @@ const splitLabel = (label) => {
 /**
  * One summary per top-level group of the sidebar. Top-level links, such as the roadmap, are skipped.
  * @param {NavEntry[]} sidebar
- * @param {ReadonlySet<string>} verified Hrefs of pages that have `lastVerified`, from `verifiedHrefs`.
+ * @param {ReadonlySet<string>} verified Hrefs of pages whose check is current, from `verifiedHrefs`.
  * @returns {PartSummary[]}
  */
 export const summarizeParts = (sidebar, verified) =>

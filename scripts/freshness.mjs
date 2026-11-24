@@ -1,22 +1,19 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { verificationStatus } from '../src/lib/verification.mjs';
 import { DOCS, DocsProblem, findPage, listPages, loadStructure, parseYaml, ROADMAP } from './structure.mjs';
 
 /** @import { LocatedPage } from './structure.mjs' */
+/** @import { VerificationStatus } from '../src/lib/verification.mjs' */
 /**
- * @typedef {'todo' | 'stale' | 'fresh'} Status
+ * @typedef {VerificationStatus} Status
  * @typedef {LocatedPage & { status: Status }} ProgressRow
  */
 
-const MAX_AGE_DAYS = 90;
-const DAY_MS = 24 * 60 * 60 * 1000;
 const START = '<!-- progress:start -->';
 const END = '<!-- progress:end -->';
 const PROGRESS_BLOCK = new RegExp(`${START}[\\s\\S]*?${END}`);
-
-/** @param {number} ageDays */
-const provesRecentCheck = (ageDays) => ageDays >= 0 && ageDays <= MAX_AGE_DAYS;
 
 /**
  * @param {string} markdown
@@ -37,8 +34,7 @@ export function classify(markdown, now) {
 	if (!frontmatter.lastVerified) {
 		return 'todo';
 	}
-	const age = (now.getTime() - new Date(frontmatter.lastVerified).getTime()) / DAY_MS;
-	return provesRecentCheck(age) ? 'fresh' : 'stale';
+	return verificationStatus(new Date(frontmatter.lastVerified), now);
 }
 
 /**

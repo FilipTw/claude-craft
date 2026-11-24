@@ -6,7 +6,8 @@ import { percent, summarizeParts, totalProgress, verifiedHrefs, withBase } from 
 
 const { id, sidebar } = Astro.locals.starlightRoute;
 const base = import.meta.env.BASE_URL;
-const progress = totalProgress(summarizeParts(sidebar, verifiedHrefs(await getCollection('docs'), base)));
+const verified = verifiedHrefs(await getCollection('docs'), base, new Date());
+const progress = totalProgress(summarizeParts(sidebar, verified));
 const done = percent(progress.verified, progress.pages);
 ---
 
