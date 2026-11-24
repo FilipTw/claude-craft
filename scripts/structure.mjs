@@ -44,6 +44,7 @@ export function parseYaml(text, reject) {
 	try {
 		return document.toJS();
 	} catch (aliasError) {
+		// Stryker disable next-line ConditionalExpression: yaml reports every bad input in errors or as a ReferenceError, so only a yaml bug reaches the rethrow.
 		if (aliasError instanceof ReferenceError) {
 			reject(aliasError.message);
 		}
