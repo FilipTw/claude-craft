@@ -86,12 +86,22 @@ h5,
 	margin-top: var(--cc-space-4);
 }
 
+/* Rows: compact radius, 2px between neighbours so hover backgrounds never touch (spec: design pass 3) */
 .sidebar-content summary,
 .sidebar-content a {
 	display: flex;
 	align-items: center;
-	min-height: var(--cc-touch-target);
-	border-radius: var(--cc-radius-sm);
+	margin-block: 1px;
+	padding-block: 0.375rem;
+	border-radius: 0.5rem;
+}
+
+/* Touch screens keep a full-size target */
+@media (pointer: coarse) {
+	.sidebar-content summary,
+	.sidebar-content a {
+		min-height: var(--cc-touch-target);
+	}
 }
 
 /* Selectors below use :where() so every level has the same specificity and source order decides. */
@@ -123,11 +133,12 @@ h5,
 	border-inline-start: 0;
 }
 
+/* The system font: Outfit's low x-height made sections look smaller than the pages under them */
 .sidebar-content :where(details details > summary) .large {
 	color: var(--cc-text);
-	font-family: var(--cc-font-heading);
+	font-family: var(--cc-font-body);
 	font-size: 0.9375rem;
-	font-weight: 500;
+	font-weight: 600;
 	letter-spacing: 0;
 	text-transform: none;
 }
@@ -138,11 +149,11 @@ h5,
 	color: var(--cc-text-muted);
 }
 
-/* A group inside a section, such as "Instalacja", reads like a page with a chevron */
+/* A group inside a section, such as "Instalacja", sits between a section and a page */
 .sidebar-content :where(details details details > summary) .large {
-	color: var(--cc-text-muted);
-	font-family: var(--cc-font-body);
+	color: var(--cc-text);
 	font-size: var(--sl-text-sm);
+	font-weight: 500;
 }
 
 .sidebar-content :where(details details:has([aria-current="page"]) > summary) .large {
@@ -162,11 +173,39 @@ h5,
 	font-weight: 400;
 }
 
-/* Active page: accent text and a dot, no filled pill */
+/*
+ * "Flow" guide line: in the section that holds the current page the line becomes a purple gradient,
+ * drawn once on the list instead of on every item.
+ */
+.sidebar-content :where(details details:has([aria-current="page"]) > ul) {
+	position: relative;
+}
+
+.sidebar-content :where(details details:has([aria-current="page"]) > ul)::before {
+	content: "";
+	position: absolute;
+	inset-block: 0;
+	inset-inline-start: var(--cc-space-3);
+	width: 1px;
+	background-image: linear-gradient(
+		to bottom,
+		transparent,
+		var(--cc-accent-ui) 12%,
+		var(--cc-accent-text) 50%,
+		var(--cc-accent-ui) 88%,
+		transparent
+	);
+}
+
+.sidebar-content :where(details details:has([aria-current="page"]) > ul > li) {
+	border-inline-start-color: transparent;
+}
+
+/* Current page: accent text, no filled pill; a glowing dot on the line and a curve from it to the text */
 .sidebar-content a[aria-current="page"],
 .sidebar-content a[aria-current="page"]:hover,
 .sidebar-content a[aria-current="page"]:focus {
-	background-color: var(--cc-surface);
+	background-color: transparent;
 	color: var(--cc-accent-text);
 	font-weight: 500;
 }
@@ -174,11 +213,27 @@ h5,
 .sidebar-content :where(ul ul) a[aria-current="page"]::before {
 	content: "";
 	position: absolute;
+	top: calc(50% + 0.5rem - 3px);
 	inset-inline-start: calc(-1 * var(--sl-sidebar-item-padding-inline) - 3.5px);
 	width: 6px;
 	height: 6px;
 	border-radius: 50%;
 	background-color: var(--cc-accent-text);
+	box-shadow:
+		0 0 0 3px var(--cc-accent-soft),
+		0 0 10px var(--cc-glow);
+}
+
+.sidebar-content :where(ul ul) a[aria-current="page"]::after {
+	content: "";
+	position: absolute;
+	top: 50%;
+	inset-inline-start: calc(-1 * var(--sl-sidebar-item-padding-inline) - 1px);
+	width: calc(2 * var(--sl-sidebar-item-padding-inline) - 3px);
+	height: 0.5rem;
+	border-block-start: 1px solid var(--cc-accent-text);
+	border-inline-start: 1px solid var(--cc-accent-text);
+	border-start-start-radius: 0.5rem;
 }
 
 /* Progress card at the top: a glowing tile with the percentage, then title, page chip and bar (spec: design pass 3) */
@@ -324,15 +379,6 @@ h5,
 }
 
 @media (min-width: 50rem) {
-	.sidebar-content summary,
-	.sidebar-content a {
-		min-height: 2.125rem;
-	}
-
-	.sidebar-content .top-level > li > details > summary {
-		min-height: 1.75rem;
-	}
-
 	.sidebar-pane {
 		border-inline-end-color: var(--cc-border);
 	}
