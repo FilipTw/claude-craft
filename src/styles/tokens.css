@@ -26,6 +26,8 @@
 	--cc-glow: rgb(230 57 255 / 0.35);
 	--cc-grid-line: rgb(255 255 255 / 0.05);
 	--cc-backdrop: rgb(6 5 9 / 0.72);
+	/* Top-edge highlight inside glowing tiles and pills */
+	--cc-highlight: rgb(255 255 255 / 0.08);
 	--cc-shadow-dialog: 0 1.5rem 4rem rgb(0 0 0 / 0.55);
 
 	/* Type */
@@ -74,6 +76,7 @@
 	--cc-glow: rgb(157 0 194 / 0.2);
 	--cc-grid-line: rgb(12 11 16 / 0.06);
 	--cc-backdrop: rgb(20 18 26 / 0.45);
+	--cc-highlight: rgb(255 255 255 / 0.7);
 	--cc-shadow-dialog: 0 1.5rem 4rem rgb(20 18 26 / 0.18);
 }
 
