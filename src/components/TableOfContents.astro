@@ -1,0 +1,19 @@
+---
+import Default from '@astrojs/starlight/components/TableOfContents.astro';
+
+const { toc } = Astro.locals.starlightRoute;
+---
+
+{/*
+	Panel around Starlight's table of contents with a reading ring (spec: design pass 3).
+	The ring's arc follows page scroll through a CSS scroll timeline; without support it stays an empty ring.
+*/}
+{toc && (
+	<div class="cc-toc">
+		<svg class="cc-toc-ring" viewBox="0 0 36 36" aria-hidden="true" focusable="false">
+			<circle class="cc-toc-ring-track" cx="18" cy="18" r="15.9155" />
+			<circle class="cc-toc-ring-arc" cx="18" cy="18" r="15.9155" pathLength="100" />
+		</svg>
+		<Default />
+	</div>
+)}

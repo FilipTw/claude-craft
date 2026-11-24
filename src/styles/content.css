@@ -97,10 +97,125 @@
 	color: var(--cc-accent-text);
 }
 
-/* Table of contents: current item with an accent bar */
-starlight-toc a[aria-current="true"] {
-	box-shadow: inset 2px 0 0 var(--cc-accent-text);
+/*
+ * "Na tej stronie": a framed panel with a reading ring, a rail on the left and a glowing dot
+ * at the current heading (spec: design pass 3).
+ */
+.cc-toc {
+	position: relative;
+	padding: var(--cc-space-4);
+	border: 1px solid var(--cc-border);
+	border-radius: var(--cc-radius-lg);
+	background: radial-gradient(110% 60% at 50% -20%, var(--cc-accent-soft), transparent 70%), var(--cc-surface);
+}
+
+.right-sidebar-panel .cc-toc h2 {
+	margin: 0 0 var(--cc-space-3);
+	padding-inline-end: 2.5rem;
+	color: var(--cc-text-muted);
+	font-family: var(--cc-font-heading);
+	font-size: var(--sl-text-2xs);
+	font-weight: 600;
+	letter-spacing: 0.1em;
+	line-height: 1.75rem;
+	text-transform: uppercase;
+}
+
+.cc-toc-ring {
+	position: absolute;
+	top: var(--cc-space-4);
+	inset-inline-end: var(--cc-space-4);
+	width: 1.75rem;
+	height: 1.75rem;
+	transform: rotate(-90deg);
+	fill: none;
+	stroke-width: 3;
+}
+
+.cc-toc-ring-track {
+	stroke: var(--cc-border-strong);
+}
+
+.cc-toc-ring-arc {
+	stroke: var(--cc-accent-text);
+	stroke-linecap: round;
+	stroke-dasharray: 100;
+	stroke-dashoffset: 100;
+	filter: drop-shadow(0 0 3px var(--cc-glow));
+}
+
+@supports (animation-timeline: scroll()) {
+	@media (prefers-reduced-motion: no-preference) {
+		/* Longhands without a duration: the minifier would otherwise fold them into the animation
+		   shorthand, which does not accept a scroll timeline, and the browser would drop the rule. */
+		.cc-toc-ring-arc {
+			animation-name: cc-reading;
+			animation-timing-function: linear;
+			animation-fill-mode: both;
+			animation-timeline: scroll(root);
+		}
+	}
+}
+
+@keyframes cc-reading {
+	to {
+		stroke-dashoffset: 0;
+	}
+}
+
+/* Rail on the top-level list; nested lists keep Starlight's depth indent */
+.cc-toc starlight-toc nav > ul {
+	position: relative;
+	padding-inline-start: var(--cc-space-3);
+}
+
+.cc-toc starlight-toc nav > ul::before {
+	content: "";
+	position: absolute;
+	inset-block: 0.25rem;
+	inset-inline-start: 0.1875rem;
+	width: 1px;
+	background-color: var(--cc-border-strong);
+}
+
+.cc-toc starlight-toc a {
+	position: relative;
+	color: var(--cc-text-muted);
+	font-size: var(--sl-text-sm);
+}
+
+.cc-toc starlight-toc a[aria-current="true"] {
 	color: var(--cc-accent-text);
+	font-weight: 500;
+}
+
+.cc-toc starlight-toc nav > ul a[aria-current="true"]::before {
+	content: "";
+	position: absolute;
+	top: calc(50% - 3.5px);
+	inset-inline-start: calc(-1 * var(--cc-space-3) + 0.1875rem - 3px);
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background-color: var(--cc-accent-text);
+	box-shadow:
+		0 0 0 3px var(--cc-accent-soft),
+		0 0 10px var(--cc-glow);
+}
+
+@media (hover: hover) {
+	.cc-toc starlight-toc a:hover {
+		color: var(--cc-heading);
+		transform: translateX(2px);
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.cc-toc starlight-toc a {
+		transition:
+			color var(--cc-transition),
+			transform var(--cc-transition);
+	}
 }
 
 /* Mobile "Na tej stronie" bar */
