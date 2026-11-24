@@ -148,7 +148,8 @@ const readSelectors = (root) => [
 ];
 
 /**
- * @param {{ root?: string, dist?: string, log?: (line: string) => void }} [options]
+ * @param {{ root?: string, dist?: string, log?: (line: string) => void, error?: (line: string) => void }} [options]
+ * `log` gets the report (stdout by default), `error` each problem that makes the exit code 1 (stderr by default).
  * @returns {0 | 1}
  * @internal
  */
@@ -156,10 +157,11 @@ export function runCheckBuild({
 	root = ROOT,
 	dist = join(root, 'dist'),
 	log = (line) => process.stdout.write(`${line}\n`),
+	error = (line) => process.stderr.write(`${line}\n`),
 } = {}) {
 	const html = filesIn(dist, /\.html$/);
 	if (html.length === 0) {
-		log(`No HTML in ${dist}. Run npm run build first.`);
+		error(`No HTML in ${dist}. Run npm run build first.`);
 		return 1;
 	}
 	const read = (/** @type {string[]} */ files) => files.map((file) => readFileSync(file, 'utf8'));
@@ -171,7 +173,7 @@ export function runCheckBuild({
 	const selectors = readSelectors(root);
 	const missing = missingClasses(selectors, available);
 	for (const line of missing) {
-		log(`Not in the build: ${line}. Starlight or Pagefind changed its markup; update the selector.`);
+		error(`Not in the build: ${line}. Starlight or Pagefind changed its markup; update the selector.`);
 	}
 	const checked = new Set(selectors.flatMap(({ classes }) => classes)).size;
 	log(`Starlight and Pagefind classes: ${checked - missing.length} of ${checked} found in the build.`);
@@ -181,7 +183,12 @@ export function runCheckBuild({
 		filesIn(assets, /\.woff2$/).map((file) => readFileSync(file)),
 	);
 	for (const { name, bytes, limit } of budgets) {
-		log(`${name}: ${kilobytes(bytes)} of ${kilobytes(limit)}${bytes > limit ? '. Over budget (ADR 0003).' : ''}`);
+		const line = `${name}: ${kilobytes(bytes)} of ${kilobytes(limit)}`;
+		if (bytes > limit) {
+			error(`${line}. Over budget (ADR 0003).`);
+		} else {
+			log(line);
+		}
 	}
 	return missing.length > 0 || budgets.some(({ bytes, limit }) => bytes > limit) ? 1 : 0;
 }
