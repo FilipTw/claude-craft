@@ -11,6 +11,7 @@ import {
 	loadStructure,
 	PAGES_OUTSIDE_MANIFEST,
 	parseStructure,
+	toManifestPath,
 	toSidebar,
 } from './structure.mjs';
 
@@ -167,6 +168,12 @@ test('findOrphans lists sorted Markdown files that are not in the manifest', () 
 	/** @type {LocatedPage[]} */
 	const pages = [{ path: '01-a/01-known', title: 'Znany', type: 'explanation', section: 'A' }];
 	assert.deepEqual(findOrphans(docs, pages, ['index.mdx']), ['01-a/09-z.md', '05-b.md']);
+});
+
+test('a Windows path from readdirSync becomes a manifest path, and a POSIX path stays as it is', () => {
+	assert.equal(toManifestPath('01-a\\02-b\\09-z.md', '\\'), '01-a/02-b/09-z.md');
+	assert.equal(toManifestPath('01-a/09-z.md', '/'), '01-a/09-z.md');
+	assert.equal(toManifestPath('05-b.md', '\\'), '05-b.md');
 });
 
 test('the real docs tree matches the manifest in both directions', () => {
