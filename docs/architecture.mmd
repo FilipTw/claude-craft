@@ -25,12 +25,14 @@ end
 subgraph J["src"]
 K["content.config.ts"]
 subgraph L["lib"]
-M["home.mjs"]
-N["home.test.mjs"]
-O["quick-links.mjs"]
-P["quick-links.test.mjs"]
-Q["search.mjs"]
-R["search.test.mjs"]
+M["hero.mjs"]
+N["hero.test.mjs"]
+O["home.mjs"]
+P["home.test.mjs"]
+Q["quick-links.mjs"]
+R["quick-links.test.mjs"]
+S["search.mjs"]
+T["search.test.mjs"]
 end
 end
 0-->H
@@ -56,3 +58,4 @@ K-->6
 N-->M
 P-->O
 R-->Q
+T-->S
