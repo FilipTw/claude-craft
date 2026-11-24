@@ -4,26 +4,21 @@ interface Props {
 	id: string;
 	/** Position of this section on the page, for example "01". */
 	index: string;
-	/** Number of sections on the page, for example "03". */
-	total: string;
 	/** Short label above the title, for example "Program". */
 	kicker: string;
 	title: string;
 	lead?: string;
 }
 
-const { id, index, total, kicker, title, lead } = Astro.props;
+const { id, index, kicker, title, lead } = Astro.props;
 ---
 
+{/* One eyebrow row (number, rule, label) over the title and lead (ADR 0003, fourth pass). */}
 <header class="cc-section-heading not-content">
-	<p class="cc-section-index" aria-hidden="true">
-		{/* Decorative outlined numeral (WCAG 1.4.3 "pure decoration"): drawn by CSS from data-index, not DOM text. */}
-		<span class="cc-section-number" data-index={index}></span>
-		<span class="cc-section-total">/ {total}</span>
+	<p class="cc-section-kicker">
+		<span class="cc-section-number" aria-hidden="true">{index}</span>
+		{kicker}
 	</p>
-	<div class="cc-section-body">
-		<p class="cc-section-kicker">{kicker}</p>
-		<h2 id={id}>{title}</h2>
-		{lead && <p class="cc-section-lead">{lead}</p>}
-	</div>
+	<h2 id={id}>{title}</h2>
+	{lead && <p class="cc-section-lead">{lead}</p>}
 </header>
