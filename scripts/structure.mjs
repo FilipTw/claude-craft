@@ -13,7 +13,7 @@ export const PAGE_TYPES = /** @type {const} */ (['tutorial', 'how-to', 'referenc
  * @typedef {{ parts: Part[] }} Structure
  * @typedef {{ path: string, title: string, type: PageType, section: string }} LocatedPage
  * @typedef {string | { label: string, collapsed: boolean, items: SidebarItem[] }} SidebarItem
- * @typedef {{ node: Record<string, unknown>, name: string, prefix: number, where: string }} Named
+ * @typedef {{ node: Record<string, unknown>, kind: 'dir' | 'file', name: string, prefix: number, where: string }} Named
  */
 export const ROOT = fileURLToPath(new URL('..', import.meta.url));
 export const DOCS = join(ROOT, 'src/content/docs');
@@ -120,17 +120,17 @@ function listAt(node, where, key) {
 function nameItem(item, parent, index) {
 	const node = isMapping(item) ? item : {};
 	const { dir } = node;
-	const key = dir == null ? 'file' : 'dir';
-	const name = node[key];
+	const kind = dir == null ? 'file' : 'dir';
+	const name = node[kind];
 	if (typeof name !== 'string') {
-		fail(`${parent}[${index}]`, name == null ? 'must look like 01-kebab-case' : `needs a text "${key}"`);
+		fail(`${parent}[${index}]`, name == null ? 'must look like 01-kebab-case' : `needs a text "${kind}"`);
 	}
 	const where = `${parent}${name}`;
 	const match = NAME.exec(name);
 	if (!match) {
 		fail(where, 'must look like 01-kebab-case');
 	}
-	return { node, name, prefix: Number(match[1]), where };
+	return { node, kind, name, prefix: Number(match[1]), where };
 }
 
 /**
@@ -163,29 +163,28 @@ export function parseStructure(text) {
 		const part = mapping(node, where, ['label', 'sections']);
 		return { label: textAt(part, where, 'label'), sections: listAt(part, where, 'sections') };
 	});
-	checkPrefixesAscendAcrossParts(parts);
-	return {
-		parts: parts.map((part) => ({ label: part.label, sections: nameItems(part.sections, '').map(parseItem) })),
-	};
-}
-
-/**
- * @param {Array<{ sections: unknown[] }>} parts
- */
-function checkPrefixesAscendAcrossParts(parts) {
-	nameItems(
+	// Section prefixes ascend across parts too, so all sections are named in one pass and then split back by part.
+	const named = nameItems(
 		parts.flatMap((part) => part.sections),
 		'',
 	);
+	let start = 0;
+	return {
+		parts: parts.map((part) => {
+			const sections = named.slice(start, start + part.sections.length);
+			start += part.sections.length;
+			return { label: part.label, sections: sections.map(parseItem) };
+		}),
+	};
 }
 
 /**
  * @param {Named} item
  * @returns {Section | ManifestEntry}
  */
-function parseItem({ node, name, where }) {
-	const { dir, type } = node;
-	if (dir) {
+function parseItem({ node, kind, name, where }) {
+	const { type } = node;
+	if (kind === 'dir') {
 		mapping(node, where, ['dir', 'label', 'items']);
 		return {
 			dir: name,
