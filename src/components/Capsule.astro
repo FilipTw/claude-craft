@@ -1,0 +1,26 @@
+---
+import { Icon } from '@astrojs/starlight/components';
+
+interface Props {
+	href: string;
+	/** Short label before the title, for example "Następna". Screen readers hear it followed by a colon. */
+	label: string;
+	title: string;
+	/** `prev` puts the arrow at the start and points it back; `next` and no value point it forward. */
+	rel?: 'prev' | 'next';
+	class?: string;
+}
+
+const { href, label, title, rel, class: className } = Astro.props;
+const back = rel === 'prev';
+---
+
+{/* A link capsule: label, title and arrow (spec: design pass 3). Pagination and the homepage quick links share it. */}
+<a class:list={['cc-capsule', { 'cc-capsule-start': back }, className]} href={href} rel={rel}>
+	{back && <span class="cc-capsule-arrow" aria-hidden="true"><Icon name="left-arrow" size="1rem" /></span>}
+	<span class="cc-capsule-text">
+		<span class="cc-capsule-label">{label}<span class="sr-only">: </span></span>{" "}
+		<span class="cc-capsule-title">{title}</span>
+	</span>
+	{!back && <span class="cc-capsule-arrow" aria-hidden="true"><Icon name="right-arrow" size="1rem" /></span>}
+</a>

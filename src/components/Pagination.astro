@@ -1,6 +1,6 @@
 ---
-import { Icon } from '@astrojs/starlight/components';
 import { pagePosition } from '../lib/home.mjs';
+import Capsule from './Capsule.astro';
 
 const { pagination, sidebar } = Astro.locals.starlightRoute;
 const { prev, next } = pagination;
@@ -11,13 +11,7 @@ const position = pagePosition(sidebar);
 {(prev || next) && (
 <nav class="cc-pagination print:hidden" aria-label="Poprzednia i następna strona">
 	{prev ? (
-		<a class="cc-capsule cc-capsule-start cc-pagination-prev" href={prev.href} rel="prev">
-			<span class="cc-capsule-arrow" aria-hidden="true"><Icon name="left-arrow" size="1rem" /></span>
-			<span class="cc-capsule-text">
-				<span class="cc-capsule-label">Poprzednia<span class="sr-only">: </span></span>{" "}
-				<span class="cc-capsule-title">{prev.label}</span>
-			</span>
-		</a>
+		<Capsule class="cc-pagination-prev" href={prev.href} rel="prev" label="Poprzednia" title={prev.label} />
 	) : <span class="cc-pagination-prev" aria-hidden="true"></span>}
 	{position && (
 		<a class="cc-page-pill" href="#_top">
@@ -28,13 +22,7 @@ const position = pagePosition(sidebar);
 		</a>
 	)}
 	{next ? (
-		<a class="cc-capsule cc-pagination-next" href={next.href} rel="next">
-			<span class="cc-capsule-text">
-				<span class="cc-capsule-label">Następna<span class="sr-only">: </span></span>{" "}
-				<span class="cc-capsule-title">{next.label}</span>
-			</span>
-			<span class="cc-capsule-arrow" aria-hidden="true"><Icon name="right-arrow" size="1rem" /></span>
-		</a>
+		<Capsule class="cc-pagination-next" href={next.href} rel="next" label="Następna" title={next.label} />
 	) : <span class="cc-pagination-next" aria-hidden="true"></span>}
 </nav>
 )}
