@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+  # Pages count as current for 90 days from lastVerified, judged at build time (src/lib/verification.mjs).
+  # A weekly rebuild keeps the progress on the site true when nothing is pushed.
+  schedule:
+    - cron: "0 4 * * 1"
 
 permissions: {}
 
