@@ -48,7 +48,7 @@ const config = {
 		},
 		{
 			comment:
-				'Homepage data is pure. A lib test imports only its subject, so quick-links and search tests each keep their own page-exists check.',
+				'Homepage data is pure. A lib test imports only its subject. Lib modules take page paths from pages.mjs, so pages.test.mjs checks that every page exists.',
 			from: { path: '^src/lib/([^/]+)\\.test\\.mjs$' },
 			to: { path: ['^src/lib/$1\\.mjs$'] },
 		},
