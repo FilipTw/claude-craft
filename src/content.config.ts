@@ -3,6 +3,7 @@ import { docsLoader, i18nLoader } from '@astrojs/starlight/loaders';
 import { docsSchema, i18nSchema } from '@astrojs/starlight/schema';
 import { z } from 'astro/zod';
 import { PAGE_TYPES } from '../scripts/structure.mjs';
+import { latestCheckDate } from './lib/verification.mjs';
 
 export const collections = {
 	docs: defineCollection({
@@ -10,7 +11,10 @@ export const collections = {
 		schema: docsSchema({
 			extend: z.object({
 				type: z.enum(PAGE_TYPES),
-				lastVerified: z.coerce.date().max(new Date(), 'lastVerified cannot be in the future').optional(),
+				lastVerified: z.coerce
+					.date()
+					.max(latestCheckDate(new Date()), 'lastVerified cannot be in the future')
+					.optional(),
 				sources: z.array(z.url({ protocol: /^https$/, error: 'must be an https URL' })).default([]),
 			}),
 		}),
