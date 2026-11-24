@@ -77,3 +77,26 @@ Zmierzone 2026-11-24 po zmianach, na `astro preview`:
 - axe 4.13.0: 0 naruszeń na stronie startowej, `roadmap/` i stronie treści. pa11y 9.1.1: brak błędów na tych trzech stronach w obu motywach i w otwartym oknie wyszukiwania z wynikami w obu motywach.
 - Brak poziomego przewijania czterech stron przy 320, 375, 667, 768, 1024 i 1440 px.
 - Stryker: `home.mjs` i `search.mjs` po 100%, całość 98,10%.
+
+## Zmiany 2026-11-24, trzecia runda
+
+Autor wskazał kolejne siedem miejsc i dał referencje. Proces szedł według addyosmani/agent-skills: delta spec, kontrakt projektu z referencji, zadania z kryteriami akceptacji, test przed implementacją i przegląd w pięciu osiach. Spec, plan i przegląd zostały lokalnie w `tasks/`, poza repozytorium.
+
+Nowe reguły kontraktu:
+
+- **Hierarchia promieni:** pigułka dla akcji i kapsuł, 16px dla paneli, 8px dla wierszy sidebara. Skill odradza „zaokrąglone wszystko”, a hierarchia zostawia pigułkę tylko tam, gdzie oznacza akcję.
+- **Poświata tylko na nawigacji:** kapsuły, kafel postępu, pierścień, aktywna kropka. Nigdy pod tekstem ciągłym.
+- **Bez cieni:** głębię daje ramka 1px i lokalna poświata.
+- **Nagłówek sekcji:** dekoracyjny konturowy numer w lewej kolumnie, rysowany przez `::before` z `data-index`. To czysta dekoracja (WCAG 1.4.3), a numer nie jest tekstem DOM, więc nie myli narzędzi kontrastu.
+- **Kapsuła:** wspólny wzorzec linku nawigacyjnego z etykietą nad tytułem. Ramka z gradientem to dwie warstwy tła z `background-clip`, bo `border-image` ignoruje promień.
+- **Sidebar:** sekcja w foncie systemowym 600, bo Outfit przy tym samym rozmiarze wyglądał na mniejszy od stron. Wiersze z odstępem 2px. Aktywna strona bez tła, z kropką i łukiem od linii prowadzącej, a linia w aktywnej sekcji ma gradient.
+- **Paginacja:** kapsuła „Poprzednia”, pigułka z pozycją strony w całej ścieżce i kapsuła „Następna”. Na telefonie pigułka na górze i „Następna” pierwsza. Bez poprzedniej i następnej strony nawigacja się nie renderuje.
+- **Spis treści:** panel z pierścieniem postępu czytania. Pierścień to animacja CSS na osi przewijania, bez JS. Reguła używa longhandów bez czasu trwania, bo minifikator składał je w skrót `animation`, który nie przyjmuje `scroll(root)`.
+
+Zmierzone 2026-11-24 na `astro preview`:
+
+- Lighthouse 12.8.2: Performance od 98 do 99, pozostałe kategorie po 100, LCP do 2,0 s, CLS do 0,002, CSS 18 KB, fonty 47 KB.
+- axe 4.13.0: 0 naruszeń na trzech stronach. pa11y 9.1.1: 0 błędów na trzech stronach w obu motywach.
+- Brak poziomego przewijania pięciu stron przy 320, 375, 667, 768, 1024 i 1440 px.
+- Stryker: `home.mjs`, `search.mjs` i `quick-links.mjs` po 100%, całość 98,17%.
+- Czytnika ekranu nie testowano.
