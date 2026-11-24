@@ -249,9 +249,8 @@ h5,
  * A component changes --cc-frame (for example on hover) instead of redrawing the background.
  */
 .cc-glass {
+	/* Hover and the current page opt in with --cc-frame: var(--cc-frame-hover) */
 	--cc-frame: var(--cc-frame-rest);
-	/* Frame for hover and the current page; a component opts in with --cc-frame: var(--cc-frame-active) */
-	--cc-frame-active: var(--cc-frame-hover);
 	position: relative;
 	border: 1px solid var(--cc-border);
 	background: var(--cc-panel-wash), var(--cc-glass-fill);
@@ -413,7 +412,7 @@ h5,
 }
 
 .cc-progress-card[aria-current="page"] {
-	--cc-frame: var(--cc-frame-active);
+	--cc-frame: var(--cc-frame-hover);
 }
 
 .cc-progress-card[aria-current="page"] .cc-progress-card-arrow,
@@ -429,7 +428,7 @@ h5,
 	}
 
 	.cc-progress-card:hover {
-		--cc-frame: var(--cc-frame-active);
+		--cc-frame: var(--cc-frame-hover);
 		transform: translateY(var(--cc-lift));
 		box-shadow:
 			inset 0 1px 0 var(--cc-highlight),
