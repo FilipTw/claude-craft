@@ -43,6 +43,12 @@ test('reads frontmatter with CRLF line endings and a BOM', () => {
 	assert.equal(classify('\uFEFF---\r\ntitle: A\r\nlastVerified: 2020-01-01\r\n---\r\n', now), 'stale');
 });
 
+test('only a BOM at the very start is dropped: as in Astro, "---" after a zero-width character does not close frontmatter', () => {
+	const hiddenCharacterBeforeClosingFence = '---\ntitle: A\nlastVerified: 2026-11-01\n﻿---\n';
+
+	assert.equal(classify(hiddenCharacterBeforeClosingFence, now), 'todo');
+});
+
 test('an invalid or future date needs checking, never counts as fresh', () => {
 	assert.equal(classify(verified('wczoraj'), now), 'stale');
 	assert.equal(classify(verified('2099-01-01'), now), 'stale');
