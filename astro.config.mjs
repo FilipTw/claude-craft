@@ -40,6 +40,8 @@ export default defineConfig({
 				MarkdownContent: './src/components/MarkdownContent.astro',
 				// biome-ignore lint/style/useNamingConvention: Starlight names overridable components in PascalCase.
 				Pagination: './src/components/Pagination.astro',
+				// biome-ignore lint/style/useNamingConvention: Starlight names overridable components in PascalCase.
+				TableOfContents: './src/components/TableOfContents.astro',
 			},
 			expressiveCode: {
 				themes: ['github-dark-default', 'github-light'],
