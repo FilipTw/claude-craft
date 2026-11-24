@@ -3,6 +3,8 @@ import { LinkButton } from '@astrojs/starlight/components';
 import { RAY_ANGLES, rayPolygon } from '../lib/hero.mjs';
 
 const { data } = Astro.locals.starlightRoute.entry;
+// title and tagline go in with set:html, as in Starlight's own Hero.
+// They come from frontmatter in this repo, never from visitors.
 const { title = data.title, tagline, actions = [] } = data.hero ?? {};
 
 // Decorative starburst: tapered beams fanning out from the bottom-right corner of a 400 × 300 box.
