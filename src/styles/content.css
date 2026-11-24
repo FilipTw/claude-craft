@@ -210,8 +210,7 @@ mobile-starlight-toc summary .toggle {
 }
 
 /*
- * Page footer: a thin divider, one muted meta row, then previous / next as compact link cards
- * in the homepage card style (ADR 0003, 2026-11-24).
+ * Page footer: a thin divider and one muted meta row above the previous / next navigation.
  */
 footer:has(> .meta) {
 	margin-top: var(--cc-space-7);
@@ -230,85 +229,117 @@ footer > .meta :where(a) {
 	color: var(--cc-text-muted);
 }
 
-.pagination-links {
+/*
+ * Previous / position / next (spec: design pass 3). Capsules come from theme.css.
+ * Phone: the position pill on top, then "Następna", then "Poprzednia".
+ */
+.cc-pagination {
+	display: grid;
+	grid-template-areas: "pill" "next" "prev";
 	gap: var(--cc-space-3);
 }
 
-.pagination-links a {
-	position: relative;
-	gap: var(--cc-space-4);
-	min-height: 5rem;
-	padding: var(--cc-space-4) var(--cc-space-5);
-	border: 1px solid var(--cc-border);
-	border-radius: var(--cc-radius-lg);
-	background-color: var(--cc-surface);
-	box-shadow: none;
-	color: var(--cc-text-muted);
-	font-size: var(--sl-text-2xs);
-	font-weight: 600;
-	letter-spacing: 0.08em;
-	line-height: 1.4;
-	text-transform: uppercase;
+.cc-pagination-prev {
+	grid-area: prev;
 }
 
-.pagination-links .link-title {
-	display: block;
-	margin-top: var(--cc-space-1);
-	color: var(--cc-heading);
+/* On a phone an empty slot would only add a gap */
+.cc-pagination > span:empty {
+	display: none;
+}
+
+.cc-pagination-next {
+	grid-area: next;
+}
+
+.cc-pagination .cc-capsule {
+	min-height: 4.5rem;
+}
+
+.cc-pagination .cc-capsule-title {
+	font-size: var(--sl-text-base);
+}
+
+.cc-capsule-start {
+	padding: var(--cc-space-3) var(--cc-space-6) var(--cc-space-3) var(--cc-space-3);
+	justify-content: flex-start;
+}
+
+.cc-page-pill {
+	display: inline-flex;
+	grid-area: pill;
+	align-items: baseline;
+	justify-content: center;
+	justify-self: center;
+	gap: 0.25rem;
+	min-width: 6.5rem;
+	padding: var(--cc-space-3) var(--cc-space-5);
+	border: 1px solid var(--cc-accent-text);
+	border-radius: var(--cc-radius-pill);
+	background: radial-gradient(120% 100% at 50% -30%, var(--cc-glow), transparent 70%), var(--cc-accent-ui);
+	box-shadow: inset 0 1px 0 var(--cc-highlight);
+	color: var(--cc-on-accent);
 	font-family: var(--cc-font-heading);
-	font-size: 1.0625rem;
-	font-weight: 500;
-	letter-spacing: 0;
-	line-height: 1.3;
-	text-transform: none;
+	text-decoration: none;
 }
 
-.pagination-links a > svg {
-	flex-shrink: 0;
-	width: 2.25rem;
-	height: 2.25rem;
-	padding: 0.5rem;
-	border: 1px solid var(--cc-border-strong);
-	border-radius: 50%;
-	color: var(--cc-heading);
+.cc-page-pill-index {
+	font-size: var(--sl-text-xl);
+	font-weight: 600;
+	line-height: 1;
 }
 
-/* On a phone the next page comes first: it is the main action */
-@media (max-width: 49.99rem) {
-	.pagination-links [rel="next"] {
-		order: -1;
+.cc-page-pill-total {
+	font-size: var(--sl-text-sm);
+	font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 50rem) {
+	.cc-pagination > span:empty {
+		display: block;
+	}
+
+	.cc-pagination {
+		grid-template-areas: "prev pill next";
+		grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+		align-items: stretch;
+	}
+
+	.cc-page-pill {
+		align-items: center;
+		align-self: stretch;
+	}
+
+	.cc-pagination-next {
+		justify-content: flex-end;
+		text-align: end;
+	}
+
+	.cc-pagination-next .cc-capsule-text {
+		justify-items: end;
 	}
 }
 
 @media (hover: hover) {
-	.pagination-links a:hover {
-		border-color: var(--cc-accent-ui);
-		box-shadow: 0 0 1.5rem var(--cc-glow);
+	.cc-page-pill:hover {
+		background: radial-gradient(120% 100% at 50% -30%, var(--cc-glow), transparent 75%), var(--cc-accent-ui-hover);
 	}
 
-	.pagination-links a:hover > svg {
-		border-color: var(--cc-accent-ui);
-		background-color: var(--cc-accent-soft);
-		color: var(--cc-accent-text);
-	}
-
-	.pagination-links [rel="next"]:hover > svg {
-		transform: translateX(3px);
-	}
-
-	.pagination-links [rel="prev"]:hover > svg {
-		transform: translateX(-3px);
+	.cc-pagination-prev:hover .cc-capsule-arrow {
+		transform: translateX(-2px);
 	}
 }
 
 @media (prefers-reduced-motion: no-preference) {
-	.pagination-links a,
-	.pagination-links a > svg {
-		transition:
-			background-color var(--cc-transition),
-			border-color var(--cc-transition),
-			box-shadow var(--cc-transition),
-			color var(--cc-transition),
-			transform var(--cc-transition);
+	.cc-page-pill {
+		transition: background-color var(--cc-transition);
+	}
+}
+
+@media (forced-colors: active) {
+	.cc-page-pill {
+		border-color: CanvasText;
+		background: Canvas;
+		color: CanvasText;
 	}
 }

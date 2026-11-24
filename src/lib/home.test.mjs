@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
 	countLabel,
+	pagePosition,
 	percent,
 	recentlyVerified,
 	summarizeParts,
@@ -148,4 +149,31 @@ test('totalProgress sums verified and total pages and starts at zero', () => {
 
 	assert.deepEqual(totalProgress([part(1, 12), part(0, 31), part(5, 5)]), { verified: 6, pages: 48 });
 	assert.deepEqual(totalProgress([]), { verified: 0, pages: 0 });
+});
+
+test('pagePosition counts the current page among all pages, depth first, from 1', () => {
+	/** @param {string} href @param {boolean} [isCurrent] */
+	const page = (href, isCurrent = false) => ({ type: /** @type {const} */ ('link'), label: href, href, isCurrent });
+	const sidebar = [
+		group('Część I: A', [group('S1', [page('/a/'), group('Inst', [page('/b/'), page('/c/', true)])])]),
+		group('Część II: B', [group('S2', [page('/d/')])]),
+	];
+
+	assert.deepEqual(pagePosition(sidebar), { index: 3, total: 4 });
+});
+
+test('pagePosition finds the first and the last page', () => {
+	/** @param {string} href @param {boolean} [isCurrent] */
+	const page = (href, isCurrent = false) => ({ type: /** @type {const} */ ('link'), label: href, href, isCurrent });
+
+	assert.deepEqual(pagePosition([page('/a/', true), page('/b/')]), { index: 1, total: 2 });
+	assert.deepEqual(pagePosition([page('/a/'), page('/b/', true)]), { index: 2, total: 2 });
+});
+
+test('pagePosition returns undefined when no page in the sidebar is current', () => {
+	/** @param {string} href */
+	const page = (href) => ({ type: /** @type {const} */ ('link'), label: href, href, isCurrent: false });
+
+	assert.equal(pagePosition([page('/a/'), group('S', [page('/b/')])]), undefined);
+	assert.equal(pagePosition([]), undefined);
 });

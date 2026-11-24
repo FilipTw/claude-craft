@@ -3,7 +3,7 @@
  * so the components stay thin and this logic has tests.
  */
 
-/** @typedef {{ type: 'link', label: string, href: string }} NavLink */
+/** @typedef {{ type: 'link', label: string, href: string, isCurrent?: boolean }} NavLink */
 /** @typedef {{ type: 'group', label: string, entries: NavEntry[] }} NavGroup */
 /** @typedef {NavLink | NavGroup} NavEntry */
 
@@ -57,6 +57,18 @@ export const totalProgress = (parts) =>
  * @returns {NavLink[]}
  */
 const linksOf = (entry) => (entry.type === 'link' ? [entry] : entry.entries.flatMap(linksOf));
+
+/**
+ * Position of the current page among all sidebar pages, counted depth first from 1.
+ * Undefined when no page is current, for example on the homepage.
+ * @param {NavEntry[]} sidebar
+ * @returns {{ index: number, total: number } | undefined}
+ */
+export const pagePosition = (sidebar) => {
+	const links = sidebar.flatMap(linksOf);
+	const index = links.findIndex((link) => link.isCurrent === true);
+	return index === -1 ? undefined : { index: index + 1, total: links.length };
+};
 
 /**
  * Splits "Część I: Fundamenty" into a kicker and a title.
