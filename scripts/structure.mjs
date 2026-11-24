@@ -1,5 +1,5 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseDocument } from 'yaml';
 
@@ -248,6 +248,15 @@ export function findPage(docsDir, path) {
 }
 
 /**
+ * A path from `readdirSync` in the form the manifest uses. On Windows the separator is `\\`, in the manifest it is `/`.
+ * @param {string} file
+ * @param {string} [separator] The platform separator by default.
+ * @returns {string}
+ * @internal
+ */
+export const toManifestPath = (file, separator = sep) => file.split(separator).join('/');
+
+/**
  * @param {string} docsDir
  * @param {LocatedPage[]} pages
  * @param {string[]} ignore
@@ -256,7 +265,7 @@ export function findPage(docsDir, path) {
 export function findOrphans(docsDir, pages, ignore) {
 	const known = new Set([...pages.flatMap((p) => [`${p.path}.md`, `${p.path}.mdx`]), ...ignore]);
 	return readdirSync(docsDir, { recursive: true })
-		.map(String)
+		.map((file) => toManifestPath(String(file)))
 		.filter((file) => /\.mdx?$/.test(file) && !known.has(file))
 		.sort();
 }
