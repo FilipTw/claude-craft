@@ -1,6 +1,6 @@
 {
 	"$schema": "https://unpkg.com/knip@6.47.0/schema.json",
-	"entry": ["scripts/{scaffold,freshness,forbid-trailers}.mjs!"],
+	"entry": ["scripts/{scaffold,freshness,forbid-trailers,check-build}.mjs!"],
 	"project": ["src/**/*.{ts,mjs,mdx,astro}!", "!src/**/*.test.mjs!", "scripts/*.mjs!", "!scripts/*.test.mjs!"],
 	"astro": { "entry": ["astro.config.mjs!", "src/content.config.ts!", "src/content/**/*.mdx!"] },
 	"includeEntryExports": true,

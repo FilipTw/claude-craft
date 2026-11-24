@@ -6,6 +6,7 @@ Baza wiedzy o Claude Code jako strona Astro Starlight. Treść po polsku, nazwy 
 
 - `npm run dev`: serwer deweloperski. Uruchamiaj go w tle przez `astro dev --background` i zatrzymuj przez `astro dev stop`.
 - `npm run build`: build z walidacją schematu i linków. Hooki go nie uruchamiają. CI buduje stronę w każdym PR. Przed PR, który zmienia treść, uruchom go lokalnie.
+- `npm run build:check`: po buildzie sprawdza, czy klasy Starlight i Pagefind wybierane przez CSS istnieją w `dist/` i czy CSS i fonty mieszczą się w budżecie (ADR 0004). CI uruchamia go po buildzie.
 - `npm test`: testy skryptów w `scripts/`.
 - `npm run scaffold`: tworzy strony z `scripts/structure.yaml`, których jeszcze nie ma. Nigdy nie nadpisuje.
 - `npm run freshness`: raport aktualności i tabela postępu w `src/content/docs/roadmap.md`.
