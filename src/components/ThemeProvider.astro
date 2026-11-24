@@ -1,7 +1,15 @@
 ---
 // The heading font loads here, on every page, so the imports stay visible to knip and dependency-cruiser.
 import '@fontsource-variable/outfit/wght.css';
+// Same file as the latin face in wght.css: Vite emits one hashed asset, so the preload and the @font-face match.
+import outfitLatin from '@fontsource-variable/outfit/files/outfit-latin-wght-normal.woff2?url';
 ---
+
+{/*
+	Preload the latin subset: the font is otherwise found only after the stylesheet arrives (HTML, CSS, font),
+	and every page title is set in it. latin-ext stays on demand, for Polish letters only.
+*/}
+<link rel="preload" href={outfitLatin} as="font" type="font/woff2" crossorigin />
 
 {/*
 	Dark is the default theme (ADR 0003). A stored "light" choice wins. Inlined to avoid FOUC, so it cannot import
