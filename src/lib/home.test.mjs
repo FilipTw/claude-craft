@@ -18,6 +18,8 @@ import {
 const link = (href) => ({ type: 'link', label: href, href });
 /** @param {string} label @param {import('./home.mjs').NavEntry[]} entries @returns {import('./home.mjs').NavGroup} */
 const group = (label, entries) => ({ type: 'group', label, entries });
+/** @param {string} href @param {boolean} [isCurrent] @returns {import('./home.mjs').NavLink} */
+const page = (href, isCurrent = false) => ({ type: 'link', label: href, href, isCurrent });
 
 test('withBase joins base and path with exactly one slash', () => {
 	assert.equal(withBase('/claude-craft/', 'roadmap/'), '/claude-craft/roadmap/');
@@ -226,8 +228,6 @@ test('totalProgress sums verified and total pages and starts at zero', () => {
 });
 
 test('pagePosition counts the current page among all pages, depth first, from 1', () => {
-	/** @param {string} href @param {boolean} [isCurrent] */
-	const page = (href, isCurrent = false) => ({ type: /** @type {const} */ ('link'), label: href, href, isCurrent });
 	const sidebar = [
 		group('Część I: A', [group('S1', [page('/a/'), group('Inst', [page('/b/'), page('/c/', true)])])]),
 		group('Część II: B', [group('S2', [page('/d/')])]),
@@ -237,17 +237,11 @@ test('pagePosition counts the current page among all pages, depth first, from 1'
 });
 
 test('pagePosition finds the first and the last page', () => {
-	/** @param {string} href @param {boolean} [isCurrent] */
-	const page = (href, isCurrent = false) => ({ type: /** @type {const} */ ('link'), label: href, href, isCurrent });
-
 	assert.deepEqual(pagePosition([page('/a/', true), page('/b/')]), { index: 1, total: 2 });
 	assert.deepEqual(pagePosition([page('/a/'), page('/b/', true)]), { index: 2, total: 2 });
 });
 
 test('pagePosition returns undefined when no page in the sidebar is current', () => {
-	/** @param {string} href */
-	const page = (href) => ({ type: /** @type {const} */ ('link'), label: href, href, isCurrent: false });
-
 	assert.equal(pagePosition([page('/a/'), group('S', [page('/b/')])]), undefined);
 	assert.equal(pagePosition([]), undefined);
 });
