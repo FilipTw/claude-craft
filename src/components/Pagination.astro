@@ -20,9 +20,11 @@ const position = pagePosition(sidebar);
 		</a>
 	) : <span class="cc-pagination-prev" aria-hidden="true"></span>}
 	{position && (
-		<a class="cc-page-pill" href="#_top" aria-label={`Strona ${position.index} z ${position.total}. Wróć na górę`}>
+		<a class="cc-page-pill" href="#_top">
+			{/* The accessible name starts with the visible "3 / 193", so speech input can name the link (WCAG 2.5.3) */}
 			<span class="cc-page-pill-index">{position.index}</span>
 			<span class="cc-page-pill-total">/ {position.total}</span>
+			<span class="sr-only">. Wróć na górę</span>
 		</a>
 	)}
 	{next ? (
