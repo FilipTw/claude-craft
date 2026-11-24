@@ -28,22 +28,15 @@ export default defineConfig({
 				'./src/styles/home.css',
 				'./src/styles/transitions.css',
 			],
+			// Starlight names overridable components in PascalCase, so biome.json allows PascalCase keys in this file.
 			components: {
-				// biome-ignore lint/style/useNamingConvention: Starlight names overridable components in PascalCase.
 				ThemeProvider: './src/components/ThemeProvider.astro',
-				// biome-ignore lint/style/useNamingConvention: Starlight names overridable components in PascalCase.
 				ThemeSelect: './src/components/ThemeSelect.astro',
-				// biome-ignore lint/style/useNamingConvention: Starlight names overridable components in PascalCase.
 				Sidebar: './src/components/Sidebar.astro',
-				// biome-ignore lint/style/useNamingConvention: Starlight names overridable components in PascalCase.
 				Hero: './src/components/Hero.astro',
-				// biome-ignore lint/style/useNamingConvention: Starlight names overridable components in PascalCase.
 				Search: './src/components/Search.astro',
-				// biome-ignore lint/style/useNamingConvention: Starlight names overridable components in PascalCase.
 				MarkdownContent: './src/components/MarkdownContent.astro',
-				// biome-ignore lint/style/useNamingConvention: Starlight names overridable components in PascalCase.
 				Pagination: './src/components/Pagination.astro',
-				// biome-ignore lint/style/useNamingConvention: Starlight names overridable components in PascalCase.
 				TableOfContents: './src/components/TableOfContents.astro',
 			},
 			expressiveCode: {
