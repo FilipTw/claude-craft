@@ -37,6 +37,7 @@ Autor chce profesjonalnego wyglądu w stylu wzorca: prawie czarne tło, akcent m
 
 - Dostępność: WCAG 2.2 AA. Tekst ma kontrast co najmniej 4,5:1, elementy UI co najmniej 3:1, focus jest zawsze widoczny, a animacje respektują `prefers-reduced-motion`. Cel dotyku ma co najmniej 24×24 px, na telefonie 44×44 px. Bramki to `@axe-core/cli` i `pa11y` bez błędów oraz ręczne przejście klawiaturą.
 - Wydajność: CSS do 50 KB po gzip, fonty do 100 KB, Lighthouse Performance co najmniej 90, CLS do 0,1.
+- Rozmiar CSS i fontów sprawdza CI po każdym buildzie (ADR 0004). Dostępność, Lighthouse i CLS mierzymy ręcznie przy każdej rundzie projektu.
 
 ## Konsekwencje
 
