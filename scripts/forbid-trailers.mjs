@@ -79,6 +79,21 @@ export function findViolations(message) {
 }
 
 /**
+ * @param {string} file
+ * @returns {string | undefined} Undefined when the file does not exist. Other read errors keep their stack.
+ */
+const readMessage = (file) => {
+	try {
+		return readFileSync(file, 'utf8');
+	} catch (error) {
+		if (/** @type {NodeJS.ErrnoException} */ (error).code === 'ENOENT') {
+			return undefined;
+		}
+		throw error;
+	}
+};
+
+/**
  * @param {{ file: string | undefined, log?: (line: string) => void }} options
  * @returns {0 | 1}
  * @internal
@@ -88,7 +103,12 @@ export function runForbidTrailers({ file, log = (line) => process.stderr.write(`
 		log('usage: node scripts/forbid-trailers.mjs <commit-msg-file>');
 		return 1;
 	}
-	const violations = findViolations(readFileSync(file, 'utf8'));
+	const message = readMessage(file);
+	if (message === undefined) {
+		log(`Cannot read ${file}: no such file. The commit-msg hook passes the message file as the first argument.`);
+		return 1;
+	}
+	const violations = findViolations(message);
 	for (const { line, rule, text } of violations) {
 		log(`line ${line}: ${rule}: ${text}`);
 	}
