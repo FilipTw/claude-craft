@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
 	countLabel,
+	docHref,
 	pagePosition,
 	percent,
 	recentlyVerified,
@@ -22,6 +23,18 @@ test('withBase joins base and path with exactly one slash', () => {
 	assert.equal(withBase('/claude-craft', '/roadmap/'), '/claude-craft/roadmap/');
 	assert.equal(withBase('/claude-craft//', '//roadmap/'), '/claude-craft/roadmap/');
 	assert.equal(withBase('/', 'roadmap/'), '/roadmap/');
+});
+
+test('docHref routes a collection id the way Starlight does, with an index page at its folder', () => {
+	assert.equal(
+		docHref('/claude-craft/', '01-foundations/01-prerequisites'),
+		'/claude-craft/01-foundations/01-prerequisites/',
+	);
+	assert.equal(docHref('/claude-craft/', 'index'), '/claude-craft/');
+	assert.equal(docHref('/claude-craft/', '05-labs/index'), '/claude-craft/05-labs/');
+	assert.equal(docHref('/', 'index'), '/');
+	assert.equal(docHref('/', 'reindex'), '/reindex/');
+	assert.equal(docHref('/', 'index-of-tools/index'), '/index-of-tools/');
 });
 
 test('summarizeParts makes one summary per top-level group and skips top-level links', () => {
@@ -138,9 +151,13 @@ test('verifiedHrefs keeps pages with lastVerified and builds sidebar hrefs', () 
 		{ id: '01-a/02-y', data: {} },
 		{ id: '02-b/01-z', data: { lastVerified: undefined } },
 		{ id: 'roadmap', data: { lastVerified: new Date('2026-02-02') } },
+		{ id: 'index', data: { lastVerified: new Date('2026-02-03') } },
 	];
 
-	assert.deepEqual([...verifiedHrefs(docs, '/claude-craft/')], ['/claude-craft/01-a/01-x/', '/claude-craft/roadmap/']);
+	assert.deepEqual(
+		[...verifiedHrefs(docs, '/claude-craft/')],
+		['/claude-craft/01-a/01-x/', '/claude-craft/roadmap/', '/claude-craft/'],
+	);
 });
 
 test('totalProgress sums verified and total pages and starts at zero', () => {
