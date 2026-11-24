@@ -27,6 +27,12 @@ test('only a block at the top of the page is frontmatter, not text between two r
 	assert.equal(classify('# Strona\n\n---\n\nlastVerified: 2026-11-01\n\n---\n', now), 'todo');
 });
 
+test('the frontmatter ends at a line of exactly three dashes, also at the end of the file', () => {
+	assert.equal(classify('---\ntitle: A\nlastVerified: 2026-11-01\n----\n', now), 'todo');
+	assert.equal(classify('---\ntitle: A\nlastVerified: 2026-11-01\n---text\n', now), 'todo');
+	assert.equal(classify('---\ntitle: A\nlastVerified: 2026-11-01\n---', now), 'fresh');
+});
+
 test('a page is fresh from the day it is verified up to exactly 90 days, and stale from day 91', () => {
 	assert.equal(classify(verified('2026-11-21'), now), 'fresh');
 	assert.equal(classify(verified('2026-08-23'), now), 'fresh');

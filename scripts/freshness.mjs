@@ -23,7 +23,7 @@ const PROGRESS_BLOCK = new RegExp(`${START}[\\s\\S]*?${END}`);
  */
 export function classify(markdown, now) {
 	const text = markdown.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n');
-	const frontmatterWithFileLineNumbers = /^(---\n[\s\S]*?)\n---/.exec(text)?.[1];
+	const frontmatterWithFileLineNumbers = /^(---\n[\s\S]*?)\n---(?:\n|$)/.exec(text)?.[1];
 	if (frontmatterWithFileLineNumbers === undefined) {
 		return 'todo';
 	}
