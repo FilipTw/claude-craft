@@ -27,5 +27,6 @@ Regułę świeżości trzyma jeden moduł: `src/lib/verification.mjs`. Importuj�
 - Skrypt nie sprawdza selektorów elementów i atrybutów, np. `site-search`. Nie widzi też klas, które JavaScript Starlight dodaje w przeglądarce, poza klasami Pagefind.
 - Budżet CSS liczy wszystkie arkusze, także te, których dana strona nie ładuje. To górna granica.
 - Dostępność (axe, pa11y), Lighthouse i CLS z ADR 0003 dalej mierzymy ręcznie. Automatyczny pomiar wymaga przeglądarki w CI i osobnej decyzji.
+- Strona nie ma Content-Security-Policy. Jest statyczna i nie przyjmuje danych od odwiedzających, więc CSP nie ma przed czym chronić. Każda strona treści ma około 100 atrybutów `style` (Expressive Code, Starlight), a Pagefind uruchamia WebAssembly. Polityka musiałaby więc dopuścić `'unsafe-inline'` i `'wasm-unsafe-eval'`. GitHub Pages pozwala ustawić CSP tylko przez `<meta>`, bez `frame-ancestors` i bez raportów. Wracamy do CSP, gdy strona zacznie przyjmować dane od innych albo ładować skrypty z obcych domen, na przykład komentarze, analitykę lub widgety.
 
 Zmierzone 2026-11-24: w buildzie jest 32 z 32 klas, CSS waży 21,1 KB z 50 KB, a fonty 46,0 KB ze 100 KB. Stryker daje dla `check-build.mjs` 98,88%. Jedyny niewykryty mutant to strażnik `if (process.argv[1] === ...)`, tak jak w pozostałych skryptach CLI.
