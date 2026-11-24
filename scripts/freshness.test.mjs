@@ -146,6 +146,26 @@ test('runFreshness prints each stale page and the fresh count on stdout by defau
 	);
 });
 
+test('runFreshness prints a docs problem on stderr by default, so stdout stays empty', (t) => {
+	const docs = tempDir();
+	const out = t.mock.method(process.stdout, 'write', () => true);
+	const err = t.mock.method(process.stderr, 'write', () => true);
+	const code = runFreshness({
+		docsDir: docs,
+		pages: [{ path: '01-x', title: 'X', type: 'explanation', section: 'A' }],
+		now,
+	});
+	out.mock.restore();
+	err.mock.restore();
+
+	assert.equal(code, 1);
+	assert.equal(out.mock.callCount(), 0);
+	assert.deepEqual(
+		err.mock.calls.map((call) => call.arguments[0]),
+		['01-x: listed in structure.yaml but missing on disk. Run npm run scaffold.\n'],
+	);
+});
+
 test('runFreshness leaves an up-to-date roadmap.md untouched', () => {
 	const docs = tempDir();
 	const roadmap = join(docs, 'roadmap.md');
@@ -168,7 +188,13 @@ test('runFreshness leaves an up-to-date roadmap.md untouched', () => {
 const runQuiet = (docs, pages) => {
 	/** @type {string[]} */
 	const lines = [];
-	const code = runFreshness({ docsDir: docs, pages, now, log: (line) => lines.push(line) });
+	const code = runFreshness({
+		docsDir: docs,
+		pages,
+		now,
+		log: (line) => lines.push(line),
+		error: (line) => lines.push(line),
+	});
 	return { code, lines };
 };
 
@@ -232,7 +258,10 @@ test('runFreshness prints the structure.yaml problem as one line and exits 1', (
 	writeFileSync(manifest, 'parts:\n  - label: A\n    sections:\n      - { file: 01-a, titel: A }\n');
 	/** @type {string[]} */
 	const lines = [];
-	assert.equal(runFreshness({ docsDir: docs, manifest, now, log: (line) => lines.push(line) }), 1);
+	assert.equal(
+		runFreshness({ docsDir: docs, manifest, now, log: (line) => lines.push(line), error: (line) => lines.push(line) }),
+		1,
+	);
 	assert.deepEqual(lines, ['structure.yaml: "01-a" has unknown keys titel. Quote titles that contain a comma']);
 });
 

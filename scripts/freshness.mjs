@@ -99,7 +99,8 @@ function readRow(docsDir, page, now) {
 }
 
 /**
- * @param {{ docsDir?: string, manifest?: string | URL, pages?: LocatedPage[], now?: Date, log?: (line: string) => void }} [options]
+ * @param {{ docsDir?: string, manifest?: string | URL, pages?: LocatedPage[], now?: Date, log?: (line: string) => void, error?: (line: string) => void }} [options]
+ * `log` gets the report (stdout by default), `error` each problem that makes the exit code 1 (stderr by default).
  * @returns {0 | 1}
  * @internal
  */
@@ -109,6 +110,7 @@ export function runFreshness({
 	pages,
 	now = new Date(),
 	log = (line) => process.stdout.write(`${line}\n`),
+	error = (line) => process.stderr.write(`${line}\n`),
 } = {}) {
 	try {
 		const rows = (pages ?? listPages(loadStructure(manifest))).map((page) => readRow(docsDir, page, now));
@@ -125,12 +127,12 @@ export function runFreshness({
 			`Fresh: ${rows.filter((r) => r.status === 'fresh').length}/${rows.length}. Progress table in src/content/docs/${ROADMAP}.`,
 		);
 		return 0;
-	} catch (error) {
-		if (error instanceof DocsProblem) {
-			log(error.message);
+	} catch (problem) {
+		if (problem instanceof DocsProblem) {
+			error(problem.message);
 			return 1;
 		}
-		throw error;
+		throw problem;
 	}
 }
 

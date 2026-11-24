@@ -90,16 +90,23 @@ test('runScaffold fills the real template of every page type with the manifest t
 	}
 });
 
-test('runScaffold prints the created count and each orphan on stdout by default', (t) => {
+test('runScaffold prints the created count on stdout and each orphan on stderr by default', (t) => {
 	const docs = tempDir();
 	writeFileSync(join(docs, '09-stray.md'), 'x');
-	const write = t.mock.method(process.stdout, 'write', () => true);
+	const out = t.mock.method(process.stdout, 'write', () => true);
+	const err = t.mock.method(process.stderr, 'write', () => true);
 	const code = runScaffold({ docsDir: docs, pages });
-	write.mock.restore();
+	out.mock.restore();
+	err.mock.restore();
+
 	assert.equal(code, 1);
 	assert.deepEqual(
-		write.mock.calls.map((call) => call.arguments[0]),
-		['Pages created: 2.\n', 'Outside the manifest: 09-stray.md. Add it to scripts/structure.yaml.\n'],
+		out.mock.calls.map((call) => call.arguments[0]),
+		['Pages created: 2.\n'],
+	);
+	assert.deepEqual(
+		err.mock.calls.map((call) => call.arguments[0]),
+		['Outside the manifest: 09-stray.md. Add it to scripts/structure.yaml.\n'],
 	);
 });
 
@@ -116,7 +123,10 @@ test('runScaffold prints the structure.yaml problem as one line and exits 1', ()
 	writeFileSync(manifest, 'parts:\n  - label: A\n    sections:\n      - { file: 01-a, titel: A }\n');
 	/** @type {string[]} */
 	const lines = [];
-	assert.equal(runScaffold({ docsDir: docs, manifest, log: (line) => lines.push(line) }), 1);
+	assert.equal(
+		runScaffold({ docsDir: docs, manifest, log: (line) => lines.push(line), error: (line) => lines.push(line) }),
+		1,
+	);
 	assert.deepEqual(lines, ['structure.yaml: "01-a" has unknown keys titel. Quote titles that contain a comma']);
 });
 

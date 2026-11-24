@@ -53,7 +53,7 @@ const healthy = {
 const runQuiet = (root) => {
 	/** @type {string[]} */
 	const lines = [];
-	const code = runCheckBuild({ root, log: (line) => lines.push(line) });
+	const code = runCheckBuild({ root, log: (line) => lines.push(line), error: (line) => lines.push(line) });
 	return { code, lines };
 };
 
@@ -237,7 +237,10 @@ test('the CLI that CI runs after the build reports on the real project', () => {
 	const result = spawnSync(process.execPath, [cli], { encoding: 'utf8' });
 
 	// CI runs the tests before the build, so dist/ may not exist yet. Either way the CLI says what it found.
-	assert.match(result.stdout, /^(?:No HTML in .*Run npm run build first\.|Starlight and Pagefind classes: )/m);
+	const found = /^Starlight and Pagefind classes: /m.test(result.stdout);
+	const noBuild = /^No HTML in .*Run npm run build first\.$/m.test(result.stderr);
+
+	assert.ok(found || noBuild, `stdout: ${result.stdout}\nstderr: ${result.stderr}`);
 });
 
 test('importing check-build.mjs does not run the CLI', () => {
@@ -257,6 +260,22 @@ test('runCheckBuild asks for a build when dist has no HTML, and exits 1', () => 
 		code: 1,
 		lines: [`No HTML in ${join(root, 'dist')}. Run npm run build first.`],
 	});
+});
+
+test('runCheckBuild prints a problem on stderr by default, so stdout stays empty', (t) => {
+	const root = tempDir();
+	const out = t.mock.method(process.stdout, 'write', () => true);
+	const err = t.mock.method(process.stderr, 'write', () => true);
+	const code = runCheckBuild({ root });
+	out.mock.restore();
+	err.mock.restore();
+
+	assert.equal(code, 1);
+	assert.equal(out.mock.callCount(), 0);
+	assert.deepEqual(
+		err.mock.calls.map((call) => call.arguments[0]),
+		[`No HTML in ${join(root, 'dist')}. Run npm run build first.\n`],
+	);
 });
 
 test('runCheckBuild reports on stdout by default', (t) => {

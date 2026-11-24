@@ -39,7 +39,8 @@ export function scaffold({ docsDir, pages, templates }) {
 }
 
 /**
- * @param {{ docsDir?: string, manifest?: string | URL, pages?: LocatedPage[], log?: (line: string) => void }} [options]
+ * @param {{ docsDir?: string, manifest?: string | URL, pages?: LocatedPage[], log?: (line: string) => void, error?: (line: string) => void }} [options]
+ * `log` gets the report (stdout by default), `error` each problem that makes the exit code 1 (stderr by default).
  * @returns {0 | 1}
  * @internal
  */
@@ -48,6 +49,7 @@ export function runScaffold({
 	manifest,
 	pages,
 	log = (line) => process.stdout.write(`${line}\n`),
+	error = (line) => process.stderr.write(`${line}\n`),
 } = {}) {
 	try {
 		const listed = pages ?? listPages(loadStructure(manifest));
@@ -60,15 +62,15 @@ export function runScaffold({
 		const orphans = findOrphans(docsDir, listed, PAGES_OUTSIDE_MANIFEST);
 		log(`Pages created: ${created.length}.`);
 		for (const orphan of orphans) {
-			log(`Outside the manifest: ${orphan}. Add it to scripts/structure.yaml.`);
+			error(`Outside the manifest: ${orphan}. Add it to scripts/structure.yaml.`);
 		}
 		return orphans.length > 0 ? 1 : 0;
-	} catch (error) {
-		if (error instanceof DocsProblem) {
-			log(error.message);
+	} catch (problem) {
+		if (problem instanceof DocsProblem) {
+			error(problem.message);
 			return 1;
 		}
-		throw error;
+		throw problem;
 	}
 }
 
