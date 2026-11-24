@@ -1,11 +1,22 @@
 import assert from 'node:assert/strict';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import {
+	copyFileSync,
+	existsSync,
+	mkdirSync,
+	mkdtempSync,
+	readFileSync,
+	rmSync,
+	symlinkSync,
+	writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { after, test } from 'node:test';
+import { pathToFileURL } from 'node:url';
 import { parse } from 'yaml';
 import { runScaffold, scaffold } from './scaffold.mjs';
-import { PAGE_TYPES } from './structure.mjs';
+import { PAGE_TYPES, ROOT } from './structure.mjs';
 
 /** @import { LocatedPage, PageType } from './structure.mjs' */
 
@@ -113,4 +124,45 @@ test('runScaffold lets an error that is not a docs problem through with its stac
 	const docs = tempDir();
 	writeFileSync(join(docs, '01-a'), 'a file where the folder should be');
 	assert.throws(() => runScaffold({ docsDir: docs, pages, log: silent }), { code: 'EEXIST' });
+});
+
+/**
+ * A copy of the files the CLI runs, with a one-page manifest and no pages yet, in a temporary folder.
+ * The CLI creates pages, so it runs there and never touches this repo.
+ */
+const cliProject = () => {
+	const root = tempDir();
+	const files = ['scripts/scaffold.mjs', 'scripts/cli.mjs', 'scripts/structure.mjs'];
+	for (const file of [...files, ...PAGE_TYPES.map((type) => `scripts/page-templates/${type}.md`)]) {
+		mkdirSync(dirname(join(root, file)), { recursive: true });
+		copyFileSync(join(ROOT, file), join(root, file));
+	}
+	symlinkSync(join(ROOT, 'node_modules'), join(root, 'node_modules'), 'junction');
+	writeFileSync(
+		join(root, 'scripts/structure.yaml'),
+		"parts:\n  - label: 'Część I: A'\n    sections:\n      - dir: 01-a\n        label: A\n        items:\n          - file: 01-one\n            title: Jeden\n",
+	);
+	mkdirSync(join(root, 'src/content/docs'), { recursive: true });
+	return { cli: join(root, 'scripts/scaffold.mjs'), page: join(root, 'src/content/docs/01-a/01-one.md') };
+};
+
+test('the CLI behind npm run scaffold creates the missing pages of its own project and exits 0', () => {
+	const { cli, page } = cliProject();
+
+	const result = spawnSync(process.execPath, [cli], { encoding: 'utf8' });
+
+	assert.equal(result.status, 0);
+	assert.equal(result.stdout, 'Pages created: 1.\n');
+	assert.match(readFileSync(page, 'utf8'), /^---\ntitle: "Jeden"\ntype: explanation\n/);
+});
+
+test('importing scaffold.mjs does not run the CLI, so a test cannot create pages', () => {
+	const { cli, page } = cliProject();
+	const importOnly = `await import(${JSON.stringify(pathToFileURL(cli).href)});`;
+
+	const result = spawnSync(process.execPath, ['--input-type=module', '--eval', importOnly], { encoding: 'utf8' });
+
+	assert.equal(result.status, 0);
+	assert.equal(result.stdout, '');
+	assert.equal(existsSync(page), false);
 });

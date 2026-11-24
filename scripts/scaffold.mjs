@@ -1,6 +1,6 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { isRunDirectly } from './cli.mjs';
 import {
 	DOCS,
 	DocsProblem,
@@ -72,6 +72,6 @@ export function runScaffold({
 	}
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+if (isRunDirectly(import.meta.url)) {
 	process.exitCode = runScaffold();
 }

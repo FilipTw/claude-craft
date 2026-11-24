@@ -28,6 +28,11 @@ const config = {
 			to: { path: [CORE, ...ASTRO] },
 		},
 		{
+			comment: 'Every CLI, the commit-msg hook included, decides whether it was started directly in one place.',
+			from: { path: '^scripts/(?:scaffold|freshness|check-build|forbid-trailers)\\.mjs$' },
+			to: { path: '^scripts/cli\\.mjs$' },
+		},
+		{
 			comment: 'The commitlint config reads the section folders from the core to build its scope list.',
 			from: { path: '^commitlint\\.config\\.mjs$' },
 			to: { path: CORE },

@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
+import { isRunDirectly } from './cli.mjs';
 import { ROOT } from './structure.mjs';
 
 /**
@@ -186,6 +186,6 @@ export function runCheckBuild({
 	return missing.length > 0 || budgets.some(({ bytes, limit }) => bytes > limit) ? 1 : 0;
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+if (isRunDirectly(import.meta.url)) {
 	process.exitCode = runCheckBuild();
 }
