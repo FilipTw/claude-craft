@@ -1,5 +1,5 @@
 /**
- * "Szybki start" capsules on the homepage (spec: design pass 3).
+ * "Szybki start" capsules on the homepage (ADR 0003, third pass).
  * Paths are relative to the site base; the component adds the base with `withBase`.
  */
 import { CLI_FLAGS_PATH, FIRST_LAB_PATH, FIRST_SESSION_PATH } from './pages.mjs';

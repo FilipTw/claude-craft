@@ -7,7 +7,7 @@ const { prev, next } = pagination;
 const position = pagePosition(sidebar);
 ---
 
-{/* Previous capsule, position pill, next capsule (spec: design pass 3). An empty slot keeps the layout steady. */}
+{/* Previous capsule, position pill, next capsule (ADR 0003, third pass). An empty slot keeps the layout steady. */}
 {(prev || next) && (
 <nav class="cc-pagination print:hidden" aria-label="Poprzednia i następna strona">
 	{prev ? (
