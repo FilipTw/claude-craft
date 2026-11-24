@@ -94,6 +94,19 @@ test('rejects a page without a title', () => {
 	assert.throws(() => parseStructure(valid.replace(', title: Wstęp', '')), /01-intro/);
 });
 
+test('each part keeps only its own sections, in order', () => {
+	const twoParts = `${valid}\n  - label: Część II\n    sections:\n      - { file: 02-other, title: Inna }\n      - { file: 03-last, title: Ostatnia }\n`;
+
+	assert.deepEqual(
+		toSidebar(parseStructure(twoParts)).map(({ label, items }) => [label, items.length]),
+		[
+			['Część I', 1],
+			['Część II', 2],
+		],
+	);
+	assert.deepEqual(toSidebar(parseStructure(twoParts))[1]?.items, ['02-other', '03-last']);
+});
+
 test('rejects the same section prefix reused in a later part', () => {
 	const twoParts = `${valid}\n  - label: Część II\n    sections:\n      - { file: 01-other, title: Inna }\n`;
 	assert.throws(() => parseStructure(twoParts), {
