@@ -83,6 +83,23 @@
 			"linter": { "rules": { "style": { "noDefaultExport": "off" } } }
 		},
 		{
+			"includes": ["astro.config.mjs"],
+			"linter": {
+				"rules": {
+					"style": {
+						"useNamingConvention": {
+							"level": "error",
+							"options": {
+								"conventions": [
+									{ "selector": { "kind": "objectLiteralProperty" }, "formats": ["camelCase", "PascalCase"] }
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		{
 			"includes": ["**/*.astro"],
 			"linter": {
 				"rules": {
