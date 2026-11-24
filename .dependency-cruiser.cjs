@@ -22,7 +22,8 @@ const config = {
 			to: { path: CORE },
 		},
 		{
-			comment: 'Astro config reads the manifest from the core and nothing else from the repo.',
+			comment:
+				'Astro config reads the manifest from the core. The content schema also reads the check date rule (below).',
 			from: { path: '^(?:astro\\.config\\.mjs|src/content\\.config\\.ts)$' },
 			to: { path: [CORE, ...ASTRO] },
 		},
@@ -37,8 +38,9 @@ const config = {
 			to: { dependencyTypes: ['core'] },
 		},
 		{
-			comment: 'One freshness rule: the roadmap CLI and the homepage data both read it, so their counts agree.',
-			from: { path: '^(?:scripts/freshness|src/lib/home)\\.mjs$' },
+			comment:
+				'One freshness rule: the roadmap CLI, the homepage data and the content schema all read it, so they agree.',
+			from: { path: '^(?:scripts/freshness\\.mjs|src/lib/home\\.mjs|src/content\\.config\\.ts)$' },
 			to: { path: '^src/lib/verification\\.mjs$' },
 		},
 		{
