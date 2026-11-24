@@ -18,8 +18,19 @@
 	view-transition-name: cc-sidebar;
 }
 
-.right-sidebar {
-	view-transition-name: cc-toc;
+/*
+ * A view-transition-name makes its element a stacking context. Below 72rem .right-sidebar holds the fixed
+ * mobile "Na tej stronie" bar, and a name there traps the bar's z-index, so the page painted over its list
+ * (ADR 0005). Below 72rem the name sits on the bar itself.
+ */
+mobile-starlight-toc nav {
+	view-transition-name: cc-mobile-toc;
+}
+
+@media (min-width: 72rem) {
+	.right-sidebar {
+		view-transition-name: cc-toc;
+	}
 }
 
 .main-pane {
@@ -30,7 +41,9 @@
 ::view-transition-old(cc-header),
 ::view-transition-new(cc-header),
 ::view-transition-old(cc-sidebar),
-::view-transition-new(cc-sidebar) {
+::view-transition-new(cc-sidebar),
+::view-transition-old(cc-mobile-toc),
+::view-transition-new(cc-mobile-toc) {
 	animation: none;
 }
 
