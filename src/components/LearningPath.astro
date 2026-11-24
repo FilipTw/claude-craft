@@ -2,7 +2,7 @@
 import { getCollection } from 'astro:content';
 import { countLabel, percent, summarizeParts, verifiedHrefs } from '../lib/home.mjs';
 
-const verified = verifiedHrefs(await getCollection('docs'), import.meta.env.BASE_URL);
+const verified = verifiedHrefs(await getCollection('docs'), import.meta.env.BASE_URL, new Date());
 const parts = summarizeParts(Astro.locals.starlightRoute.sidebar, verified);
 ---
 

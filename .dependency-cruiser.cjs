@@ -37,7 +37,12 @@ const config = {
 			to: { dependencyTypes: ['core'] },
 		},
 		{
-			comment: 'Homepage data is pure: src/lib depends on nothing. A lib test imports only its subject.',
+			comment: 'One freshness rule: the roadmap CLI and the homepage data both read it, so their counts agree.',
+			from: { path: '^(?:scripts/freshness|src/lib/home)\\.mjs$' },
+			to: { path: '^src/lib/verification\\.mjs$' },
+		},
+		{
+			comment: 'Homepage data is pure. A lib test imports only its subject.',
 			from: { path: '^src/lib/([^/]+)\\.test\\.mjs$' },
 			to: { path: ['^src/lib/$1\\.mjs$'] },
 		},
