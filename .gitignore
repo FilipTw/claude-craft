@@ -10,3 +10,6 @@ reports/
 coverage/
 .stryker-tmp/
 .lycheecache
+
+# Local spec, plan and task list (addyosmani/agent-skills workflow); outcomes go to docs/adr
+tasks/
