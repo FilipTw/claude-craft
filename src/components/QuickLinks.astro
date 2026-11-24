@@ -1,0 +1,21 @@
+---
+import { Icon } from '@astrojs/starlight/components';
+import { withBase } from '../lib/home.mjs';
+import { QUICK_LINKS } from '../lib/quick-links.mjs';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<ul class="cc-quick not-content" role="list">
+	{QUICK_LINKS.map(({ label, title, path }) => (
+		<li>
+			<a class="cc-capsule" href={withBase(base, path)}>
+				<span class="cc-capsule-text">
+					<span class="cc-capsule-label">{label}<span class="sr-only">:</span></span>
+					<span class="cc-capsule-title">{title}</span>
+				</span>
+				<span class="cc-capsule-arrow" aria-hidden="true"><Icon name="right-arrow" size="1rem" /></span>
+			</a>
+		</li>
+	))}
+</ul>

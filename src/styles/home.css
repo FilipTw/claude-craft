@@ -512,7 +512,12 @@
 	color: var(--cc-text-muted);
 }
 
-/* Quick start: three cards in a row once they fit */
-[data-has-hero] .card-grid {
-	grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+/* Quick start: capsules (style in theme.css), three in a row once they fit */
+.sl-markdown-content .cc-quick {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+	gap: var(--cc-space-3);
+	margin: 0;
+	padding: 0;
+	list-style: none;
 }
