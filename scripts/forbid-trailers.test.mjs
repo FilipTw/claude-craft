@@ -188,6 +188,21 @@ test('runForbidTrailers prints usage and returns 1 without a file argument', () 
 	assert.match(lines.join('\n'), /usage: node scripts\/forbid-trailers\.mjs <commit-msg-file>/);
 });
 
+test('runForbidTrailers names a message file that does not exist and returns 1 instead of a stack', () => {
+	/** @type {string[]} */
+	const lines = [];
+	const file = join(tempDir(), 'missing');
+
+	assert.equal(runForbidTrailers({ file, log: (line) => lines.push(line) }), 1);
+	assert.deepEqual(lines, [
+		`Cannot read ${file}: no such file. The commit-msg hook passes the message file as the first argument.`,
+	]);
+});
+
+test('runForbidTrailers lets other read errors through with their stack', () => {
+	assert.throws(() => runForbidTrailers({ file: tempDir(), log: silent }), { code: 'EISDIR' });
+});
+
 test('runForbidTrailers reports on stderr by default', (t) => {
 	const write = t.mock.method(process.stderr, 'write', () => true);
 	const code = runForbidTrailers({ file: messageFile('Generated with Claude Code\n') });
