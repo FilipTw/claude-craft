@@ -18,7 +18,7 @@ const config = {
 		},
 		{
 			comment: 'Each CLI builds on the core only. The two CLIs never import each other.',
-			from: { path: '^scripts/(?:scaffold|freshness)\\.mjs$' },
+			from: { path: '^scripts/(?:scaffold|freshness|check-build)\\.mjs$' },
 			to: { path: CORE },
 		},
 		{
