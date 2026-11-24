@@ -236,17 +236,63 @@ h5,
 	border-start-start-radius: 0.5rem;
 }
 
-/* Progress card at the top: a glowing tile with the percentage, then title, page chip and bar (spec: design pass 3) */
-.cc-progress-card {
+/*
+ * Glass panel: a see-through fill, a top highlight and a gradient frame (ADR 0003, fourth pass).
+ * Shared by the progress card, capsules, the position pill and the "Na tej stronie" panel.
+ * The frame is drawn on ::before and cut out with a mask, so the fill itself can stay translucent.
+ * A component changes --cc-frame (for example on hover) instead of redrawing the background.
+ */
+.cc-glass {
+	--cc-frame: linear-gradient(to bottom, var(--cc-accent-ui), var(--cc-border) 60%);
+	/* Frame for hover and the current page; a component opts in with --cc-frame: var(--cc-frame-active) */
+	--cc-frame-active: linear-gradient(to bottom, var(--cc-accent-text), var(--cc-accent-ui) 60%);
 	position: relative;
+	border: 1px solid var(--cc-border);
+	background: radial-gradient(90% 120% at 50% -45%, var(--cc-glow), transparent 70%), var(--cc-glass-fill);
+	box-shadow: inset 0 1px 0 var(--cc-highlight);
+	-webkit-backdrop-filter: var(--cc-glass-blur);
+	backdrop-filter: var(--cc-glass-blur);
+}
+
+@supports (mask-composite: exclude) {
+	.cc-glass {
+		border-color: transparent;
+	}
+
+	.cc-glass::before {
+		content: "";
+		position: absolute;
+		inset: -1px;
+		padding: 1px;
+		border-radius: inherit;
+		background: var(--cc-frame);
+		mask:
+			linear-gradient(#000 0 0) content-box,
+			linear-gradient(#000 0 0);
+		mask-composite: exclude;
+		pointer-events: none;
+	}
+}
+
+@media (forced-colors: active) {
+	.cc-glass {
+		border-color: CanvasText;
+		background: Canvas;
+	}
+
+	.cc-glass::before {
+		content: none;
+	}
+}
+
+/* Progress card at the top: a glowing round tile with the percentage, then title, page chip and bar */
+.cc-progress-card {
 	display: grid;
 	grid-template-columns: auto 1fr auto;
 	align-items: center;
 	gap: var(--cc-space-3);
-	padding: var(--cc-space-2);
-	border: 1px solid var(--cc-border);
-	border-radius: var(--cc-radius-lg);
-	background-color: var(--cc-surface);
+	padding: var(--cc-space-3);
+	border-radius: var(--cc-radius-xl);
 	color: var(--cc-text);
 	text-decoration: none;
 }
@@ -255,18 +301,20 @@ h5,
 	display: grid;
 	place-content: center;
 	justify-items: center;
-	width: 3.5rem;
-	height: 3.5rem;
+	width: 3rem;
+	height: 3rem;
 	border: 1px solid var(--cc-accent-ui);
-	border-radius: var(--cc-radius-md);
+	border-radius: 50%;
 	background: radial-gradient(120% 90% at 30% 0%, var(--cc-glow), transparent 70%), var(--cc-accent-soft);
-	box-shadow: inset 0 1px 0 var(--cc-highlight);
+	box-shadow:
+		inset 0 1px 0 var(--cc-highlight),
+		0 0 1rem var(--cc-glow);
 }
 
 .cc-progress-tile-value {
 	color: var(--cc-heading);
 	font-family: var(--cc-font-heading);
-	font-size: var(--sl-text-lg);
+	font-size: var(--sl-text-sm);
 	font-weight: 600;
 	line-height: 1;
 }
@@ -274,37 +322,38 @@ h5,
 .cc-progress-tile-label {
 	margin-top: 0.125rem;
 	color: var(--cc-text-muted);
-	font-size: 0.625rem;
+	font-size: 0.5625rem;
 	letter-spacing: 0.04em;
+	line-height: 1;
 }
 
 .cc-progress-card-text {
 	display: grid;
-	gap: 0.25rem;
+	gap: var(--cc-space-1);
 	min-width: 0;
 }
 
 .cc-progress-card-title {
 	color: var(--cc-heading);
 	font-family: var(--cc-font-heading);
-	font-size: 0.9375rem;
+	font-size: var(--sl-text-sm);
 	font-weight: 600;
 	line-height: 1.2;
 }
 
 .cc-progress-card-chip {
 	justify-self: start;
-	padding: 0.0625rem var(--cc-space-2);
+	padding: 0 var(--cc-space-2);
 	border: 1px solid var(--cc-border-strong);
 	border-radius: var(--cc-radius-pill);
 	color: var(--cc-text-muted);
-	font-size: var(--sl-text-2xs);
+	font-size: 0.6875rem;
 	font-variant-numeric: tabular-nums;
+	line-height: 1.5;
 }
 
 .cc-progress-card-bar {
 	height: 3px;
-	margin-top: 0.125rem;
 	border-radius: var(--cc-radius-pill);
 	background-color: var(--cc-border);
 	overflow: hidden;
@@ -318,13 +367,13 @@ h5,
 }
 
 .cc-progress-card-arrow {
-	margin-inline-end: var(--cc-space-2);
+	margin-inline-end: var(--cc-space-1);
 	color: var(--cc-text-muted);
 	opacity: 0;
 }
 
 .cc-progress-card[aria-current="page"] {
-	border-color: var(--cc-accent-ui);
+	--cc-frame: var(--cc-frame-active);
 }
 
 .cc-progress-card[aria-current="page"] .cc-progress-card-arrow,
@@ -340,8 +389,10 @@ h5,
 	}
 
 	.cc-progress-card:hover {
-		border-color: var(--cc-accent-ui);
-		box-shadow: 0 0 1.25rem var(--cc-glow);
+		--cc-frame: var(--cc-frame-active);
+		box-shadow:
+			inset 0 1px 0 var(--cc-highlight),
+			0 0 1.25rem var(--cc-glow);
 	}
 
 	.cc-progress-card:hover .cc-progress-card-arrow {
@@ -385,24 +436,17 @@ h5,
 }
 
 /*
- * Capsule: a pill-shaped navigation link with a small label over a title and an arrow in a circle.
- * Used by "Szybki start" and the previous/next links (spec: design pass 3).
- * The frame is a gradient: a padding-box fill over a border-box gradient, since border-image ignores radius.
+ * Capsule: a pill-shaped glass link (.cc-glass) with a small label over a title and an arrow in a circle.
+ * Used by "Szybki start" and the previous/next links.
  */
 .cc-capsule {
-	position: relative;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	gap: var(--cc-space-4);
 	min-height: 4.5rem;
 	padding: var(--cc-space-3) var(--cc-space-3) var(--cc-space-3) var(--cc-space-6);
-	border: 1px solid transparent;
 	border-radius: var(--cc-radius-pill);
-	background:
-		radial-gradient(90% 120% at 50% -45%, var(--cc-glow), transparent 70%) padding-box,
-		linear-gradient(var(--cc-bg), var(--cc-bg)) padding-box,
-		linear-gradient(to bottom, var(--cc-accent-ui), var(--cc-border) 55%) border-box;
 	color: var(--cc-heading);
 	text-decoration: none;
 }
@@ -445,10 +489,7 @@ h5,
 
 @media (hover: hover) {
 	.cc-capsule:hover {
-		background:
-			radial-gradient(90% 140% at 50% -40%, var(--cc-glow), transparent 75%) padding-box,
-			linear-gradient(var(--cc-bg), var(--cc-bg)) padding-box,
-			linear-gradient(to bottom, var(--cc-accent-text), var(--cc-accent-ui) 60%) border-box;
+		--cc-frame: var(--cc-frame-active);
 	}
 
 	.cc-capsule:hover .cc-capsule-arrow {
@@ -473,12 +514,5 @@ h5,
 @media (prefers-reduced-motion: reduce) {
 	.cc-capsule:active {
 		transform: none;
-	}
-}
-
-@media (forced-colors: active) {
-	.cc-capsule {
-		border-color: CanvasText;
-		background: Canvas;
 	}
 }

@@ -12,7 +12,7 @@ const done = percent(progress.verified, progress.pages);
 
 {/* Starlight already wraps the sidebar in <nav>. The card replaces the roadmap link (ADR 0003, 2026-11-24). */}
 <a
-	class="cc-progress-card"
+	class="cc-progress-card cc-glass"
 	href={withBase(base, 'roadmap/')}
 	aria-current={id === 'roadmap' ? 'page' : undefined}
 	aria-label={`Ścieżka nauki: zweryfikowano ${progress.verified} z ${progress.pages} stron (${done}%)`}
