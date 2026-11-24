@@ -32,10 +32,51 @@
 	inset-inline-end: -2rem;
 	width: min(45%, 26rem);
 	height: auto;
-	stroke: var(--cc-accent-ui);
-	stroke-width: 1;
-	opacity: 0.55;
+	opacity: 0.85;
 	pointer-events: none;
+}
+
+/* Beam gradient stops: hot accent at the meeting point, the UI accent mid-way, gone at the tips */
+.cc-burst-hot {
+	stop-color: var(--cc-accent-text);
+}
+
+.cc-burst-mid {
+	stop-color: var(--cc-accent-ui);
+	stop-opacity: 0.7;
+}
+
+.cc-burst-cold {
+	stop-color: var(--cc-accent-ui);
+	stop-opacity: 0;
+}
+
+.cc-burst-glow {
+	opacity: 0.6;
+}
+
+.cc-burst-core {
+	opacity: 0.55;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.cc-burst-glow,
+	.cc-burst-core {
+		animation: cc-burst-breathe 6s ease-in-out infinite;
+	}
+}
+
+@keyframes cc-burst-breathe {
+	50% {
+		opacity: 0.3;
+	}
+}
+
+/* Higher specificity than the 48rem rule that shows the burst */
+@media (forced-colors: active) {
+	.cc-hero .cc-hero-burst {
+		display: none;
+	}
 }
 
 .cc-hero-copy {

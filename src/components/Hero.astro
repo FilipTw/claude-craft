@@ -1,20 +1,40 @@
 ---
 import { LinkButton } from '@astrojs/starlight/components';
+import { RAY_ANGLES, rayPolygon } from '../lib/hero.mjs';
 
 const { data } = Astro.locals.starlightRoute.entry;
 const { title = data.title, tagline, actions = [] } = data.hero ?? {};
 
-// Rays of the decorative starburst: angles in degrees, fanning out from the bottom-right corner.
-const rays = Array.from({ length: 13 }, (_, index) => 180 + index * 7.5);
+// Decorative starburst: tapered beams fanning out from the bottom-right corner of a 400 × 300 box.
+const origin = { x: 400, y: 300 };
+const beams = RAY_ANGLES.map((angle) => rayPolygon(origin, angle, 420, 5, 0.5));
 ---
 
 <section class="cc-hero" aria-labelledby="_top">
 	<div class="cc-hero-grid" aria-hidden="true"></div>
 	<svg class="cc-hero-burst" viewBox="0 0 400 300" aria-hidden="true" focusable="false">
-		{rays.map((angle) => {
-			const radians = (angle * Math.PI) / 180;
-			return <line x1="400" y1="300" x2={400 + Math.cos(radians) * 420} y2={300 + Math.sin(radians) * 420} />;
-		})}
+		<defs>
+			{/* Bright where the beams meet, fading out towards their tips; stop colors come from CSS tokens */}
+			<radialGradient id="cc-burst-fade" gradientUnits="userSpaceOnUse" cx={origin.x} cy={origin.y} r="420">
+				<stop offset="0" class="cc-burst-hot" />
+				<stop offset="0.45" class="cc-burst-mid" />
+				<stop offset="1" class="cc-burst-cold" />
+			</radialGradient>
+			<radialGradient id="cc-burst-core" gradientUnits="userSpaceOnUse" cx={origin.x} cy={origin.y} r="60">
+				<stop offset="0" class="cc-burst-hot" />
+				<stop offset="1" class="cc-burst-cold" />
+			</radialGradient>
+			<filter id="cc-burst-blur" x="-20%" y="-20%" width="140%" height="140%">
+				<feGaussianBlur stdDeviation="4" />
+			</filter>
+			<g id="cc-burst-beams" fill="url(#cc-burst-fade)">
+				{beams.map((points) => <polygon points={points} />)}
+			</g>
+		</defs>
+		{/* The beams twice: blurred underneath as a glow, sharp on top */}
+		<use href="#cc-burst-beams" class="cc-burst-glow" filter="url(#cc-burst-blur)" />
+		<use href="#cc-burst-beams" />
+		<circle class="cc-burst-core" cx={origin.x} cy={origin.y} r="60" fill="url(#cc-burst-core)" />
 	</svg>
 	<div class="cc-hero-copy">
 		<h1 id="_top" data-page-title class="cc-hero-title" set:html={title} />
