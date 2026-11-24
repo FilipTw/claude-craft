@@ -100,3 +100,22 @@ Zmierzone 2026-11-24 na `astro preview`:
 - Brak poziomego przewijania pięciu stron przy 320, 375, 667, 768, 1024 i 1440 px.
 - Stryker: `home.mjs`, `search.mjs` i `quick-links.mjs` po 100%, całość 98,17%.
 - Czytnika ekranu nie testowano.
+
+## Zmiany 2026-11-24, czwarta runda
+
+Autor wskazał cztery miejsca: nagłówek sekcji zlewał się z hero, a konturowy numer psuł kształt „1” w foncie Outfit. Karta postępu i spis treści były zbyt kwadratowe i szare. Paginacja była za duża, a pełna fioletowa pigułka nie pasowała do kapsuł.
+
+Te reguły zastępują reguły trzeciej rundy:
+
+- **Nagłówek sekcji:** jedna kolumna. Nad tytułem stoi rząd z numerem w kolorze akcentu, krótką linią i etykietą. Numer to zwykły tekst z `aria-hidden`, bo `--cc-accent-text` ma kontrast 5,1:1 i nie potrzebuje triku z `data-index`. Znika licznik „/ 03” i prop `total`. Pierwszy nagłówek ma większy odstęp od hero.
+- **Panel glass:** klasa `.cc-glass` łączy półprzezroczyste tło (`--cc-glass-fill`), rozmycie tła (`--cc-glass-blur`), górny highlight i ramkę z gradientem. Ramkę rysuje `::before` wycięte maską (`mask-composite: exclude`), bo dwie warstwy tła z `background-clip` wymagały nieprzezroczystego wypełnienia. Komponent zmienia tylko `--cc-frame`, na przykład na `--cc-frame-active` przy hover. Klasę mają karta postępu, kapsuły, pigułka pozycji i spis treści. Bez wsparcia maski zostaje zwykła ramka 1px, a w `forced-colors` ramka `CanvasText`.
+- **Hierarchia promieni:** panele glass mają `--cc-radius-xl` (28px). Pigułka zostaje dla akcji i kapsuł, 8px dla wierszy sidebara.
+- **Karta postępu:** okrągły kafel 48px zamiast kwadratu 56px, mniejszy tytuł i chip, większy wewnętrzny odstęp.
+- **Paginacja:** kapsuły mają 52px wysokości zamiast 72px, strzałkę 36px i tytuł w rozmiarze `sm`. Pigułka pozycji to ten sam panel glass co kapsuły, z numerem w kolorze akcentu i tej samej wysokości. Kapsuły „Szybki start” zostają w pełnym rozmiarze.
+
+Zmierzone 2026-11-24:
+
+- `npm run check` i `npm run build` przechodzą.
+- Stryker: `home.mjs`, `search.mjs` i `quick-links.mjs` po 100%, całość 98,17%.
+- Wygląd sprawdzony na zrzutach z headless Chrome przy 390 i 1440 px w ciemnym motywie. Jasnego motywu nie sprawdzono na zrzucie. Kontrast tekstu na `--cc-glass-fill` jest tam co najmniej taki jak na `--cc-surface`, bo wypełnienie jest jaśniejsze od niego.
+- Lighthouse, axe i pa11y nie były uruchamiane w tej rundzie.

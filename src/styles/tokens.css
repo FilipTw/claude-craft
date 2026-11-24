@@ -29,7 +29,7 @@
 	/* Top-edge highlight inside glowing tiles and pills */
 	--cc-highlight: rgb(255 255 255 / 0.08);
 	--cc-shadow-dialog: 0 1.5rem 4rem rgb(0 0 0 / 0.55);
-	/* Glass panels: a see-through fill over --cc-bg. Text on it stays on a near-#1a1822 tone, so contrast matches --cc-surface. */
+	/* Glass panels: over --cc-bg the fill composes to about #17151e, close to --cc-surface, so text contrast matches it (muted text ~7:1) */
 	--cc-glass-fill: rgb(32 29 42 / 0.55);
 	--cc-glass-blur: blur(14px) saturate(150%);
 
@@ -82,6 +82,7 @@
 	--cc-backdrop: rgb(20 18 26 / 0.45);
 	--cc-highlight: rgb(255 255 255 / 0.7);
 	--cc-shadow-dialog: 0 1.5rem 4rem rgb(20 18 26 / 0.18);
+	/* Over white this composes lighter than --cc-surface, so text contrast only rises */
 	--cc-glass-fill: rgb(246 245 249 / 0.7);
 }
 
